@@ -1,0 +1,53 @@
+How to make an MPlayer release
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+preparations:
+- Announce the intent to create a release branch on mailing lists and IRC.
+- Ask translators to get their languages synchronized.
+- Update the Changelog.
+- Identify regressions or other serious issues, fix or revert (on the branch)
+  as needed so the release is of good quality.
+- Find a codename for the release
+- update osdep/mplayer.rc if necessary
+- possibly bump etc/codecs.conf "release" line
+
+create the release tree:
+- tag Subversion with release name
+- update release.sh script with version number
+***the following steps are done automatically by release.sh script***
+- checkout the mplayer src tree
+- Add a VERSION file with the release version to the root of the source tree.
+- check out FFmpeg subdirs
+- remove obsolete DOCS translations, help files
+
+- build the HTML docs from XML sources, then clean up
+
+release the tree:
+    cd ..
+    mv main MPlayer-0.90rc5
+    tar -cf MPlayer-0.90rc5.tar MPlayer-0.90rc5
+    bzip2 -9 MPlayer-0.90rc5.tar
+***end of part done by release.sh**
+
+test it (download to your local machine, extract, compile, run)
+ - compilers: gcc 4.x, gcc 3.x, gcc 2.95, MinGW, Cygwin
+ - architectures: PPC, AMD64, x86 with MMX[2], SSE[2], 3DNow
+ - OS: Linux, BSD, Windows, Mac OS X
+
+copy to FTP:
+    cp MPlayer-0.90rc5.tar.bz2 /home/ftp/MPlayer/releases/
+    cp Changelog-0.90rc5 and update Changelog symlink
+    md5sum MPlayer-0.90rc5.tar.bz2 > MPlayer-0.90rc5.tar.bz2.md5
+
+Write a news entry for the release, update the links in dload.html. Test it,
+sometimes links are broken. Do not forget the translations.
+
+Send the release notes as a mail to the mplayer-announce mailing list.
+
+Add the new release version to bugzilla page.
+
+Update release version in #mplayer and #mplayerdev topics.
+
+Update project page on Freshmeat
+
+Done.

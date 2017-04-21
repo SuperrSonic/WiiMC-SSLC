@@ -1,0 +1,11 @@
+# WiiMC-SS features:
+- 704(square) screen width.
+- Attractive pointer.
+- Enabled ADX decoding.
+- Added ".dash" extension, using this extension will skip the deblock filter.
+- Made ".webm" extension always disable framedropping.
+- Removed Deflicker filter.
+- Removed picture viewer to increase memory.
+- Removed NTFS and EXT libs to increase memory.
+- Disabled some minor codecs to increase memory.
+- Default to gray theme.
