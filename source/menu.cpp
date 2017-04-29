@@ -610,7 +610,7 @@ static void *GuiThread (void *arg)
 
 		Menu_Render();
 
-		if(userInput[0].wpad->data_present > 0 || ExitRequested)
+		if(userInput[0].wpad->data_present > 0 || userInput[0].pad.btns_d > 0 || ExitRequested)
 		{
 			if(ssTimer != 0)
 			{
