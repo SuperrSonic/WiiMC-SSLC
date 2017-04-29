@@ -588,7 +588,7 @@ static void *GuiThread (void *arg)
 
 		if(mainWindow->GetState() != STATE_DISABLED)
 		{
-			if(userInput[0].wpad->btns_d & (WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X))
+			if(userInput[0].wpad->btns_d & (WPAD_BUTTON_1 | WPAD_CLASSIC_BUTTON_X) || userInput[0].pad.btns_d & PAD_TRIGGER_R)
 			{
 				int newMenu = menuCurrent + 1;
 				if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
@@ -597,7 +597,7 @@ static void *GuiThread (void *arg)
 					newMenu = MENU_BROWSE_VIDEOS;
 				ChangeMenu(newMenu);
 			}
-			else if(userInput[0].wpad->btns_d & (WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y))
+			else if(userInput[0].wpad->btns_d & (WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y) || userInput[0].pad.btns_d & PAD_TRIGGER_L)
 			{
 				int newMenu = menuCurrent - 1;
 				if(newMenu == MENU_DVD && WiiSettings.dvdDisabled)
@@ -629,7 +629,7 @@ static void *GuiThread (void *arg)
 
 		CheckSleepTimer();
 
-		if(userInput[0].wpad->btns_d & (WPAD_BUTTON_HOME | WPAD_CLASSIC_BUTTON_HOME))
+		if(userInput[0].wpad->btns_d & (WPAD_BUTTON_HOME | WPAD_CLASSIC_BUTTON_HOME) || userInput[0].pad.btns_d & PAD_BUTTON_START)
 			ExitRequested = true; // exit program
 
 		if(ExitRequested)
@@ -2077,10 +2077,10 @@ static void MenuBrowse(int menu)
 	browser.menu = menu;
 
 	GuiTrigger trigPlus;
-	trigPlus.SetButtonOnlyTrigger(-1, WPAD_BUTTON_PLUS | WPAD_CLASSIC_BUTTON_PLUS, PAD_BUTTON_X);
+	trigPlus.SetButtonOnlyTrigger(-1, WPAD_BUTTON_PLUS | WPAD_CLASSIC_BUTTON_PLUS, PAD_BUTTON_Y);
 
 	GuiTrigger trigMinus;
-	trigMinus.SetButtonOnlyTrigger(-1, WPAD_BUTTON_MINUS | WPAD_CLASSIC_BUTTON_MINUS, PAD_BUTTON_Y);
+	trigMinus.SetButtonOnlyTrigger(-1, WPAD_BUTTON_MINUS | WPAD_CLASSIC_BUTTON_MINUS, PAD_BUTTON_X);
 
 	GuiButton upOneLevelBtn(0,0);
 	upOneLevelBtn.SetTrigger(trigB);
@@ -5412,10 +5412,10 @@ static void SetupGui()
 	trigDown->SetButtonOnlyTrigger(-1, WPAD_BUTTON_DOWN | WPAD_CLASSIC_BUTTON_DOWN, PAD_BUTTON_DOWN);
 
 	trigPlus = new GuiTrigger;
-	trigPlus->SetButtonOnlyTrigger(-1, WPAD_BUTTON_PLUS | WPAD_CLASSIC_BUTTON_PLUS, PAD_BUTTON_X);
+	trigPlus->SetButtonOnlyTrigger(-1, WPAD_BUTTON_PLUS | WPAD_CLASSIC_BUTTON_PLUS, PAD_BUTTON_Y);
 
 	trigMinus = new GuiTrigger;
-	trigMinus->SetButtonOnlyTrigger(-1, WPAD_BUTTON_MINUS | WPAD_CLASSIC_BUTTON_MINUS, PAD_BUTTON_Y);
+	trigMinus->SetButtonOnlyTrigger(-1, WPAD_BUTTON_MINUS | WPAD_CLASSIC_BUTTON_MINUS, PAD_BUTTON_X);
 
 	// images
 	throbber = new GuiImageData(throbber_png);

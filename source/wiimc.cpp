@@ -697,7 +697,7 @@ int main(int argc, char *argv[])
 	__exception_setreload(8);
 
 	DI_Init();
-	PAD_Init();
+	//PAD_Init();
 	WPAD_Init();
 	USBStorage_Initialize(); // to set aside MEM2 area
 

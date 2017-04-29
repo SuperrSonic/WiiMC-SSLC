@@ -51,13 +51,10 @@ GuiTrigger userInput[4];
 void UpdatePads()
 {
 	WPAD_ReadPending(0, NULL); // only wiimote 1
-	//PAD_ScanPads();
-	//u16 held = PAD_ButtonsHeld(0);
+	PAD_ScanPads();
 
-	/*if (held & PAD_TRIGGER_Z) {
-		ExitRequested = true;
-		ActivateExitThread();
-	}*/
+	userInput[0].pad.btns_d = PAD_ButtonsDown(0);
+	userInput[0].pad.btns_h = PAD_ButtonsHeld(0);
 }
 
 /****************************************************************************
@@ -67,6 +64,8 @@ void UpdatePads()
  ***************************************************************************/
 void SetupPads()
 {
+	PAD_Init();
+
 	WPAD_SetIdleTimeout(60);
 
 	// read wiimote accelerometer and IR data
@@ -161,14 +160,17 @@ void MPlayerInput()
 	if(userInput[0].wpad->ir.valid)
 		ir = true;
 
-	if(userInput[0].wpad->btns_d & WPAD_BUTTON_1)
+	u16 down = PAD_ButtonsDown(0);
+	u16 held = PAD_ButtonsHeld(0);
+
+	if(userInput[0].wpad->btns_d & WPAD_BUTTON_1 || down & PAD_BUTTON_B)
 		osdLevel ^= 1;
-	else if(ExitRequested || userInput[0].wpad->btns_d & WPAD_BUTTON_HOME)
+	else if(ExitRequested || userInput[0].wpad->btns_d & WPAD_BUTTON_HOME || down & PAD_BUTTON_START)
 		wiiGotoGui();
 
 	if(!inDVDMenu)
 	{
-		if(userInput[0].wpad->btns_d & WPAD_BUTTON_A)
+		if(userInput[0].wpad->btns_d & WPAD_BUTTON_A || down & PAD_BUTTON_A)
 		{
 			// Hack to allow people to unpause while the OSD GUI is visible by
 			// pointing above the button bar and pressing A. We also need to be outside
@@ -187,7 +189,7 @@ void MPlayerInput()
 				wiiPause();
 			}
 		}
-		else if(userInput[0].wpad->btns_h & WPAD_BUTTON_PLUS)
+		else if(userInput[0].wpad->btns_h & WPAD_BUTTON_PLUS || held & PAD_BUTTON_Y)
 		{
 			volnow = gettime();
 	
@@ -201,7 +203,7 @@ void MPlayerInput()
 				ShowVideoVolumeLevelBar();
 			}
 		}
-		else if(userInput[0].wpad->btns_h & WPAD_BUTTON_MINUS)
+		else if(userInput[0].wpad->btns_h & WPAD_BUTTON_MINUS || held & PAD_BUTTON_X)
 		{
 			volnow = gettime();
 	
@@ -215,12 +217,12 @@ void MPlayerInput()
 				ShowVideoVolumeLevelBar();
 			}
 		}
-		else if (userInput[0].wpad->btns_h & WPAD_BUTTON_B)
+		else if (userInput[0].wpad->btns_h & WPAD_BUTTON_B || held & PAD_TRIGGER_Z)
 		{
 			unsigned int delay = (resizeinitial == 1) ? RESIZE_INITIAL_DELAY : RESIZE_DELAY;
 			int resizenow = gettime();
 
-			if(userInput[0].wpad->btns_h & WPAD_BUTTON_RIGHT)
+			if(userInput[0].wpad->btns_h & WPAD_BUTTON_RIGHT || held & PAD_BUTTON_RIGHT)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -229,7 +231,7 @@ void MPlayerInput()
 					MPlayerResize(+0.003F, 0.00F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_LEFT)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_LEFT || held & PAD_BUTTON_LEFT)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -238,7 +240,7 @@ void MPlayerInput()
 					MPlayerResize(-0.003F, 0.00F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_UP)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_UP || held & PAD_BUTTON_UP)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -247,7 +249,7 @@ void MPlayerInput()
 					MPlayerResize(0.00F, +0.003F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_DOWN)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_DOWN || held & PAD_BUTTON_DOWN)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -263,25 +265,25 @@ void MPlayerInput()
 				resizeinitial = 0;
 			}
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_RIGHT)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_RIGHT || down & PAD_BUTTON_RIGHT)
 		{
 			wiiFastForward();
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_LEFT)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_LEFT || down & PAD_BUTTON_LEFT)
 		{
 			wiiRewind();
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_UP)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_UP || down & PAD_BUTTON_UP)
 		{
 			if(!wiiIsPaused())
 				wiiSetProperty(MP_CMD_SUB_SELECT, 0);
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_DOWN)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_DOWN || down & PAD_BUTTON_DOWN)
 		{
 			if(!wiiIsPaused())
 				wiiSetProperty(MP_CMD_SWITCH_AUDIO, 0);
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_2)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_2 || down & PAD_TRIGGER_L)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_MENU);
 		}
@@ -291,19 +293,19 @@ void MPlayerInput()
 		if(userInput[0].wpad->ir.valid)
 			wiiUpdatePointer((int)userInput[0].wpad->ir.x, (int)userInput[0].wpad->ir.y);
 
-		if(userInput[0].wpad->btns_d & WPAD_BUTTON_A)
+		if(userInput[0].wpad->btns_d & WPAD_BUTTON_A || down & PAD_BUTTON_A)
 		{
 			if(userInput[0].wpad->ir.valid)
 				wiiDVDNav(MP_CMD_DVDNAV_MOUSECLICK);
 			else
 				wiiDVDNav(MP_CMD_DVDNAV_SELECT);
 		}
-		else if (userInput[0].wpad->btns_h & WPAD_BUTTON_B)
+		else if (userInput[0].wpad->btns_h & WPAD_BUTTON_B || held & PAD_TRIGGER_Z)
 		{
 			unsigned int delay = (resizeinitial == 1) ? RESIZE_INITIAL_DELAY : RESIZE_DELAY;
 			int resizenow = gettime();
 
-			if(userInput[0].wpad->btns_h & WPAD_BUTTON_RIGHT)
+			if(userInput[0].wpad->btns_h & WPAD_BUTTON_RIGHT || held & PAD_BUTTON_RIGHT)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -312,7 +314,7 @@ void MPlayerInput()
 					MPlayerResize(+0.003F, 0.00F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_LEFT)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_LEFT || held & PAD_BUTTON_LEFT)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -321,7 +323,7 @@ void MPlayerInput()
 					MPlayerResize(-0.003F, 0.00F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_UP)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_UP || held & PAD_BUTTON_UP)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -330,7 +332,7 @@ void MPlayerInput()
 					MPlayerResize(0.00F, +0.003F);
 				}
 			}
-			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_DOWN)
+			else if(userInput[0].wpad->btns_h & WPAD_BUTTON_DOWN || held & PAD_BUTTON_DOWN)
 			{
 				if(diff_usec(resizeprev, resizenow) > delay)
 				{
@@ -346,19 +348,19 @@ void MPlayerInput()
 				resizeinitial = 0;
 			}
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_UP)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_UP || down & PAD_BUTTON_UP)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_UP);
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_DOWN)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_DOWN || down & PAD_BUTTON_DOWN)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_DOWN);
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_RIGHT)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_RIGHT || down & PAD_BUTTON_RIGHT)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_RIGHT);
 		}
-		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_LEFT)
+		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_LEFT || down & PAD_BUTTON_LEFT)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_LEFT);
 		}

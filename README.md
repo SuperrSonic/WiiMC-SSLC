@@ -1,6 +1,7 @@
 # WiiMC-SS features:
 - 704(square) screen width.
 - Attractive pointer.
+- GameCube controller support.
 - Enabled ADX decoding.
 - Added ".dash" extension, using this extension will skip the deblock filter.
 - Made ".webm" extension always disable framedropping.
