@@ -610,7 +610,17 @@ static void *GuiThread (void *arg)
 
 		Menu_Render();
 
-		if(userInput[0].wpad->data_present > 0 || userInput[0].pad.btns_d > 0 || ExitRequested)
+		if(userInput[0].wpad->data_present > 0 || userInput[0].pad.btns_d == PAD_BUTTON_A || //OK, I know this looks bad...
+											userInput[0].pad.btns_d == PAD_BUTTON_B ||
+											userInput[0].pad.btns_d == PAD_BUTTON_Y ||
+											userInput[0].pad.btns_d == PAD_BUTTON_X ||
+											userInput[0].pad.btns_d == PAD_BUTTON_UP ||
+											userInput[0].pad.btns_d == PAD_BUTTON_DOWN ||
+											userInput[0].pad.btns_d == PAD_BUTTON_LEFT ||
+											userInput[0].pad.btns_d == PAD_BUTTON_RIGHT ||
+											userInput[0].pad.btns_d == PAD_TRIGGER_Z ||
+											userInput[0].pad.btns_d == PAD_TRIGGER_R ||
+											userInput[0].pad.btns_d == PAD_TRIGGER_L || ExitRequested)
 		{
 			if(ssTimer != 0)
 			{
