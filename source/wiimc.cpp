@@ -375,6 +375,20 @@ extern "C" bool FindNextFile(bool load)
 			browserVideos.selIndex = browserVideos.selIndex->next;
 
 			char *start = strrchr(loadedFile,'/');
+			char ext[7];
+			GetExt(loadedFile, ext);
+
+			if(strcasecmp(ext, "dash") == 0)
+			{
+				wiiDash();
+			} else {
+				wiiElse();
+			}
+
+			if(strcasecmp(ext, "webm") == 0) // always disable framedropping for VP8
+				wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_DISABLED);
+			else
+				wiiSetProperty(MP_CMD_FRAMEDROPPING, WiiSettings.frameDropping);
 
 			// use part after last / for display name, if it's not already the end of the string
 			if(start != NULL && start[1] != 0)
