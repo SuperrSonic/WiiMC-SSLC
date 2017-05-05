@@ -41,7 +41,7 @@ static void pred4x4_tm_vp8_paired(uint8_t *src, const uint8_t *topright, int str
 	}
 }
 
-static void pred16x16_plane_paired(uint8_t *src, int stride)
+/*static void pred16x16_plane_paired(uint8_t *src, int stride)
 {
 	const float scale = 0.03125;
 	vector float fHV, fH, fV, fA, fB;
@@ -99,7 +99,7 @@ static void pred16x16_plane_paired(uint8_t *src, int stride)
 		psq_st(paired_add(fB, add[0]),14,src,0,4);
 		fA = paired_add(fA, fV);
 	}
-}
+}*/
 
 static void pred16x16_tm_vp8_paired(uint8_t *src, int stride)
 {
@@ -216,7 +216,7 @@ void ff_h264_pred_init_ppc(H264PredContext *h, int codec_id, const int bit_depth
 		h->pred16x16[PLANE_PRED8x8] = pred16x16_tm_vp8_paired;
 	} else {
 		h->pred8x8[PLANE_PRED8x8] = pred8x8_plane_paired;
-		if (codec_id == CODEC_ID_H264)
-			h->pred16x16[PLANE_PRED8x8] = pred16x16_plane_paired;
+		//if (codec_id == CODEC_ID_H264)
+			//h->pred16x16[PLANE_PRED8x8] = pred16x16_plane_paired;
 	}
 }
