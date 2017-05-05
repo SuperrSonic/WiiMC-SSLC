@@ -258,17 +258,11 @@ InitVideo ()
 		screenwidth = 768;
 		vmode->viWidth = 704;
         vmode->fbWidth = 640;
-        vmode->efbHeight = 480;
-        vmode->xfbHeight = 480;
-        vmode->viHeight = 480;
 	}
 	else
 	{
 		vmode->viWidth = 704;
         vmode->fbWidth = 640;
-        vmode->efbHeight = 480;
-        vmode->xfbHeight = 480;
-        vmode->viHeight = 480;
 	}
 
 	if (pal)
