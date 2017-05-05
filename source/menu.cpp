@@ -620,7 +620,11 @@ static void *GuiThread (void *arg)
 											userInput[0].pad.btns_d == PAD_BUTTON_RIGHT ||
 											userInput[0].pad.btns_d == PAD_TRIGGER_Z ||
 											userInput[0].pad.btns_d == PAD_TRIGGER_R ||
-											userInput[0].pad.btns_d == PAD_TRIGGER_L || ExitRequested)
+											userInput[0].pad.btns_d == PAD_TRIGGER_L ||
+											userInput[0].pad.stickX < -36 ||
+											userInput[0].pad.stickY < -36 ||
+											userInput[0].pad.stickX > 36 ||
+											userInput[0].pad.stickY > 36 || ExitRequested)
 		{
 			if(ssTimer != 0)
 			{

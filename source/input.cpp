@@ -55,6 +55,8 @@ void UpdatePads()
 
 	userInput[0].pad.btns_d = PAD_ButtonsDown(0);
 	userInput[0].pad.btns_h = PAD_ButtonsHeld(0);
+	userInput[0].pad.stickX = PAD_StickX(0);
+	userInput[0].pad.stickY = PAD_StickY(0);
 }
 
 /****************************************************************************
