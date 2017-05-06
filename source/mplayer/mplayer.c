@@ -5208,6 +5208,11 @@ void wiiSetCacheFill(int fill)
 		stream_cache_min_percent = fill;
 }
 
+void wiiSetVolNorm1()
+{
+	m_config_set_option(mconfig,"af","volnorm=1:0.25");
+}
+
 void wiiSetOnlineCacheFill(int fill)
 {
 	online_stream_cache_min_percent = fill;

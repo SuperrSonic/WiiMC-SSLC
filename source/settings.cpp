@@ -353,6 +353,8 @@ prepareSettingsData ()
 	createXMLSetting("skipBackward", "Skip backward", toStr(WiiSettings.skipBackward));
 	createXMLSetting("skipForward", "Skip forward", toStr(WiiSettings.skipForward));
 	createXMLSetting("videosFolder", "Videos folder", WiiSettings.videosFolder);
+	createXMLSetting("videoFull", "Videos in Fullscreen", toStr(WiiSettings.videoFull));
+	createXMLSetting("audioNorm", "Volume Normalizer", toStr(WiiSettings.audioNorm));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
@@ -631,6 +633,8 @@ void DefaultSettings ()
 	WiiSettings.skipBackward = 10;
 	WiiSettings.skipForward = 30;
 	WiiSettings.videosFolder[0] = 0;
+	WiiSettings.videoFull = 0;
+	WiiSettings.audioNorm = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.musicFolder[0] = 0;
@@ -711,6 +715,10 @@ static void FixInvalidSettings()
 		WiiSettings.aspectRatio = -2;
 	if(WiiSettings.cacheFill < 10 || WiiSettings.cacheFill > 100)
 		WiiSettings.cacheFill = 30;
+	if(WiiSettings.videoFull < 0 || WiiSettings.videoFull > 1)
+		WiiSettings.videoFull = 0;
+	if(WiiSettings.audioNorm < 0 || WiiSettings.audioNorm > 1)
+		WiiSettings.audioNorm = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
@@ -1052,6 +1060,8 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.skipBackward, "skipBackward");
 				loadXMLSetting(&WiiSettings.skipForward, "skipForward");
 				loadXMLSetting(WiiSettings.videosFolder, "videosFolder", sizeof(WiiSettings.videosFolder));
+				loadXMLSetting(&WiiSettings.videoFull, "videoFull");
+				loadXMLSetting(&WiiSettings.audioNorm, "audioNorm");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));

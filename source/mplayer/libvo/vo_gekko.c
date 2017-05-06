@@ -100,6 +100,11 @@ static int inline query_format(uint32_t format)
 	else return VO_FALSE;
 }
 
+void wiiSetFullScreen()
+{
+	mplayerwidth = 854;
+}
+
 void reinit_video()
 {
 	ShutdownGui(); // tell GUI to shut down, MPlayer is ready to take over

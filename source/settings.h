@@ -117,6 +117,9 @@ struct SWiiSettings {
 	int		skipBackward;
 	int		skipForward;
 	char 	videosFolder[MAXPATHLEN];
+	int 	videoDs;
+	int 	videoFull;
+	int 	audioNorm;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
 	char	musicFolder[MAXPATHLEN];

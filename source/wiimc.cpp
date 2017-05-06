@@ -617,6 +617,20 @@ void StopMPlayerFile()
 	controlledbygui = 2; // signal any previous file to end
 }
 
+void wiiSetVolNorm()
+{
+	if (WiiSettings.audioNorm == 1) {
+		wiiSetVolNorm1();
+	}
+}
+
+void wiiSetVidFull()
+{
+	if (WiiSettings.videoFull == 1) {
+		wiiSetFullScreen();
+	}
+}
+
 extern "C" {
 void SetMPlayerSettings()
 {
@@ -636,6 +650,8 @@ void SetMPlayerSettings()
 	wiiSetSeekBackward(WiiSettings.skipBackward);
 	wiiSetSeekForward(WiiSettings.skipForward);
 	wiiSetCacheFill(WiiSettings.cacheFill);
+	wiiSetVolNorm();
+	wiiSetVidFull();
 	wiiSetOnlineCacheFill(WiiSettings.onlineCacheFill);
 
 	if(strncmp(loadedFile, "dvd", 3) == 0) // always use framedropping for DVD
@@ -647,8 +663,6 @@ void SetMPlayerSettings()
 		wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_DISABLED);
 	else
 		wiiSetProperty(MP_CMD_FRAMEDROPPING, WiiSettings.frameDropping);
-
-	//wiiSetProperty(MP_CMD_AF_SWITCH, volnorm);
 
 	if(aspectRatio!=WiiSettings.aspectRatio)
 	{
@@ -698,7 +712,7 @@ int main(int argc, char *argv[])
 	AUDIO_Init(NULL);
 	DSP_Init();
 	AUDIO_StopDMA();
-	InitVideo();
+	InitVideo(argc, argv);
 
 	// Wii Power/Reset buttons
 	__STM_Close();
@@ -711,7 +725,6 @@ int main(int argc, char *argv[])
 	__exception_setreload(8);
 
 	DI_Init();
-	//PAD_Init();
 	WPAD_Init();
 	USBStorage_Initialize(); // to set aside MEM2 area
 

@@ -19,6 +19,7 @@
 #include "menu.h"
 #include "wiimc.h"
 #include "utils/mem2_manager.h"
+#include "settings.h"
 
 
 extern "C" {
@@ -242,11 +243,18 @@ void Draw_VIDEO()
 }
 
 void
-InitVideo ()
+InitVideo (int argc, char *argv[])
 {
 	VIDEO_Init();
-	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
-	//vmode = &TVNtsc240Ds; // 240p
+	if (argc == 2) {
+		vmode = &TVNtsc240Ds;
+	} else if (argc == 3) {
+		vmode = &TVEurgb60Hz240Ds;
+	} else if (argc == 4) {
+		vmode = &TVMpal240Ds;
+	} else {
+		vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
+	}
 
 	bool pal = false;
 

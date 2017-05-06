@@ -12,7 +12,7 @@
 #include "network.h"
 
 #define APPNAME			"WiiMC"
-#define APPVERSION		"1.3.6"
+#define APPVERSION		"1.3.8"
 #define APPFOLDER		"wiimc"
 
 enum {
@@ -81,6 +81,10 @@ void wiiUpdatePointer(int x, int y);
 bool wiiPlayingDVD();
 bool wiiInDVDMenu();
 void wiiSetCacheFill(int fill);
+void wiiSetVolNorm();
+void wiiSetVolNorm1();
+void wiiSetVidFull();
+void wiiSetFullScreen();
 void wiiSetOnlineCacheFill(int fill);
 void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);

@@ -21,7 +21,7 @@ extern "C" {
 #define MAX_WIDTH 1280
 #define MAX_HEIGHT 720
 
-void InitVideo();
+void InitVideo(int argc, char *argv[]);
 void InitVideo2();
 void StopGX();
 void ResetVideo_Menu();
