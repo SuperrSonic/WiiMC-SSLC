@@ -19,7 +19,7 @@
 #include "menu.h"
 #include "wiimc.h"
 #include "utils/mem2_manager.h"
-#include "settings.h"
+//#include "settings.h" //What, this shouldn't be here.
 
 
 extern "C" {

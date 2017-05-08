@@ -621,6 +621,8 @@ void wiiSetVolNorm()
 {
 	if (WiiSettings.audioNorm == 1) {
 		wiiSetVolNorm1();
+	} else if (WiiSettings.audioNorm == 2) {
+		wiiSetVolNorm2();
 	}
 }
 

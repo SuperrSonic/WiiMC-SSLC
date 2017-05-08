@@ -3,6 +3,8 @@
 - Attractive pointer.
 - GameCube controller support.
 - Enabled ADX decoding.
+- Optional 240p mode.
+- Exposed the volume normalizer filter.
 - Added ".dash" extension, using this extension will skip the deblock filter.
 - Made ".webm" extension always disable framedropping.
 - Removed Deflicker filter.

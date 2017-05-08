@@ -717,7 +717,7 @@ static void FixInvalidSettings()
 		WiiSettings.cacheFill = 30;
 	if(WiiSettings.videoFull < 0 || WiiSettings.videoFull > 1)
 		WiiSettings.videoFull = 0;
-	if(WiiSettings.audioNorm < 0 || WiiSettings.audioNorm > 1)
+	if(WiiSettings.audioNorm < 0 || WiiSettings.audioNorm > 2)
 		WiiSettings.audioNorm = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)

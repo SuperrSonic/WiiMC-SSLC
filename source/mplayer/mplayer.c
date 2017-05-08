@@ -5213,6 +5213,11 @@ void wiiSetVolNorm1()
 	m_config_set_option(mconfig,"af","volnorm=1:0.25");
 }
 
+void wiiSetVolNorm2()
+{
+	m_config_set_option(mconfig,"af","volnorm=2:0.25");
+}
+
 void wiiSetOnlineCacheFill(int fill)
 {
 	online_stream_cache_min_percent = fill;

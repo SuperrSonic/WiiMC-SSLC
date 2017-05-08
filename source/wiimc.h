@@ -83,6 +83,7 @@ bool wiiInDVDMenu();
 void wiiSetCacheFill(int fill);
 void wiiSetVolNorm();
 void wiiSetVolNorm1();
+void wiiSetVolNorm2();
 void wiiSetVidFull();
 void wiiSetFullScreen();
 void wiiSetOnlineCacheFill(int fill);
