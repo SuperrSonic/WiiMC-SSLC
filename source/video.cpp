@@ -248,12 +248,19 @@ InitVideo (int argc, char *argv[])
 	VIDEO_Init();
 	if (argc == 2) {
 		vmode = &TVNtsc240Ds;
+		vmode->viWidth = 704;
 	} else if (argc == 3) {
 		vmode = &TVEurgb60Hz240Ds;
+		vmode->viWidth = 704;
 	} else if (argc == 4) {
 		vmode = &TVMpal240Ds;
+		vmode->viWidth = 704;
+	} else if (argc == 5) {
+		vmode = VIDEO_GetPreferredMode(NULL);
+		vmode->viWidth = 720;
 	} else {
 		vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
+		vmode->viWidth = 704;
 	}
 
 	bool pal = false;
@@ -264,12 +271,10 @@ InitVideo (int argc, char *argv[])
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 	{
 		screenwidth = 768;
-		vmode->viWidth = 704;
         vmode->fbWidth = 640;
 	}
 	else
 	{
-		vmode->viWidth = 704;
         vmode->fbWidth = 640;
 	}
 
