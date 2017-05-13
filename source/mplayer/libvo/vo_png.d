@@ -41,8 +41,8 @@ libvo/vo_png.o: libvo/vo_png.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/math.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h \
  ffmpeg/libavutil/attributes.h ffmpeg/libavutil/avconfig.h \
- ffmpeg/libavutil/mem.h ffmpeg/libavutil/error.h \
- ffmpeg/libavutil/avutil.h ffmpeg/libavutil/mathematics.h \
+ ffmpeg/libavutil/mem.h ffmpeg/libavutil/avutil.h \
+ ffmpeg/libavutil/error.h ffmpeg/libavutil/mathematics.h \
  ffmpeg/libavutil/rational.h ffmpeg/libavutil/intfloat_readwrite.h \
  ffmpeg/libavutil/log.h ffmpeg/libavutil/pixfmt.h \
  ffmpeg/libavutil/samplefmt.h mp_core.h mp_osd.h libao2/audio_out.h \
@@ -86,9 +86,7 @@ libvo/vo_png.o: libvo/vo_png.c \
  libvo/video_out.h libvo/video_out_internal.h libmpcodecs/vfcap.h \
  libmpcodecs/mp_image.h libvo/geometry.h sub/osd.h subopt-helper.h \
  ffmpeg/libavcodec/avcodec.h ffmpeg/libavutil/cpu.h \
- ffmpeg/libavutil/dict.h ffmpeg/libavutil/log.h ffmpeg/libavutil/pixfmt.h \
- ffmpeg/libavutil/rational.h ffmpeg/libavutil/audioconvert.h \
- ffmpeg/libavcodec/version.h
+ ffmpeg/libavutil/audioconvert.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
 
@@ -184,9 +182,9 @@ ffmpeg/libavutil/avconfig.h:
 
 ffmpeg/libavutil/mem.h:
 
-ffmpeg/libavutil/error.h:
-
 ffmpeg/libavutil/avutil.h:
+
+ffmpeg/libavutil/error.h:
 
 ffmpeg/libavutil/mathematics.h:
 
@@ -340,14 +338,4 @@ ffmpeg/libavcodec/avcodec.h:
 
 ffmpeg/libavutil/cpu.h:
 
-ffmpeg/libavutil/dict.h:
-
-ffmpeg/libavutil/log.h:
-
-ffmpeg/libavutil/pixfmt.h:
-
-ffmpeg/libavutil/rational.h:
-
 ffmpeg/libavutil/audioconvert.h:
-
-ffmpeg/libavcodec/version.h:

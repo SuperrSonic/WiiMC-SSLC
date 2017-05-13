@@ -878,7 +878,7 @@ static void ff_h264_idct_add8_paired(uint8_t **dest, const int *block_offset, DC
 	}
 }
 
-#if 1
+#if 0
 // FIXME: Rounding errors.
 static void ff_h264_idct8_add_paired(uint8_t *dst, DCTELEM *block, int stride)
 {
@@ -1210,33 +1210,33 @@ void ff_dsputil_h264_init_ppc(DSPContext *c, AVCodecContext *avctx)
 
 void ff_h264dsp_init_ppc(H264DSPContext *c, const int bit_depth, const int chroma_format_idc)
 {
-	c->h264_idct_add = ff_h264_idct_add_paired;
+	/*c->h264_idct_add = ff_h264_idct_add_paired;
 	c->h264_idct_add8 = ff_h264_idct_add8_paired;
 	c->h264_idct_add16 = ff_h264_idct_add16_paired;
 	c->h264_idct_add16intra = ff_h264_idct_add16intra_paired;
 	c->h264_idct_dc_add = ff_h264_idct_dc_add_paired;
-	c->h264_idct8_add = ff_h264_idct8_add_paired;
+	//c->h264_idct8_add = ff_h264_idct8_add_paired;
 	c->h264_idct8_dc_add = ff_h264_idct8_dc_add_paired;
-	c->h264_idct8_add4 = ff_h264_idct8_add4_paired;
+	c->h264_idct8_add4 = ff_h264_idct8_add4_paired;*/ //Green video
 	
 	c->weight_h264_pixels_tab[0] = weight_h264_pixels16x16_paired;
-	c->weight_h264_pixels_tab[1] = weight_h264_pixels16x8_paired;
-	c->weight_h264_pixels_tab[2] = weight_h264_pixels8x16_paired;
+	//c->weight_h264_pixels_tab[1] = weight_h264_pixels16x8_paired;
+	//c->weight_h264_pixels_tab[2] = weight_h264_pixels8x16_paired;
 	c->weight_h264_pixels_tab[3] = weight_h264_pixels8x8_paired;
-	c->weight_h264_pixels_tab[4] = weight_h264_pixels8x4_paired;
-	c->weight_h264_pixels_tab[5] = weight_h264_pixels4x8_paired;
+	//c->weight_h264_pixels_tab[4] = weight_h264_pixels8x4_paired;
+	//c->weight_h264_pixels_tab[5] = weight_h264_pixels4x8_paired;
 	c->weight_h264_pixels_tab[6] = weight_h264_pixels4x4_paired;
-	c->weight_h264_pixels_tab[7] = weight_h264_pixels4x2_paired;
-	c->weight_h264_pixels_tab[8] = weight_h264_pixels2x4_paired;
+	//c->weight_h264_pixels_tab[7] = weight_h264_pixels4x2_paired;
+	//c->weight_h264_pixels_tab[8] = weight_h264_pixels2x4_paired;
 	c->weight_h264_pixels_tab[9] = weight_h264_pixels2x2_paired;
 	c->biweight_h264_pixels_tab[0] = biweight_h264_pixels16x16_paired;
-	c->biweight_h264_pixels_tab[1] = biweight_h264_pixels16x8_paired;
-	c->biweight_h264_pixels_tab[2] = biweight_h264_pixels8x16_paired;
+	//c->biweight_h264_pixels_tab[1] = biweight_h264_pixels16x8_paired;
+	//c->biweight_h264_pixels_tab[2] = biweight_h264_pixels8x16_paired;
 	c->biweight_h264_pixels_tab[3] = biweight_h264_pixels8x8_paired;
-	c->biweight_h264_pixels_tab[4] = biweight_h264_pixels8x4_paired;
-	c->biweight_h264_pixels_tab[5] = biweight_h264_pixels4x8_paired;
+	//c->biweight_h264_pixels_tab[4] = biweight_h264_pixels8x4_paired;
+	//c->biweight_h264_pixels_tab[5] = biweight_h264_pixels4x8_paired;
 	c->biweight_h264_pixels_tab[6] = biweight_h264_pixels4x4_paired;
-	c->biweight_h264_pixels_tab[7] = biweight_h264_pixels4x2_paired;
-	c->biweight_h264_pixels_tab[8] = biweight_h264_pixels2x4_paired;
+	//c->biweight_h264_pixels_tab[7] = biweight_h264_pixels4x2_paired; // crash
+	//c->biweight_h264_pixels_tab[8] = biweight_h264_pixels2x4_paired; // crash
 	c->biweight_h264_pixels_tab[9] = biweight_h264_pixels2x2_paired;
 }

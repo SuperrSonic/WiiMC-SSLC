@@ -75,7 +75,7 @@ libmpdemux/demuxer.o: libmpdemux/demuxer.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h \
  ffmpeg/libavutil/attributes.h ffmpeg/libavutil/avconfig.h \
  ffmpeg/libavutil/common.h ffmpeg/libavutil/mem.h \
- ffmpeg/libavutil/error.h ffmpeg/libavutil/avutil.h \
+ ffmpeg/libavutil/avutil.h ffmpeg/libavutil/error.h \
  ffmpeg/libavutil/mathematics.h ffmpeg/libavutil/rational.h \
  ffmpeg/libavutil/intfloat_readwrite.h ffmpeg/libavutil/log.h \
  ffmpeg/libavutil/pixfmt.h mpbswap.h ffmpeg/libavutil/bswap.h \
@@ -84,10 +84,8 @@ libmpdemux/demuxer.o: libmpdemux/demuxer.c \
  libaf/control.h cpudetect.h libmpdemux/stheader.h \
  libmpcodecs/dec_video.h libmpcodecs/dec_teletext.h \
  ffmpeg/libavcodec/avcodec.h ffmpeg/libavutil/samplefmt.h \
- ffmpeg/libavutil/avutil.h ffmpeg/libavutil/cpu.h ffmpeg/libavutil/dict.h \
- ffmpeg/libavutil/log.h ffmpeg/libavutil/pixfmt.h \
- ffmpeg/libavutil/rational.h ffmpeg/libavutil/audioconvert.h \
- ffmpeg/libavcodec/version.h av_helpers.h ffmpeg/libavutil/avstring.h
+ ffmpeg/libavutil/avutil.h ffmpeg/libavutil/cpu.h \
+ ffmpeg/libavutil/audioconvert.h av_helpers.h ffmpeg/libavutil/avstring.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
 
@@ -283,9 +281,9 @@ ffmpeg/libavutil/common.h:
 
 ffmpeg/libavutil/mem.h:
 
-ffmpeg/libavutil/error.h:
-
 ffmpeg/libavutil/avutil.h:
+
+ffmpeg/libavutil/error.h:
 
 ffmpeg/libavutil/mathematics.h:
 
@@ -333,17 +331,7 @@ ffmpeg/libavutil/avutil.h:
 
 ffmpeg/libavutil/cpu.h:
 
-ffmpeg/libavutil/dict.h:
-
-ffmpeg/libavutil/log.h:
-
-ffmpeg/libavutil/pixfmt.h:
-
-ffmpeg/libavutil/rational.h:
-
 ffmpeg/libavutil/audioconvert.h:
-
-ffmpeg/libavcodec/version.h:
 
 av_helpers.h:
 
