@@ -633,6 +633,13 @@ void wiiSetVidFull()
 	}
 }
 
+void wiiSetDf()
+{
+	if (WiiSettings.videoDf == 1) {
+		SetDf();
+	}
+}
+
 extern "C" {
 void SetMPlayerSettings()
 {

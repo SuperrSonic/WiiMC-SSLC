@@ -119,6 +119,7 @@ struct SWiiSettings {
 	char 	videosFolder[MAXPATHLEN];
 	int 	videoFull;
 	int 	audioNorm;
+	int		videoDf;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
 	char	musicFolder[MAXPATHLEN];
@@ -153,7 +154,7 @@ const char validVideoExtensions[][7] =
 	"3gp", "asf", "avi", "bik", "dash", "divx", "dpg", "dv", "dvr-ms", "evo", "f4v", 
 	"flc", "fli", "flv", "ifo", "iso", "ivf", "m1v", "m2t", "m2ts", "m2v", 
 	"m4v", "mkv", "mov", "mp4", "mp4v", "mpe", "mpeg", "mpg", "mqv", "nsv", 
-	"nuv", "ogm", "qt", "rm", "rmvb", "swf", "trp", "ts", "vdr", "vfw", "viv",
+	"nuv", "ogm", "qt", "rm", "rmvb", "sfd", "swf", "trp", "ts", "vdr", "vfw", "viv",
 	"vob", "vro", "webm", "wmv", "y4m", ""
 };
 

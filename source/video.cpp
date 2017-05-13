@@ -19,7 +19,6 @@
 #include "menu.h"
 #include "wiimc.h"
 #include "utils/mem2_manager.h"
-//#include "settings.h" //What, this shouldn't be here.
 
 
 extern "C" {
@@ -242,6 +241,19 @@ void Draw_VIDEO()
 	VIDEO_Flush();
 }
 
+void SetDf()
+{
+	if (vmode == &TVNtsc480Prog) {
+		CONF_GetVideo();
+		vmode = &TVNtsc480ProgSoft;
+	} else if (vmode == &TVPal576ProgScale) {
+		CONF_GetVideo();
+		vmode = &TVEurgb60Hz480ProgSoft;
+	}
+
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
+}
+
 void
 InitVideo (int argc, char *argv[])
 {
@@ -338,7 +350,6 @@ InitVideo2 ()
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
-	// GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
 	GX_SetFieldMode(vmode->field_rendering,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);

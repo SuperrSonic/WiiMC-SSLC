@@ -355,6 +355,7 @@ prepareSettingsData ()
 	createXMLSetting("videosFolder", "Videos folder", WiiSettings.videosFolder);
 	createXMLSetting("videoFull", "Videos in Fullscreen", toStr(WiiSettings.videoFull));
 	createXMLSetting("audioNorm", "Volume Normalizer", toStr(WiiSettings.audioNorm));
+	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
@@ -635,6 +636,7 @@ void DefaultSettings ()
 	WiiSettings.videosFolder[0] = 0;
 	WiiSettings.videoFull = 0;
 	WiiSettings.audioNorm = 0;
+	WiiSettings.videoDf = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.musicFolder[0] = 0;
@@ -719,6 +721,8 @@ static void FixInvalidSettings()
 		WiiSettings.videoFull = 0;
 	if(WiiSettings.audioNorm < 0 || WiiSettings.audioNorm > 2)
 		WiiSettings.audioNorm = 0;
+	if(WiiSettings.videoDf < 0 || WiiSettings.videoDf > 1)
+		WiiSettings.videoDf = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
@@ -1062,6 +1066,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(WiiSettings.videosFolder, "videosFolder", sizeof(WiiSettings.videosFolder));
 				loadXMLSetting(&WiiSettings.videoFull, "videoFull");
 				loadXMLSetting(&WiiSettings.audioNorm, "audioNorm");
+				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));
@@ -1123,6 +1128,8 @@ bool LoadSettings()
 	{
 		FixInvalidSettings();
 		ChangeLanguage();
+
+		wiiSetDf();
 
 		sprintf(filepath,"%s/restore_points", appPath);
 		char *buffer = (char *)mem2_malloc(50*1024, MEM2_OTHER);

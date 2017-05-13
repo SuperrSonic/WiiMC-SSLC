@@ -86,6 +86,8 @@ void wiiSetVolNorm1();
 void wiiSetVolNorm2();
 void wiiSetVidFull();
 void wiiSetFullScreen();
+void wiiSetDf();
+void SetDf();
 void wiiSetOnlineCacheFill(int fill);
 void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);
