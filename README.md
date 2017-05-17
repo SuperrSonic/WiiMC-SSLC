@@ -7,7 +7,7 @@
 - Exposed the volume normalizer filter.
 - Added ".dash" extension, using this extension will skip the deblock filter.
 - Made ".webm" extension always disable framedropping.
-- Removed Deflicker filter.
+- Made the deflicker filter optional.
 - Removed picture viewer to increase memory.
 - Removed NTFS and EXT libs to increase memory.
 - Disabled some minor codecs to increase memory.

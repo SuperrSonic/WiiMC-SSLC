@@ -2449,29 +2449,29 @@ int reinit_video_chain(void)
     sh_video->vfilter = append_filters(sh_video->vfilter);
     eosd_init(sh_video->vfilter);
 
-#ifdef GEKKO
+/*#ifdef GEKKO
 if (sh_video->disp_w > 1024)
 {
 	codecs_t *c = find_video_codec(sh_video->format, sh_video->bih ? ((unsigned int *)&sh_video->bih->biCompression) : NULL, sh_video->codec, 0);
 	
 	if (strncmp(c->name, "ffmpeg", 6) == 0 || strncmp(c->name, "ffodivx", 7) == 0)
 	{
-		//m_config_set_option(mconfig, "lavdopts", "fast=0:lowres=1:skipframe=default:skiploopfilter=default");
+		m_config_set_option(mconfig, "lavdopts", "fast=0:lowres=1:skipframe=default:skiploopfilter=default");
 		//force_frame_dropping = 1;
 	}
 	else
 	{
-		//m_config_set_option(mconfig, "lavdopts", "fast=1:lowres=0:skipframe=nonref:skiploopfilter=all");
+		m_config_set_option(mconfig, "lavdopts", "fast=1:lowres=0:skipframe=nonref:skiploopfilter=all");
 		//force_frame_dropping = 0;
 	}
 }
 else
 {
 	// set back to default
-	//m_config_set_option(mconfig, "lavdopts", "fast=0:lowres=0:skipframe=default:skiploopfilter=default");
+	m_config_set_option(mconfig, "lavdopts", "fast=0:lowres=0:skipframe=default:skiploopfilter=default");
 	//force_frame_dropping = -1;
 }
-#endif
+#endif*/
 
 
 #ifdef CONFIG_ASS
