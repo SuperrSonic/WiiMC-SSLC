@@ -41,6 +41,7 @@
 #include "gx_supp.h"
 #include "../../utils/mem2_manager.h"
 #include "../../video.h"
+#include <ogc/machine/processor.h>
 
 #define HASPECT 320
 #define VASPECT 240
@@ -64,6 +65,9 @@ float g_contrast = 0.0f;
 extern bool need_wait;
 extern u8 whichfb;
 extern unsigned int *xfb[2];
+
+static uint32_t retraceCount;
+static uint32_t referenceRetraceCount;
 
 static int hor_pos=0, vert_pos=0;
 static float hor_zoom = 1.0f, vert_zoom = 1.0f;
@@ -153,6 +157,14 @@ void GX_SetScreenPos(int _hor_pos, int _vert_pos, float _hor_zoom, float _vert_z
 	hor_zoom = _hor_zoom;
 	vert_zoom = _vert_zoom;
 	GX_UpdateScaling();
+}
+
+static void retrace_callback(u32 retrace_count)
+{
+   u32 level = 0;
+   _CPU_ISR_Disable(level);
+   retraceCount = retrace_count;
+   _CPU_ISR_Restore(level);
 }
 
 /****************************************************************************
@@ -469,10 +481,18 @@ inline void DrawMPlayer()
 	if (wr>0) DCFlushRange(Yrtexture, Yrtexsize);
 	DCFlushRange(Utexture, UVtexsize);
 	DCFlushRange(Vtexture, UVtexsize);
+	u32 level = 0;
 
-	if(need_wait)
+	if(need_wait == true) {
 		GX_WaitDrawDone();
-		
+    _CPU_ISR_Disable(level);
+    if (referenceRetraceCount > retraceCount) {
+		VIDEO_WaitVSync();
+    }
+	referenceRetraceCount = retraceCount;
+    _CPU_ISR_Restore(level);
+	}
+
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
 
@@ -513,9 +533,13 @@ inline void DrawMPlayer()
 	whichfb ^= 1; // flip framebuffer
 
 	GX_CopyDisp(xfb[whichfb], GX_TRUE);
-	VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	GX_SetDrawDone();
+	VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;
+	
+	_CPU_ISR_Disable(level);
+    ++referenceRetraceCount;
+    _CPU_ISR_Restore(level);
 }
 
 void GX_AllocTextureMemory()
@@ -562,6 +586,11 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 
 	GX_UpdateScaling();
 
+    u32 level = 0;
+    _CPU_ISR_Disable(level);
+    referenceRetraceCount = retraceCount;
+    _CPU_ISR_Restore(level);
+
 	GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 	GX_SetCullMode(GX_CULL_NONE);
 	GX_SetClipMode(GX_DISABLE);
@@ -576,7 +605,9 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GX_SetColorUpdate(GX_ENABLE);
 
+	//GX_SetDrawDoneCallback(VIDEO_Flush); //added while testing
 	GX_Flush();
+	VIDEO_SetPostRetraceCallback(retrace_callback);
 }
 
 #define LUMA_COPY(type) \
@@ -681,8 +712,10 @@ void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 		UVrowpitch = (stride[1] * 4) - UVwidth;
 	}
 
-	if(need_wait)
+	if(need_wait == true) {
 		GX_WaitDrawDone();
+		//VIDEO_WaitVSync();
+	}
 
 	if (stride[0] & 7)
 		LUMA_COPY(u64)

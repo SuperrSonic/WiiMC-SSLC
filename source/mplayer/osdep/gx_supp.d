@@ -95,7 +95,10 @@ osdep/gx_supp.o: osdep/gx_supp.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/inttypes.h \
  libmpcodecs/img_format.h config.h osdep/../libvo/csputils.h \
  osdep/gx_supp.h osdep/../../utils/mem2_manager.h osdep/../../video.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogcsys.h osdep/timer.h
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogcsys.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/machine/processor.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/machine/asm.h \
+ osdep/timer.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
 
@@ -298,5 +301,9 @@ osdep/../../utils/mem2_manager.h:
 osdep/../../video.h:
 
 C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogcsys.h:
+
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/machine/processor.h:
+
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/machine/asm.h:
 
 osdep/timer.h:
