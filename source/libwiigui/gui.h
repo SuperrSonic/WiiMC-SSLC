@@ -621,9 +621,9 @@ class GuiImageData
 		u8 GetFormat();
 	protected:
 		void LoadPNG(const u8 *i); //!< Load a PNG
-		void LoadBMP(const u8 *i, int s); //!< Load a BMP
+		//void LoadBMP(const u8 *i, int s); //!< Load a BMP
 		void LoadJPEG(const u8 *i, int s); //!< Load a JPEG
-		void LoadGIF(const u8 *i, int s); //!< Load a GIF
+		//void LoadGIF(const u8 *i, int s); //!< Load a GIF
 		u8 * data; //!< Image data
 		u8 format; //!< Texture format
 		int height; //!< Height of image
