@@ -385,11 +385,6 @@ extern "C" bool FindNextFile(bool load)
 				wiiElse();
 			}
 
-			if(strcasecmp(ext, "webm") == 0) // always disable framedropping for VP8
-				wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_DISABLED);
-			else
-				wiiSetProperty(MP_CMD_FRAMEDROPPING, WiiSettings.frameDropping);
-
 			// use part after last / for display name, if it's not already the end of the string
 			if(start != NULL && start[1] != 0)
 			{
@@ -665,11 +660,6 @@ void SetMPlayerSettings()
 
 	if(strncmp(loadedFile, "dvd", 3) == 0) // always use framedropping for DVD
 		wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_AUTO);
-	else
-		wiiSetProperty(MP_CMD_FRAMEDROPPING, WiiSettings.frameDropping);
-
-	if(strcasecmp(ext, "webm") == 0) // always disable framedropping for VP8
-		wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_DISABLED);
 	else
 		wiiSetProperty(MP_CMD_FRAMEDROPPING, WiiSettings.frameDropping);
 

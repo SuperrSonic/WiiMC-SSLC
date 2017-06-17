@@ -1700,11 +1700,13 @@ static int matroska_read_header(AVFormatContext *s)
                       st->codec-> width * track->video.display_height,
                       255);
             st->need_parsing = AVSTREAM_PARSE_HEADERS;
-            if (track->default_duration) {
+            if (track->default_duration)
+                st->avg_frame_rate = av_d2q(1000000000.0/track->default_duration, INT_MAX);
+            /*if (track->default_duration) {   // Breaks decoding on certain framerates, only when framedrop is enabled
                 av_reduce(&st->r_frame_rate.num, &st->r_frame_rate.den,
                           1000000000, track->default_duration, 30000);
                 st->avg_frame_rate = st->r_frame_rate;
-            }
+            }*/
 
             /* export stereo mode flag as metadata tag */
             if (track->video.stereo_mode && track->video.stereo_mode < MATROSKA_VIDEO_STEREO_MODE_COUNT)
