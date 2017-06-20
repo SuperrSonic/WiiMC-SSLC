@@ -485,13 +485,14 @@ inline void DrawMPlayer()
 
 	if(need_wait == true) {
 		GX_WaitDrawDone();
+	}
+
     _CPU_ISR_Disable(level);
     if (referenceRetraceCount > retraceCount) {
 		VIDEO_WaitVSync();
     }
 	referenceRetraceCount = retraceCount;
     _CPU_ISR_Restore(level);
-	}
 
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
