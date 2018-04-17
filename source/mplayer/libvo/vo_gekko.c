@@ -100,9 +100,17 @@ static int inline query_format(uint32_t format)
 	else return VO_FALSE;
 }
 
+#define WIDTH_WIDE 854
+
 void wiiSetFullScreen()
 {
-	mplayerwidth = 854;
+	mplayerwidth = WIDTH_WIDE;
+}
+
+void wiiSetScreenNorm()
+{
+	if (CONF_GetAspectRatio() != CONF_ASPECT_16_9)
+		mplayerwidth = vmode->fbWidth;
 }
 
 void reinit_video()
@@ -180,7 +188,7 @@ static int preinit(const char *arg)
 	subopt_parse(arg, subopts);
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-		mplayerwidth = 854; // 480 * (16/9)
+		mplayerwidth = WIDTH_WIDE; // 480 * (16/9)
 
 	vo_screenheight = mplayerheight;
 	vo_screenwidth = mplayerwidth;

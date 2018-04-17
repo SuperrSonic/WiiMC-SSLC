@@ -28,7 +28,7 @@
 #define MAX_GLYPHS_INITIAL 1024
 #define MAX_LINES_INITIAL 64
 #define SUBPIXEL_MASK 63
-#define SUBPIXEL_ACCURACY 7
+#define SUBPIXEL_ACCURACY 63
 
 ASS_Renderer *ass_renderer_init(ASS_Library *library)
 {

@@ -58,6 +58,7 @@ extern int controlledbygui;
 
 //Global variables for brightness and contrast filters
 //Ranges for both should be constrained to [-1.0,1.0]
+//Shouldn't brightness default to 1.0?
 float g_brightness = 0.0f;
 float g_contrast = 0.0f;
 
@@ -487,15 +488,15 @@ inline void DrawMPlayer()
 		GX_WaitDrawDone();
 	}
 
-    _CPU_ISR_Disable(level);
+	GX_InvVtxCache();
+	GX_InvalidateTexAll();
+
+	_CPU_ISR_Disable(level);
     if (referenceRetraceCount > retraceCount) {
 		VIDEO_WaitVSync();
     }
 	referenceRetraceCount = retraceCount;
     _CPU_ISR_Restore(level);
-
-	GX_InvVtxCache();
-	GX_InvalidateTexAll();
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 		GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
@@ -537,7 +538,7 @@ inline void DrawMPlayer()
 	GX_SetDrawDone();
 	VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;
-	
+
 	_CPU_ISR_Disable(level);
     ++referenceRetraceCount;
     _CPU_ISR_Restore(level);
@@ -546,7 +547,7 @@ inline void DrawMPlayer()
 void GX_AllocTextureMemory()
 {
 	Yltexture = (u8*)mem2_memalign(32, 1024*MAX_HEIGHT, MEM2_VIDEO);
-	Yrtexture = (u8*)mem2_memalign(32, (MAX_WIDTH-1024)*MAX_HEIGHT, MEM2_VIDEO);
+	Yrtexture = (u8*)mem2_memalign(32, WIDTH_MULT*MAX_HEIGHT, MEM2_VIDEO);
 	Utexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);
 	Vtexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);        
 }
@@ -560,6 +561,10 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	Mtx44 p;
 
 	need_wait=false;
+	u32 level = 0;
+	_CPU_ISR_Disable(level);
+    referenceRetraceCount = retraceCount;
+    _CPU_ISR_Restore(level);
 
 	// Allocate 32byte aligned texture memory
 	wYl = width < 1024 ? width : 1016;
@@ -574,10 +579,9 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	UVtexsize = (w*h)/4;
 
     memset(Yltexture, 0, 1024*MAX_HEIGHT);
-    memset(Yrtexture, 0, (MAX_WIDTH-1024)*MAX_HEIGHT);
+    memset(Yrtexture, 0, WIDTH_MULT*MAX_HEIGHT);
     memset(Utexture, 0x80, 1024*(MAX_HEIGHT/2));
     memset(Vtexture, 0x80, 1024*(MAX_HEIGHT/2));	
-	
 
 	// center, to correct difference between pitch and real width
 	video_diffx = (w - width)/2.0;
@@ -586,11 +590,6 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	video_vaspect = vaspect;
 
 	GX_UpdateScaling();
-
-    u32 level = 0;
-    _CPU_ISR_Disable(level);
-    referenceRetraceCount = retraceCount;
-    _CPU_ISR_Restore(level);
 
 	GX_SetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 	GX_SetCullMode(GX_CULL_NONE);
@@ -704,7 +703,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 
 void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 {
-
+	
 	if(st0!=stride[0] || st1!=stride[1])
 	{
 		st0=stride[0];
@@ -715,7 +714,6 @@ void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 
 	if(need_wait == true) {
 		GX_WaitDrawDone();
-		//VIDEO_WaitVSync();
 	}
 
 	if (stride[0] & 7)
@@ -726,7 +724,7 @@ void GX_FillTextureYUV(u8 *buffer[3], int stride[3])
 	if (stride[1] & 7)
 		CHROMA_COPY(u64)
 	else
-		CHROMA_COPY(double) 
+		CHROMA_COPY(double)
 }
 
 void GX_RenderTexture()

@@ -6,7 +6,6 @@
 - Optional 240p mode.
 - Exposed the volume normalizer filter.
 - Added ".dash" extension, using this extension will skip the deblock filter.
-- Made ".webm" extension always disable framedropping.
 - Made the deflicker filter optional.
 - Removed picture viewer to increase memory.
 - Removed NTFS and EXT libs to increase memory.

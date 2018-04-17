@@ -579,12 +579,10 @@ void LoadMPlayerFile()
 		partitionlabel = GetPartitionLabel(loadedFile);
 	}
 
-	if(strcasecmp(ext, "dash") == 0)
-	{
+	if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 		wiiDash();
-	} else {
+	else
 		wiiElse();
-	}
 
 	// wait for directory parsing to finish (to find subtitles)	
 	while(WiiSettings.subtitleVisibility && !ParseDone())
@@ -625,6 +623,8 @@ void wiiSetVidFull()
 {
 	if (WiiSettings.videoFull == 1) {
 		wiiSetFullScreen();
+	} else {
+		wiiSetScreenNorm();
 	}
 }
 
@@ -732,12 +732,12 @@ int main(int argc, char *argv[])
 	StartNetworkThread(); //to set net heap aside MEM2 area
 	usleep(100); //force network thread execution 
 
-	u32 size = ( (1024*MAX_HEIGHT)+((MAX_WIDTH-1024)*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
+	u32 size = ( (1024*MAX_HEIGHT)+(WIDTH_MULT*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
                 (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     
                 (32*1024); // padding	
 	AddMem2Area (size, MEM2_VIDEO); 
 	AddMem2Area (3*1024*1024, MEM2_BROWSER);
-	AddMem2Area (8*1024*1024, MEM2_GUI);
+	AddMem2Area (7*1024*1024, MEM2_GUI);
 	AddMem2Area (5*1024*1024, MEM2_OTHER); // vars + ttf
 
 	GX_AllocTextureMemory();

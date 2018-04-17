@@ -337,6 +337,7 @@ prepareSettingsData ()
 	createXMLSetting("lockFolders", "Static folders", toStr(WiiSettings.lockFolders));
 	createXMLSetting("startArea", "Starting area", toStr(WiiSettings.startArea));
 	createXMLSetting("debug", "Debug", toStr(WiiSettings.debug));
+	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
 	// Videos
 	createXMLSection("Videos", "Videos Settings");
 	createXMLSetting("videoZoomHor", "Horizontal video zoom", FtoStr(WiiSettings.videoZoomHor));
@@ -356,6 +357,7 @@ prepareSettingsData ()
 	createXMLSetting("videoFull", "Videos in Fullscreen", toStr(WiiSettings.videoFull));
 	createXMLSetting("audioNorm", "Volume Normalizer", toStr(WiiSettings.audioNorm));
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
+	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
@@ -619,6 +621,7 @@ void DefaultSettings ()
 	WiiSettings.inactivityShutdown = 2;
 	WiiSettings.lockFolders = 0;
 	WiiSettings.startArea = MENU_BROWSE_VIDEOS;
+	WiiSettings.screenDim = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
 	WiiSettings.videoZoomVert = 1;
@@ -637,6 +640,7 @@ void DefaultSettings ()
 	WiiSettings.videoFull = 0;
 	WiiSettings.audioNorm = 0;
 	WiiSettings.videoDf = 0;
+	WiiSettings.skipLoop = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.musicFolder[0] = 0;
@@ -701,6 +705,8 @@ static void FixInvalidSettings()
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
 	if(WiiSettings.dvdDisabled && WiiSettings.startArea == MENU_DVD)
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
+	if(WiiSettings.screenDim < 0 || WiiSettings.screenDim > 1)
+		WiiSettings.screenDim = 0;
 
 	// Videos
 	if(WiiSettings.videoZoomHor < 0.5 || WiiSettings.videoZoomHor > 1.5)
@@ -723,6 +729,8 @@ static void FixInvalidSettings()
 		WiiSettings.audioNorm = 0;
 	if(WiiSettings.videoDf < 0 || WiiSettings.videoDf > 1)
 		WiiSettings.videoDf = 0;
+	if(WiiSettings.skipLoop < 0 || WiiSettings.skipLoop > 1)
+		WiiSettings.skipLoop = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
@@ -1049,6 +1057,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.lockFolders, "lockFolders");
 				loadXMLSetting(&WiiSettings.startArea, "startArea");
 				loadXMLSetting(&WiiSettings.debug, "debug");
+				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
 				// Videos
 				loadXMLSetting(&WiiSettings.videoZoomHor, "videoZoomHor");
 				loadXMLSetting(&WiiSettings.videoZoomVert, "videoZoomVert");
@@ -1067,6 +1076,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoFull, "videoFull");
 				loadXMLSetting(&WiiSettings.audioNorm, "audioNorm");
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
+				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));

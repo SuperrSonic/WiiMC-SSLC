@@ -102,6 +102,7 @@ struct SWiiSettings {
 	int		lockFolders;
 	int		startArea;
 	int		debug;
+	int		screenDim;
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount
@@ -120,6 +121,7 @@ struct SWiiSettings {
 	int 	videoFull;
 	int 	audioNorm;
 	int		videoDf;
+	int		skipLoop;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
 	char	musicFolder[MAXPATHLEN];
@@ -154,8 +156,8 @@ const char validVideoExtensions[][7] =
 	"3gp", "asf", "avi", "bik", "dash", "divx", "dpg", "dv", "dvr-ms", "evo", "f4v", 
 	"flc", "fli", "flv", "ifo", "iso", "ivf", "m1v", "m2t", "m2ts", "m2v", 
 	"m4v", "mkv", "mov", "mp4", "mp4v", "mpe", "mpeg", "mpg", "mqv", "nsv", 
-	"nuv", "ogm", "qt", "rm", "rmvb", "sfd", "swf", "trp", "ts", "vdr", "vfw", "viv",
-	"vob", "vro", "webm", "wmv", "y4m", ""
+	"nuv", "ogm", "qt", "rm", "rmvb", "sfd", "swf", "thp", "trp", "ts", "vdr", "vfw",
+	"viv", "vob", "vro", "webm", "wmv", "y4m", ""
 };
 
 const char validAudioExtensions[][5] = 

@@ -19,7 +19,7 @@
 #ifndef LIBASS_PARSE_H
 #define LIBASS_PARSE_H
 
-#define BLUR_MAX_RADIUS 100.0
+#define BLUR_MAX_RADIUS 0.0
 
 #define _r(c)   ((c) >> 24)
 #define _g(c)   (((c) >> 16) & 0xFF)

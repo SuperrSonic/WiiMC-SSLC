@@ -279,6 +279,7 @@ static int progressTotal = 0;
 bool menuMode = 0; // 0 - normal GUI, 1 - GUI for MPlayer
 static int slideshow = 0; // slideshow mode
 static u64 ssTimer = 0;
+static vu32* HW_VIDIM = (vu32*)0xCD80001C;
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
 {	
@@ -630,6 +631,8 @@ static void *GuiThread (void *arg)
 			{
 				ssTimer = 0;
 				screensaverThreadHalt = 1;
+				if(WiiSettings.screenDim == 1)
+					*HW_VIDIM &= ~1 << 7;
 			}
 		}
 		else if(!slideshow)
@@ -639,6 +642,17 @@ static void *GuiThread (void *arg)
 
 			if(diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.screensaverDelay-60))
 				ResumeScreensaverThread();
+			if(WiiSettings.screenDim == 1) {
+				if(diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.screensaverDelay-60+4)) {
+					*HW_VIDIM |= 1 << 7; // Enable dimming
+					//*HW_VIDIM |= 1 << 5; //luma = 2
+					*HW_VIDIM |= 1 << 4;
+					//*HW_VIDIM |= 1 << 3;
+					//*HW_VIDIM |= 1 << 2; //chroma = 2
+					*HW_VIDIM |= 1 << 1;
+					//*HW_VIDIM |= 1 << 0;
+				}
+			}
 		}
 
 		CheckSleepTimer();
@@ -1913,7 +1927,7 @@ static int LoadNewFile()
 
 static void HideAudioVolumeLevelBar();
 
-bool LoadYouTubeFile(char *url, char *newurl)
+/*bool LoadYouTubeFile(char *url, char *newurl)
 {
 	if(!ChangeInterface(DEVICE_INTERNET,0,NOTSILENT))
 		return false;
@@ -2056,7 +2070,7 @@ bool LoadYouTubeFile(char *url, char *newurl)
 		return true;
 
 	return false;
-}
+}*/
 
 static GuiFileBrowser *fileBrowser = NULL;
 
@@ -2409,7 +2423,7 @@ static void MenuBrowse(int menu)
 				GetExt(browser.selIndex->file, ext);
 				int numItems = 0;
 
-				if(strncmp(browser.selIndex->file, "http://www.youtube.", 19) == 0)
+				/*if(strncmp(browser.selIndex->file, "http://www.youtube.", 19) == 0)
 				{
 					if(!mainWindow->Find(disabled))
 						mainWindow->Append(disabled);
@@ -2434,7 +2448,7 @@ static void MenuBrowse(int menu)
 					mainWindow->SetState(STATE_DEFAULT);
 					ErrorPrompt("Error loading YouTube file!");
 					continue;
-				}
+				}*/
 
 				// identified as a playlist, or file is an unrecognized audio or video extension or allowed protocol
 				// parse as a playlist
@@ -3003,6 +3017,7 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Inactivity Shutdown");
 	sprintf(options.name[i++], "Browser Folders");
 	sprintf(options.name[i++], "Starting Area");
+	sprintf(options.name[i++], "Screen Burn-in Reduction");
 
 	options.length = i;
 
@@ -3111,6 +3126,9 @@ static void MenuSettingsGlobal()
 				if(WiiSettings.startArea == MENU_DVD && WiiSettings.dvdDisabled)
 					WiiSettings.startArea++;
 				break;
+			case 10:
+				WiiSettings.screenDim ^= 1;
+				break;
 		}
 
 		if(ret >= 0 || firstRun)
@@ -3177,6 +3195,8 @@ static void MenuSettingsGlobal()
 				case MENU_DVD: 					sprintf(options.value[9], "DVD"); break;
 				case MENU_BROWSE_ONLINEMEDIA: 	sprintf(options.value[9], "Online Media"); break;
 			}
+			
+			sprintf(options.value[10], "%s", WiiSettings.screenDim ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3549,6 +3569,10 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Backward");
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Files Folder");
+	sprintf(options.name[i++], "Videos in Fullscreen");
+	sprintf(options.name[i++], "Volume Normalizer");
+	sprintf(options.name[i++], "Deflicker");
+	sprintf(options.name[i++], "Skip Deblocking Filter");
 
 	options.length = i;
 
@@ -3677,6 +3701,24 @@ static void MenuSettingsVideos()
 				OnScreenKeyboard(WiiSettings.videosFolder, MAXPATHLEN);
 				CleanupPath(WiiSettings.videosFolder);
 				break;
+			case 12:
+				WiiSettings.videoFull ^= 1;
+				break;
+			case 13:
+				WiiSettings.audioNorm += 1;
+				if (WiiSettings.audioNorm > 2)
+					WiiSettings.audioNorm = 0;
+				break;
+			case 14:
+				WiiSettings.videoDf ^= 1;
+				if(WiiSettings.videoDf == 1)
+					SetDf();
+				else
+					SetDfOff();
+				break;
+			case 15:
+				WiiSettings.skipLoop ^= 1;
+				break;
 		}
 
 		if(ret >= 0 || firstRun)
@@ -3714,6 +3756,10 @@ static void MenuSettingsVideos()
 			sprintf (options.value[9], "%d %s", WiiSettings.skipBackward, gettext("sec"));
 			sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
 			snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
+			sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
+			sprintf (options.value[13], "%d%", WiiSettings.audioNorm);
+			sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
+			sprintf (options.value[15], "%s", WiiSettings.skipLoop ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3997,7 +4043,7 @@ static void MenuSettingsOnlineMedia()
 				break;
 			case 1:
 				if(WiiSettings.youtubeFormat == 5)
-					WiiSettings.youtubeFormat = 18;
+					WiiSettings.youtubeFormat = 43;
 				else if(WiiSettings.youtubeFormat == 18)
 					WiiSettings.youtubeFormat = 35;
 				else
@@ -4018,7 +4064,7 @@ static void MenuSettingsOnlineMedia()
 
 			if(WiiSettings.youtubeFormat == 5)
 				sprintf(options.value[1], "Low (400x240)");
-			else if(WiiSettings.youtubeFormat == 18)
+			else if(WiiSettings.youtubeFormat == 43)
 				sprintf(options.value[1], "Medium (480x360)");
 			else
 				sprintf(options.value[1], "High (854x480)");

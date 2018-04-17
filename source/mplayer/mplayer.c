@@ -2969,16 +2969,17 @@ m_config_set_option(mconfig,"ao","gekko");
 m_config_set_option(mconfig,"osdlevel","0");
 m_config_set_option(mconfig,"channels","2");
 m_config_set_option(mconfig,"sub-fuzziness","1");
-m_config_set_option(mconfig,"subfont-autoscale","3"); //movie diagonal (default)
-m_config_set_option(mconfig,"subfont-osd-scale","1");
+m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
+m_config_set_option(mconfig,"subfont-osd-scale","1"); // 25 is good if ass=0?
 m_config_set_option(mconfig,"subfont-text-scale","1");
+//m_config_set_option(mconfig,"autosync","1"); // No real proof this was useful
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 //m_config_set_option(mconfig,"af","volnorm=1:0.25"); // "=2:0.75" sounds too loud and distorted, default "=1:0.25"
 //m_config_set_option(mconfig,"vf","pp=lb"); // deinterlace; linear blend
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
-m_config_set_option(mconfig,"ass-font-scale","2.5");
-m_config_set_option(mconfig,"ass-force-style", "MarginV=20");
+m_config_set_option(mconfig,"ass-font-scale","1");
+//m_config_set_option(mconfig,"ass-force-style", "MarginV=20"); // This messes up stylized subs, but places text subs excellently
 #endif
 SetMPlayerSettings();
 
@@ -4975,7 +4976,8 @@ static void wiiSeek(int sec, int mode)
 	if(!mpctx->demuxer || !mpctx->demuxer->seekable)
 		return;
 
-	if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)
+	//if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)
+	if(strncmp(filename, "mms:", 4) == 0)
 		return;
 
 	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );

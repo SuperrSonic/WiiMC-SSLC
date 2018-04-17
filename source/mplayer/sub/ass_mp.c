@@ -88,7 +88,7 @@ static void init_style(ASS_Style *style, const char *name, double playres)
 #endif
 	style->MarginL = 10;
 	style->MarginR = 10;
-	style->MarginV = 5;
+	style->MarginV = 20;
 	style->ScaleX = 1.;
 	style->ScaleY = 1.;
 }

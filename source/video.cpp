@@ -30,6 +30,7 @@ static Mtx GXmodelView2D;
 unsigned int *xfb[2] = { NULL, NULL }; // Double buffered
 u8 whichfb = 0; // Switch
 bool need_wait=false;
+//bool double_strike=false;
 
 GXRModeObj *vmode; // Menu video mode
 u8 * videoScreenshot = NULL;
@@ -243,6 +244,9 @@ void Draw_VIDEO()
 
 void SetDf()
 {
+	//if(double_strike)
+		//return;
+
 	if (vmode == &TVNtsc480Prog) {
 		CONF_GetVideo();
 		vmode = &TVNtsc480ProgSoft;
@@ -254,19 +258,39 @@ void SetDf()
 	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
 }
 
+void SetDfOff()
+{
+	//if(double_strike)
+		//return;
+
+	if (vmode == &TVNtsc480ProgSoft) {
+		CONF_GetVideo();
+		vmode = &TVNtsc480Prog;
+	} else if (vmode == &TVEurgb60Hz480ProgSoft) {
+		CONF_GetVideo();
+		vmode = &TVPal576ProgScale;
+	}
+
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_FALSE,vmode->vfilter);
+}
+
 void
 InitVideo (int argc, char *argv[])
 {
 	VIDEO_Init();
+	VIDEO_SetBlack (TRUE);
 	if (argc == 2) {
 		vmode = &TVNtsc240Ds;
 		vmode->viWidth = 704;
+		//double_strike = true;
 	} else if (argc == 3) {
 		vmode = &TVEurgb60Hz240Ds;
 		vmode->viWidth = 704;
+		//double_strike=true;
 	} else if (argc == 4) {
 		vmode = &TVMpal240Ds;
 		vmode->viWidth = 704;
+		//double_strike = true;
 	} else if (argc == 5) {
 		vmode = VIDEO_GetPreferredMode(NULL);
 		vmode->viWidth = 720;
@@ -283,7 +307,7 @@ InitVideo (int argc, char *argv[])
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 	{
 		screenwidth = 768;
-        vmode->fbWidth = 640;
+    	vmode->fbWidth = 640;
 	}
 	else
 	{
@@ -325,7 +349,7 @@ InitVideo2 ()
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
-	VIDEO_SetBlack (FALSE);
+	//VIDEO_SetBlack (FALSE);
 	VIDEO_Flush ();
 	VIDEO_WaitVSync();
 	if (vmode->viTVMode & VI_NON_INTERLACE)
@@ -354,6 +378,7 @@ InitVideo2 ()
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);
 	GX_Flush();
+	VIDEO_SetBlack (FALSE);
 
 	videoScreenshot = (u8 *) mem2_malloc(vmode->fbWidth * vmode->efbHeight * 4, MEM2_VIDEO);
 }

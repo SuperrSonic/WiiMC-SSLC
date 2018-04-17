@@ -26,7 +26,7 @@
 #include "ass_render.h"
 #include "ass_parse.h"
 
-#define MAX_BE 127
+#define MAX_BE 1
 #define NBSP 0xa0   // unicode non-breaking space character
 
 #define skip_to(x) while ((*p != (x)) && (*p != '}') && (*p != 0)) { ++p;}
