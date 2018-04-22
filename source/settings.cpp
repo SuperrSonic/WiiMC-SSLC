@@ -357,6 +357,7 @@ prepareSettingsData ()
 	createXMLSetting("videoFull", "Videos in Fullscreen", toStr(WiiSettings.videoFull));
 	createXMLSetting("audioNorm", "Volume Normalizer", toStr(WiiSettings.audioNorm));
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
+	createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
 	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
 	// Music
 	createXMLSection("Music", "Music Settings");
@@ -640,6 +641,7 @@ void DefaultSettings ()
 	WiiSettings.videoFull = 0;
 	WiiSettings.audioNorm = 0;
 	WiiSettings.videoDf = 0;
+	WiiSettings.viWidth = 0;
 	WiiSettings.skipLoop = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
@@ -729,6 +731,8 @@ static void FixInvalidSettings()
 		WiiSettings.audioNorm = 0;
 	if(WiiSettings.videoDf < 0 || WiiSettings.videoDf > 1)
 		WiiSettings.videoDf = 0;
+	if(WiiSettings.viWidth < 0 || WiiSettings.viWidth > 1)
+		WiiSettings.viWidth = 0;
 	if(WiiSettings.skipLoop < 0 || WiiSettings.skipLoop > 1)
 		WiiSettings.skipLoop = 0;
 
@@ -1076,6 +1080,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoFull, "videoFull");
 				loadXMLSetting(&WiiSettings.audioNorm, "audioNorm");
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
+				loadXMLSetting(&WiiSettings.viWidth, "viWidth");
 				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
@@ -1139,6 +1144,7 @@ bool LoadSettings()
 		FixInvalidSettings();
 		ChangeLanguage();
 
+		wiiSetVIscale();
 		wiiSetDf();
 
 		sprintf(filepath,"%s/restore_points", appPath);

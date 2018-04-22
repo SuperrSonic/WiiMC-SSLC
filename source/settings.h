@@ -121,6 +121,7 @@ struct SWiiSettings {
 	int 	videoFull;
 	int 	audioNorm;
 	int		videoDf;
+	int		viWidth;
 	int		skipLoop;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH

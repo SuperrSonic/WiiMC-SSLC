@@ -242,6 +242,20 @@ void Draw_VIDEO()
 	VIDEO_Flush();
 }
 
+void SetVIscale()
+{
+	vmode->viWidth = VI_MAX_WIDTH_NTSC;
+	VIDEO_Configure (vmode);
+	VIDEO_Flush();
+}
+
+void SetVIscaleback()
+{
+	vmode->viWidth = 704;
+	VIDEO_Configure (vmode);
+	VIDEO_Flush();
+}
+
 void SetDf()
 {
 	//if(double_strike)
@@ -281,23 +295,18 @@ InitVideo (int argc, char *argv[])
 	VIDEO_SetBlack (TRUE);
 	if (argc == 2) {
 		vmode = &TVNtsc240Ds;
-		vmode->viWidth = 704;
 		//double_strike = true;
 	} else if (argc == 3) {
 		vmode = &TVEurgb60Hz240Ds;
-		vmode->viWidth = 704;
 		//double_strike=true;
 	} else if (argc == 4) {
 		vmode = &TVMpal240Ds;
-		vmode->viWidth = 704;
 		//double_strike = true;
-	} else if (argc == 5) {
-		vmode = VIDEO_GetPreferredMode(NULL);
-		vmode->viWidth = 720;
 	} else {
 		vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
-		vmode->viWidth = 704;
 	}
+
+	vmode->viWidth = 704;
 
 	bool pal = false;
 
@@ -305,14 +314,7 @@ InitVideo (int argc, char *argv[])
 		pal = true;
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-	{
 		screenwidth = 768;
-    	vmode->fbWidth = 640;
-	}
-	else
-	{
-        vmode->fbWidth = 640;
-	}
 
 	if (pal)
 	{

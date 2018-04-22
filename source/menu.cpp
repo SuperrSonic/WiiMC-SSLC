@@ -973,9 +973,9 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
 	{
 		usleep(THREAD_SLEEP);
 
-		if(btn1.GetState() == STATE_CLICKED)
+		if(btn1.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_A)
 			choice = 1;
-		else if(btn2.GetState() == STATE_CLICKED)
+		else if(btn2.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B)
 			choice = 0;
 
 		if(guiShutdown)
@@ -1873,7 +1873,7 @@ static int LoadNewFile()
 		browserMusic.selIndex = NULL;
 
 		if(wii_error == 1)
-			ErrorPrompt("Resolution exceeds maximum allowed (1280x720)!");
+			ErrorPrompt("Resolution exceeds maximum allowed (1024x720)!");
 		else
 			ErrorPrompt("Error loading file!");
 
@@ -3569,9 +3569,10 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Backward");
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Files Folder");
-	sprintf(options.name[i++], "Videos in Fullscreen");
+	sprintf(options.name[i++], "Force Fullscreen in 4:3");
 	sprintf(options.name[i++], "Volume Normalizer");
 	sprintf(options.name[i++], "Deflicker");
+	sprintf(options.name[i++], "Set VI Width to 720");
 	sprintf(options.name[i++], "Skip Deblocking Filter");
 
 	options.length = i;
@@ -3717,6 +3718,13 @@ static void MenuSettingsVideos()
 					SetDfOff();
 				break;
 			case 15:
+				WiiSettings.viWidth ^= 1;
+				if(WiiSettings.viWidth == 1)
+					SetVIscale();
+				else
+					SetVIscaleback();
+				break;
+			case 16:
 				WiiSettings.skipLoop ^= 1;
 				break;
 		}
@@ -3759,7 +3767,8 @@ static void MenuSettingsVideos()
 			sprintf (options.value[12], "%s", WiiSettings.videoFull ? "On" : "Off");
 			sprintf (options.value[13], "%d%", WiiSettings.audioNorm);
 			sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
-			sprintf (options.value[15], "%s", WiiSettings.skipLoop ? "On" : "Off");
+			sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
+			sprintf (options.value[16], "%s", WiiSettings.skipLoop ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3982,7 +3991,7 @@ static void MenuSettingsOnlineMedia()
 	OptionList options;
 
 	sprintf(options.name[i++], "Cache Fill");
-	sprintf(options.name[i++], "YouTube Quality");
+	//sprintf(options.name[i++], "YouTube Quality");
 	sprintf(options.name[i++], "Online Media Folder");
 
 	options.length = i;
@@ -4041,15 +4050,15 @@ static void MenuSettingsOnlineMedia()
 				if(WiiSettings.onlineCacheFill > 50)
 					WiiSettings.onlineCacheFill = 5;
 				break;
-			case 1:
+			/*case 1:
 				if(WiiSettings.youtubeFormat == 5)
 					WiiSettings.youtubeFormat = 43;
 				else if(WiiSettings.youtubeFormat == 18)
 					WiiSettings.youtubeFormat = 35;
 				else
 					WiiSettings.youtubeFormat = 5;
-				break;
-			case 2:
+				break;*/
+			case 1:
 				OnScreenKeyboard(WiiSettings.onlinemediaFolder, MAXPATHLEN);
 				if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
 					CleanupPath(WiiSettings.onlinemediaFolder);
@@ -4062,14 +4071,14 @@ static void MenuSettingsOnlineMedia()
 
 			sprintf (options.value[0], "%d%%", WiiSettings.onlineCacheFill);
 
-			if(WiiSettings.youtubeFormat == 5)
+			/*if(WiiSettings.youtubeFormat == 5)
 				sprintf(options.value[1], "Low (400x240)");
 			else if(WiiSettings.youtubeFormat == 43)
 				sprintf(options.value[1], "Medium (480x360)");
 			else
-				sprintf(options.value[1], "High (854x480)");
+				sprintf(options.value[1], "High (854x480)");*/
 
-			snprintf(options.value[2], 60, "%s", WiiSettings.onlinemediaFolder);
+			snprintf(options.value[1], 60, "%s", WiiSettings.onlinemediaFolder);
 			optionBrowser.TriggerUpdate();
 		}
 

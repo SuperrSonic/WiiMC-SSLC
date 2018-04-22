@@ -612,27 +612,30 @@ void StopMPlayerFile()
 
 void wiiSetVolNorm()
 {
-	if (WiiSettings.audioNorm == 1) {
+	if (WiiSettings.audioNorm == 1)
 		wiiSetVolNorm1();
-	} else if (WiiSettings.audioNorm == 2) {
+	else if (WiiSettings.audioNorm == 2)
 		wiiSetVolNorm2();
-	}
 }
 
 void wiiSetVidFull()
 {
-	if (WiiSettings.videoFull == 1) {
+	if (WiiSettings.videoFull == 1)
 		wiiSetFullScreen();
-	} else {
+	else
 		wiiSetScreenNorm();
-	}
 }
 
 void wiiSetDf()
 {
-	if (WiiSettings.videoDf == 1) {
+	if (WiiSettings.videoDf == 1)
 		SetDf();
-	}
+}
+
+void wiiSetVIscale()
+{
+	if (WiiSettings.viWidth == 1)
+		SetVIscale();
 }
 
 extern "C" {
