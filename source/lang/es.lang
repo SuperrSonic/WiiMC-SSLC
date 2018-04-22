@@ -226,6 +226,21 @@ msgstr "Reinicio automático"
 msgid "Videos Files Folder"
 msgstr "Carpeta de vídeos"
 
+msgid "Force Fullscreen in 4:3"
+msgstr "Tamaño completo en 4:3"
+
+msgid "Volume Normalizer"
+msgstr "Iguala el volumen"
+
+msgid "Deflicker"
+msgstr "Defliqueador"
+
+msgid "Set VI Width to 720"
+msgstr "Cambia el ancho a 720"
+
+msgid "Skip Deblocking Filter"
+msgstr "Saltar filtro in-loop"
+
 msgid "Play Order"
 msgstr "Modo de reproducción"
 
@@ -639,6 +654,9 @@ msgstr "WiiMC no tiene acceso al DVD - AHBPROT no está habilitado."
 
 msgid "Starting Area"
 msgstr "Área de inicio"
+
+msgid "Screen Burn-in Reduction"
+msgstr "Protector de pantalla"
 
 msgid "Error downloading font file!"
 msgstr "Error descargando la fuente del archivo!"
