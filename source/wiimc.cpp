@@ -378,7 +378,7 @@ extern "C" bool FindNextFile(bool load)
 			char ext[7];
 			GetExt(loadedFile, ext);
 
-			if(strcasecmp(ext, "dash") == 0)
+			if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 			{
 				wiiDash();
 			} else {

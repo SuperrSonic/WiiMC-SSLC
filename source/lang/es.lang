@@ -2,7 +2,7 @@ msgid "********"
 msgstr "••••••••"
 
 msgid "Videos"
-msgstr "Vídeo"
+msgstr "Video"
 
 msgid "Music"
 msgstr "Música"
@@ -74,7 +74,7 @@ msgid "Subtitles"
 msgstr "Subtítulos"
 
 msgid "Subtitle Delay"
-msgstr "Retardo de subtítulo"
+msgstr "Retraso de subtítulos"
 
 msgid "Settings"
 msgstr "Opciones"
@@ -116,7 +116,7 @@ msgid "Close"
 msgstr "Cerrar"
 
 msgid "DVD"
-msgstr "DVD vídeo"
+msgstr "DVD Video"
 
 msgid "Go back"
 msgstr "Atras"
@@ -152,7 +152,7 @@ msgid "Settings - Global"
 msgstr "Opciones - Generales"
 
 msgid "Settings - Videos"
-msgstr "Opciones - Vídeos"
+msgstr "Opciones - Video"
 
 msgid "Settings - Music"
 msgstr "Opciones - Música"
@@ -218,13 +218,13 @@ msgid "Cache Fill"
 msgstr "Memoria disponible"
 
 msgid "Audio Delay"
-msgstr "Retardo de audio"
+msgstr "Retraso de audio"
 
 msgid "Auto-Resume"
 msgstr "Reinicio automático"
 
 msgid "Videos Files Folder"
-msgstr "Carpeta de vídeos"
+msgstr "Carpeta de videos"
 
 msgid "Force Fullscreen in 4:3"
 msgstr "Tamaño completo en 4:3"
@@ -512,7 +512,7 @@ msgid "Visibility"
 msgstr "Visibilidad"
 
 msgid "Delay"
-msgstr "Retardo"
+msgstr "Retrasar"
 
 msgid "Codepage"
 msgstr "Codificacion"
@@ -608,7 +608,7 @@ msgid "Purple (Default)"
 msgstr "Púrpura (Por defecto)"
 
 msgid "Auto-Play Next Video"
-msgstr "Auto-Play siguiente vídeo"
+msgstr "Auto-Play siguiente video"
 
 msgid "Adding files to playlist..."
 msgstr "Añadiendo ficheros a la lista de reproducción..."
@@ -682,13 +682,13 @@ msgid "The current IOS is unsupported. Functionality and/or stability may be adv
 msgstr "El IOS actual no es soportado. La funcionalidad y/o estabilidad pueden verse drásticamente afectadas."
 
 msgid "Screensaver Delay"
-msgstr "Retardo del Salvapantallas"
+msgstr "Retraso del Salvapantallas"
 
 msgid "Inactivity Shutdown"
 msgstr "Cierre por Inactividad"
 
 msgid "Invalid subtitle delay."
-msgstr "No válido el retardo de subtítulos."
+msgstr "No válido el retraso de subtítulos."
 
 msgid "DVD playback is not supported on this Wii."
 msgstr "La reproducción de DVD no es compatible con esta Wii."
