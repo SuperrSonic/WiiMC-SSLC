@@ -709,7 +709,7 @@ void ChangeLanguage()
 {
 	char error[128] = {0};
 
-	if(WiiSettings.language == LANG_JAPANESE ||
+	/*if(WiiSettings.language == LANG_JAPANESE ||
 		WiiSettings.language == LANG_SIMP_CHINESE ||
 		WiiSettings.language == LANG_TRAD_CHINESE ||
 		WiiSettings.language == LANG_KOREAN ||
@@ -856,7 +856,7 @@ restart:
 		}
 error:
 		WiiSettings.language = LANG_ENGLISH;
-	}
+	}*/
 
 	if(currentFont != FONT_DEFAULT)
 	{
@@ -3137,12 +3137,12 @@ static void MenuSettingsGlobal()
 
 			switch(WiiSettings.language)
 			{
-				case LANG_JAPANESE:				sprintf(options.value[0], "Japanese"); break;
+				//case LANG_JAPANESE:				sprintf(options.value[0], "Japanese"); break;
 				case LANG_ENGLISH:				sprintf(options.value[0], "English"); break;
-				case LANG_GERMAN:				sprintf(options.value[0], "German"); break;
-				case LANG_FRENCH:				sprintf(options.value[0], "French"); break;
-				case LANG_SPANISH:				sprintf(options.value[0], "Spanish"); break;
-				case LANG_ITALIAN:				sprintf(options.value[0], "Italian"); break;
+				//case LANG_GERMAN:				sprintf(options.value[0], "German"); break;
+				//case LANG_FRENCH:				sprintf(options.value[0], "French"); break;
+				case LANG_SPANISH:				sprintf(options.value[0], "Español"); break;
+				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italian"); break;
 				case LANG_DUTCH:				sprintf(options.value[0], "Dutch"); break;
 				case LANG_SIMP_CHINESE:			sprintf(options.value[0], "Chinese (Simplified)"); break;
 				case LANG_TRAD_CHINESE:			sprintf(options.value[0], "Chinese (Traditional)"); break;
@@ -3158,7 +3158,7 @@ static void MenuSettingsGlobal()
 				case LANG_TAMIL:				sprintf(options.value[0], "Tamil"); break;
 				case LANG_SWEDISH:				sprintf(options.value[0], "Swedish"); break;
 				case LANG_DANISH:				sprintf(options.value[0], "Danish"); break;
-				case LANG_BULGARIAN:			sprintf(options.value[0], "Bulgarian"); break;
+				case LANG_BULGARIAN:			sprintf(options.value[0], "Bulgarian"); break;*/
 			}
 			
 			sprintf (options.value[1], "%d%%", WiiSettings.volume);

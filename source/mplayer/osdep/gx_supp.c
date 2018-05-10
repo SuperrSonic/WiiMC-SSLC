@@ -58,7 +58,6 @@ extern int controlledbygui;
 
 //Global variables for brightness and contrast filters
 //Ranges for both should be constrained to [-1.0,1.0]
-//Shouldn't brightness default to 1.0?
 float g_brightness = 0.0f;
 float g_contrast = 0.0f;
 
@@ -605,7 +604,6 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	GX_SetAlphaCompare(GX_GREATER, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GX_SetColorUpdate(GX_ENABLE);
 
-	//GX_SetDrawDoneCallback(VIDEO_Flush); //added while testing
 	GX_Flush();
 	VIDEO_SetPostRetraceCallback(retrace_callback);
 }

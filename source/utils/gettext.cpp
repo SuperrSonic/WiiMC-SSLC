@@ -210,12 +210,12 @@ bool LoadLanguage()
 	
 	switch(WiiSettings.language)
 	{
-		case LANG_JAPANESE: file = (char *)jp_lang; eof = file + jp_lang_size; break;
+		//case LANG_JAPANESE: file = (char *)jp_lang; eof = file + jp_lang_size; break;
 		case LANG_ENGLISH: file = (char *)en_lang; eof = file + en_lang_size; break;
-		case LANG_GERMAN: file = (char *)de_lang; eof = file + de_lang_size; break;
-		case LANG_FRENCH: file = (char *)fr_lang; eof = file + fr_lang_size; break;
+		//case LANG_GERMAN: file = (char *)de_lang; eof = file + de_lang_size; break;
+		//case LANG_FRENCH: file = (char *)fr_lang; eof = file + fr_lang_size; break;
 		case LANG_SPANISH: file = (char *)es_lang; eof = file + es_lang_size; break;
-		case LANG_ITALIAN: file = (char *)it_lang; eof = file + it_lang_size; break;
+		/*case LANG_ITALIAN: file = (char *)it_lang; eof = file + it_lang_size; break;
 		case LANG_DUTCH: file = (char *)nl_lang; eof = file + nl_lang_size; break;
 		case LANG_SIMP_CHINESE: file = (char *)zh_cn_lang; eof = file + zh_cn_lang_size; break;
 		case LANG_TRAD_CHINESE: file = (char *)zh_tw_lang; eof = file + zh_tw_lang_size; break;
@@ -231,7 +231,7 @@ bool LoadLanguage()
 		case LANG_TAMIL: file = (char *)ta_lang; eof = file + ta_lang_size; break;
 		case LANG_SWEDISH: file = (char *)sv_lang; eof = file + sv_lang_size; break;
 		case LANG_DANISH: file = (char *)da_lang; eof = file + da_lang_size; break;
-		case LANG_BULGARIAN: file = (char *)bg_lang; eof = file + bg_lang_size; break;
+		case LANG_BULGARIAN: file = (char *)bg_lang; eof = file + bg_lang_size; break;*/
 		default: return false;
 	}
 
