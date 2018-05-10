@@ -621,7 +621,7 @@ void DefaultSettings ()
 	WiiSettings.screensaverDelay = 300;
 	WiiSettings.inactivityShutdown = 2;
 	WiiSettings.lockFolders = 0;
-	WiiSettings.startArea = MENU_BROWSE_VIDEOS;
+	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
 	WiiSettings.screenDim = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
