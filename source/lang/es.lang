@@ -478,17 +478,17 @@ msgstr "Imposible guardar opciones"
 msgid "Thanks to"
 msgstr "Gracias a"
 
-msgid "This software is open source and may be copied, distributed, or modified under the terms of the GNU General Public License (GPL) Version 2."
-msgstr "Este software es libre y puede ser copiado, distribuido y/o modificado bajo las normas de GNU General Public License (GPL) Versión 2."
-
 msgid "Menu artwork"
 msgstr "Iconos del menú"
 
-msgid "Coding"
+msgid "Programming"
 msgstr "Programación"
 
-msgid "Coding & menu design"
-msgstr "Programación y diseno del menu"
+msgid "& menu design"
+msgstr "& diseño del menú"
+
+msgid "This is a private build of WiiMC."
+msgstr "Esto es una versión privada de WiiMC."
 
 msgid "Logo"
 msgstr ""
@@ -529,9 +529,6 @@ msgstr "¡Imposible cambiar idioma. Memoria insuficiente!"
 msgid "Font Required"
 msgstr "Fuente requerida"
 
-msgid "A new font is required to display this language."
-msgstr "Se requiere nueva fuente para mostrar este idioma."
-
 msgid "Download font"
 msgstr "Descargar fuente"
 
@@ -540,9 +537,6 @@ msgstr "¡Imposible guardar fuente!"
 
 msgid "Out of Memory"
 msgstr "Fuera de memoria"
-
-msgid "WiiMC does not have enough free memory to load the picture viewer."
-msgstr "WiiMC no tiene suficiente memoria libre para cargar el visor de imágenes."
 
 msgid "Close MPlayer"
 msgstr "Cerrar MPlayer"
@@ -556,29 +550,11 @@ msgstr "Este directorio contiene más entradas del máximo permitido. No todas s
 msgid "This playlist contains more entries than the maximum allowed. Not all entries will be visible."
 msgstr "Esta lista de reproducción contiene más entradas del máximo permitido. No todas serán visibles."
 
-msgid "Downloading..."
-msgstr "Descargando..."
-
-msgid "Unzipping..."
-msgstr "Descomprimiendo..."
-
 msgid "Color"
 msgstr "Color"
 
 msgid "Size"
 msgstr "Tamaño"
-
-msgid "White"
-msgstr "Blanco"
-
-msgid "Black"
-msgstr "Negro"
-
-msgid "Yellow"
-msgstr "Amarillo"
-
-msgid "Red"
-msgstr "Rojo"
 
 msgid "Sleep Timer"
 msgstr "Temporizador"
@@ -588,24 +564,6 @@ msgstr "seg"
 
 msgid "min"
 msgstr "min"
-
-msgid "Blue"
-msgstr "Azul"
-
-msgid "Green"
-msgstr "Verde"
-
-msgid "Grey"
-msgstr "Gris"
-
-msgid "Orange"
-msgstr "Naranja"
-
-msgid "Theme"
-msgstr "Tema"
-
-msgid "Purple (Default)"
-msgstr "Púrpura (Por defecto)"
 
 msgid "Auto-Play Next Video"
 msgstr "Auto-Play siguiente video"
@@ -631,14 +589,11 @@ msgstr "Soporte DVD"
 msgid "Enabled"
 msgstr "Habilitado"
 
-msgid "Error loading YouTube file!"
-msgstr "Error en la carga del archivo de Youtube!"
-
 msgid "Rotate"
 msgstr "Rotar"
 
-msgid "Resolution exceeds maximum allowed (1280x720)!"
-msgstr "La resolución excede el máximo permitido (1280x720)!"
+msgid "Resolution exceeds maximum allowed (1024x720)!"
+msgstr "La resolución excede el máximo permitido (1024x720)!"
 
 msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
 msgstr "El IOS actual ha sido alterado (firma errónea). La funcionalidad y/o estabilidad puede verse afectada."
@@ -658,6 +613,9 @@ msgstr "Área de inicio"
 msgid "Screen Burn-in Reduction"
 msgstr "Protector de pantalla"
 
+msgid "Double Strike"
+msgstr "Modo "Double Strike""
+
 msgid "Error downloading font file!"
 msgstr "Error descargando la fuente del archivo!"
 
@@ -666,17 +624,6 @@ msgstr "Error abriendo la fuente del archivo!"
 
 msgid "Could not change language. The font file is corrupted!"
 msgstr "No se puede cambiar de idioma. Fuente del archivo erronea!"
-
-msgid "YouTube Quality"
-msgstr "Calidad de YouTube"
-
-msgid "Low (400x240)"
-msgstr "Baja (400x240)"
-msgid "Medium (480x360)"
-msgstr "Media (480x360)"
-
-msgid "High (854x480)"
-msgstr "Alta (854x480)"
 
 msgid "The current IOS is unsupported. Functionality and/or stability may be adversely affected."
 msgstr "El IOS actual no es soportado. La funcionalidad y/o estabilidad pueden verse drásticamente afectadas."
