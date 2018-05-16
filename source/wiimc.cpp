@@ -55,6 +55,7 @@ char loadedFile[1024] = { 0 };
 char loadedDevice[16] = { 0 };
 char loadedFileDisplay[128] = { 0 };
 static bool settingsSet = false;
+static bool AutobootExit = false;
 
 // MPlayer threads
 #define MPLAYER_STACKSIZE (512*1024)
@@ -367,6 +368,11 @@ extern "C" bool FindNextFile(bool load)
 			loadedFile[0] = 0;
 			loadedFileDisplay[0] = 0;
 			ResetVideos();
+			// Exit after loading autobooted file
+			if(AutobootExit) {
+				VIDEO_SetBlack (TRUE);
+				ExitRequested = true;
+			}
 			return false;
 		}
 		else
@@ -638,6 +644,18 @@ void wiiSetVIscale()
 		SetVIscale();
 }
 
+void wiiSetDoubleStrike()
+{
+	if (WiiSettings.doubleStrike == 1) {
+		SetDoubleStrike();
+		WiiSettings.videoDf = 0;
+		if(WiiSettings.viWidth == 1)
+			SetVIscale();
+		else
+			SetVIscaleback();
+	}
+}
+
 extern "C" {
 void SetMPlayerSettings()
 {
@@ -766,6 +784,13 @@ int main(int argc, char *argv[])
 	LWP_CreateThread(&cthread, mplayercachethread, NULL, cachestack, CACHE_STACKSIZE, 70);
 
 	usleep(200);
+
+	// path sent by the plugin's argument
+	if(argc > 1 && (argv[0][0] == 'u' || argv[0][0] == 's'))
+	{
+		sprintf(loadedFile, argv[1]);
+		AutobootExit = true;
+	}
 
 	// create GUI thread
  	while(1)

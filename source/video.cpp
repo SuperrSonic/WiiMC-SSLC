@@ -30,7 +30,6 @@ static Mtx GXmodelView2D;
 unsigned int *xfb[2] = { NULL, NULL }; // Double buffered
 u8 whichfb = 0; // Switch
 bool need_wait=false;
-//bool double_strike=false;
 
 GXRModeObj *vmode; // Menu video mode
 u8 * videoScreenshot = NULL;
@@ -242,6 +241,41 @@ void Draw_VIDEO()
 	VIDEO_Flush();
 }
 
+void SetDoubleStrikeOff()
+{
+	CONF_GetVideo();
+	vmode = VIDEO_GetPreferredMode(NULL);
+
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE, GX_DISABLE);
+	GX_Flush();
+}
+
+void SetDoubleStrike()
+{
+	CONF_GetVideo();
+	vmode = &TVNtsc240Ds;
+
+	// Support other types?
+	/*	vmode = &TVEurgb60Hz240Ds;
+		vmode = &TVMpal240Ds;*/
+
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_FALSE,vmode->vfilter);
+	GX_SetFieldMode(GX_DISABLE, GX_ENABLE);
+	GX_Flush();
+}
+
 void SetVIscale()
 {
 	vmode->viWidth = VI_MAX_WIDTH_NTSC;
@@ -258,9 +292,6 @@ void SetVIscaleback()
 
 void SetDf()
 {
-	//if(double_strike)
-		//return;
-
 	if (vmode == &TVNtsc480Prog) {
 		CONF_GetVideo();
 		vmode = &TVNtsc480ProgSoft;
@@ -274,9 +305,6 @@ void SetDf()
 
 void SetDfOff()
 {
-	//if(double_strike)
-		//return;
-
 	if (vmode == &TVNtsc480ProgSoft) {
 		CONF_GetVideo();
 		vmode = &TVNtsc480Prog;
@@ -292,20 +320,7 @@ void
 InitVideo (int argc, char *argv[])
 {
 	VIDEO_Init();
-	VIDEO_SetBlack (TRUE);
-	if (argc == 2) {
-		vmode = &TVNtsc240Ds;
-		//double_strike = true;
-	} else if (argc == 3) {
-		vmode = &TVEurgb60Hz240Ds;
-		//double_strike=true;
-	} else if (argc == 4) {
-		vmode = &TVMpal240Ds;
-		//double_strike = true;
-	} else {
-		vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
-	}
-
+	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
 	vmode->viWidth = 704;
 
 	bool pal = false;
@@ -332,6 +347,7 @@ InitVideo (int argc, char *argv[])
 	if (CONF_GetDisplayOffsetH(&hoffset) == 0)
 		vmode->viXOrigin += hoffset;
 
+	VIDEO_SetBlack (TRUE);
 	VIDEO_Configure (vmode);
 }
 
@@ -351,7 +367,6 @@ InitVideo2 ()
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
-	//VIDEO_SetBlack (FALSE);
 	VIDEO_Flush ();
 	VIDEO_WaitVSync();
 	if (vmode->viTVMode & VI_NON_INTERLACE)
@@ -359,6 +374,8 @@ InitVideo2 ()
 	else
 		while (VIDEO_GetNextField())
 			VIDEO_WaitVSync();
+
+	VIDEO_SetBlack (FALSE);
 
 	// Initialize GX
 	GXColor background = { 0, 0, 0, 0xff };
@@ -376,11 +393,10 @@ InitVideo2 ()
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
-	GX_SetFieldMode(vmode->field_rendering,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);
 	GX_Flush();
-	VIDEO_SetBlack (FALSE);
 
 	videoScreenshot = (u8 *) mem2_malloc(vmode->fbWidth * vmode->efbHeight * 4, MEM2_VIDEO);
 }

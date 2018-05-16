@@ -1601,14 +1601,14 @@ static void CreditsWindow()
 	txt[i]->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	txt[i]->SetPosition(0,y); i++; y+=44;
 
-	txt[i] = new GuiText("Programming & menu design", 20, (GXColor){160, 160, 160, 255});
+	txt[i] = new GuiText("Programming", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
 	txt[i] = new GuiText("Daigo 'Tengensei'", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
 
-	txt[i] = new GuiText("Programming", 20, (GXColor){160, 160, 160, 255});
+	txt[i] = new GuiText("& menu design", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
 	txt[i] = new GuiText("Tantric & rodries", 20, (GXColor){255, 255, 255, 255});
@@ -1762,6 +1762,7 @@ void EnableVideoImg()
 	if(!videoImg)
 		return;
 
+	videoImg->SetScaleY(screenheight/(float)vmode->efbHeight);
 	videoImg->SetVisible(true);
 }
 
@@ -3018,6 +3019,7 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Browser Folders");
 	sprintf(options.name[i++], "Starting Area");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
+	sprintf(options.name[i++], "Double Strike");
 
 	options.length = i;
 
@@ -3129,6 +3131,20 @@ static void MenuSettingsGlobal()
 			case 10:
 				WiiSettings.screenDim ^= 1;
 				break;
+			case 11:
+				WiiSettings.doubleStrike ^= 1;
+				if(WiiSettings.doubleStrike == 1) {
+					SetDoubleStrike();
+					WiiSettings.videoDf = 0; // Not necessary but if enabled when 240p gets turned off it will do nothing so reset it
+				} else {
+					SetDoubleStrikeOff();
+					WiiSettings.videoDf = 0;
+				}
+				if(WiiSettings.viWidth == 1)
+						SetVIscale();
+					else
+						SetVIscaleback();
+				break;
 		}
 
 		if(ret >= 0 || firstRun)
@@ -3197,6 +3213,7 @@ static void MenuSettingsGlobal()
 			}
 			
 			sprintf(options.value[10], "%s", WiiSettings.screenDim ? "On" : "Off");
+			sprintf(options.value[11], "%s", WiiSettings.doubleStrike ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -5855,7 +5872,6 @@ static void SetupGui()
 	videoImg = new GuiImage();
 	videoImg->SetImage(videoScreenshot, vmode->fbWidth, vmode->viHeight);
 	videoImg->SetScaleX(screenwidth/(float)vmode->fbWidth);
-	videoImg->SetScaleY(screenheight/(float)vmode->efbHeight);
 	videoImg->SetVisible(false);
 	menuWindow->Append(videoImg);
 
@@ -6090,12 +6106,22 @@ static void StopGuiThreads()
  ***************************************************************************/
 
 void WiiMenu()
-{	
+{
+	static bool firstboot = true;
 	menuMode = 0; // switch to normal GUI mode
 	guiShutdown = false;
 	FrameTimer = 1;
 
 	SetupGui(); // only once
+
+	// Blacken the screen if we autoboot a file
+	if(firstboot)
+	{
+		if(loadedFile[0] != 0)
+		{
+			VIDEO_SetBlack(TRUE);
+		}
+	}
 
 	mainWindow = menuWindow;
 	mainWindow->Remove(disabled);
@@ -6139,6 +6165,25 @@ void WiiMenu()
 		ExitRequested = true;
 		return;
 	}
+	
+	// Try to autoboot the file sent by the plugin
+	if(firstboot)
+	{
+		firstboot = false;
+
+		if(loadedFile[0] != 0)
+		{
+			guiShutdown = true;
+			sleep(2); // USB mount delay
+
+			LoadNewFile();
+
+			SuspendParseThread();
+			SuspendGui();
+		}
+		VIDEO_SetBlack(FALSE);
+	}
+	
 	usleep(500);
 	ResumeGui();
 

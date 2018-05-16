@@ -338,6 +338,7 @@ prepareSettingsData ()
 	createXMLSetting("startArea", "Starting area", toStr(WiiSettings.startArea));
 	createXMLSetting("debug", "Debug", toStr(WiiSettings.debug));
 	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
+	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
 	// Videos
 	createXMLSection("Videos", "Videos Settings");
 	createXMLSetting("videoZoomHor", "Horizontal video zoom", FtoStr(WiiSettings.videoZoomHor));
@@ -623,6 +624,7 @@ void DefaultSettings ()
 	WiiSettings.lockFolders = 0;
 	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
 	WiiSettings.screenDim = 0;
+	WiiSettings.doubleStrike = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
 	WiiSettings.videoZoomVert = 1;
@@ -709,6 +711,8 @@ static void FixInvalidSettings()
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
 	if(WiiSettings.screenDim < 0 || WiiSettings.screenDim > 1)
 		WiiSettings.screenDim = 0;
+	if(WiiSettings.doubleStrike < 0 || WiiSettings.doubleStrike > 1)
+		WiiSettings.doubleStrike = 0;
 
 	// Videos
 	if(WiiSettings.videoZoomHor < 0.5 || WiiSettings.videoZoomHor > 1.5)
@@ -1062,6 +1066,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.startArea, "startArea");
 				loadXMLSetting(&WiiSettings.debug, "debug");
 				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
+				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
 				// Videos
 				loadXMLSetting(&WiiSettings.videoZoomHor, "videoZoomHor");
 				loadXMLSetting(&WiiSettings.videoZoomVert, "videoZoomVert");
@@ -1146,6 +1151,7 @@ bool LoadSettings()
 
 		wiiSetVIscale();
 		wiiSetDf();
+		wiiSetDoubleStrike();
 
 		sprintf(filepath,"%s/restore_points", appPath);
 		char *buffer = (char *)mem2_malloc(50*1024, MEM2_OTHER);
