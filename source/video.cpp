@@ -37,6 +37,7 @@ int screenheight = 480;
 int screenwidth = 640;
 u32 FrameTimer = 0;
 bool drawGui = false;
+bool pal = false;
 
 /****************************************************************************
  * TakeScreenshot
@@ -241,6 +242,25 @@ void Draw_VIDEO()
 	VIDEO_Flush();
 }
 
+void HOffset()
+{
+	if (pal)
+	{
+		vmode->viXOrigin = (VI_MAX_WIDTH_PAL - vmode->viWidth) / 2;
+		vmode->viYOrigin = (VI_MAX_HEIGHT_PAL - vmode->viHeight) / 2;
+	}
+	else
+	{
+		vmode->viXOrigin = (VI_MAX_WIDTH_NTSC - vmode->viWidth) / 2;
+		vmode->viYOrigin = (VI_MAX_HEIGHT_NTSC - vmode->viHeight) / 2;
+	}
+
+	s8 hoffset = 0;
+
+	if (CONF_GetDisplayOffsetH(&hoffset) == 0)
+		vmode->viXOrigin += hoffset;
+}
+
 void SetDoubleStrikeOff()
 {
 	CONF_GetVideo();
@@ -259,11 +279,10 @@ void SetDoubleStrikeOff()
 void SetDoubleStrike()
 {
 	CONF_GetVideo();
-	vmode = &TVNtsc240Ds;
-
-	// Support other types?
-	/*	vmode = &TVEurgb60Hz240Ds;
-		vmode = &TVMpal240Ds;*/
+	if(pal)
+		vmode = &TVEurgb60Hz240Ds;
+	else
+		vmode = &TVNtsc240Ds;
 
 	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
@@ -279,6 +298,7 @@ void SetDoubleStrike()
 void SetVIscale()
 {
 	vmode->viWidth = VI_MAX_WIDTH_NTSC;
+	HOffset();
 	VIDEO_Configure (vmode);
 	VIDEO_Flush();
 }
@@ -286,6 +306,7 @@ void SetVIscale()
 void SetVIscaleback()
 {
 	vmode->viWidth = 704;
+	HOffset();
 	VIDEO_Configure (vmode);
 	VIDEO_Flush();
 }
@@ -323,29 +344,13 @@ InitVideo (int argc, char *argv[])
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
 	vmode->viWidth = 704;
 
-	bool pal = false;
-
 	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale)
 		pal = true;
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 		screenwidth = 768;
 
-	if (pal)
-	{
-		vmode->viXOrigin = (VI_MAX_WIDTH_PAL - vmode->viWidth) / 2;
-		vmode->viYOrigin = (VI_MAX_HEIGHT_PAL - vmode->viHeight) / 2;
-	}
-	else
-	{
-		vmode->viXOrigin = (VI_MAX_WIDTH_NTSC - vmode->viWidth) / 2;
-		vmode->viYOrigin = (VI_MAX_HEIGHT_NTSC - vmode->viHeight) / 2;
-	}
-
-	s8 hoffset = 0;
-
-	if (CONF_GetDisplayOffsetH(&hoffset) == 0)
-		vmode->viXOrigin += hoffset;
+	HOffset();
 
 	VIDEO_SetBlack (TRUE);
 	VIDEO_Configure (vmode);
