@@ -605,7 +605,7 @@ msgid "Subtitle font file not found. Subtitles will not be visible."
 msgstr "La fuente del subtítulo no se encuentra. El subtítulo no estará visible."
 
 msgid "WiiMC does not have DVD access - AHBPROT is not enabled."
-msgstr "WiiMC no tiene acceso al DVD - AHBPROT no está habilitado."
+msgstr "WiiMC no tiene acceso al DVD."
 
 msgid "Starting Area"
 msgstr "Área de inicio"
@@ -614,7 +614,7 @@ msgid "Screen Burn-in Reduction"
 msgstr "Protector de pantalla"
 
 msgid "Double Strike"
-msgstr "Modo "Double Strike""
+msgstr "Modo "Double-Strike""
 
 msgid "Error downloading font file!"
 msgstr "Error descargando la fuente del archivo!"
