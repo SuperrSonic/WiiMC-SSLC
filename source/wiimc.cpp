@@ -732,7 +732,7 @@ int main(int argc, char *argv[])
 	AUDIO_Init(NULL);
 	DSP_Init();
 	AUDIO_StopDMA();
-	InitVideo(argc, argv);
+	InitVideo();
 
 	// Wii Power/Reset buttons
 	__STM_Close();
@@ -759,7 +759,7 @@ int main(int argc, char *argv[])
 	AddMem2Area (size, MEM2_VIDEO); 
 	AddMem2Area (3*1024*1024, MEM2_BROWSER);
 	AddMem2Area (7*1024*1024, MEM2_GUI);
-	AddMem2Area (5*1024*1024, MEM2_OTHER); // vars + ttf
+	AddMem2Area (4*1024*1024, MEM2_OTHER); // vars + ttf
 
 	GX_AllocTextureMemory();
 

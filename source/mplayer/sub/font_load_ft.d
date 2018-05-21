@@ -93,12 +93,7 @@ sub/font_load_ft.o: sub/font_load_ft.c config.h \
  C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gctypes.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdbool.h \
  stream/stream.h stream/http.h sub/ass_mp.h sub/subreader.h libass/ass.h \
- libass/ass_types.h sub/ass_mp.h path.h sub/osd_font.h \
- sub/../../utils/mem2_manager.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/system.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gcutil.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/gx_struct.h
+ libass/ass_types.h sub/ass_mp.h path.h sub/osd_font.h
 
 config.h:
 
@@ -337,13 +332,3 @@ sub/ass_mp.h:
 path.h:
 
 sub/osd_font.h:
-
-sub/../../utils/mem2_manager.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/system.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gcutil.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/gx_struct.h:

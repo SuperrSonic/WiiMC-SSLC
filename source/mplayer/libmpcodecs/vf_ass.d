@@ -81,12 +81,7 @@ libmpcodecs/vf_ass.o: libmpcodecs/vf_ass.c config.h \
  ffmpeg/libavutil/intfloat_readwrite.h ffmpeg/libavutil/log.h \
  ffmpeg/libavutil/pixfmt.h mpbswap.h ffmpeg/libavutil/bswap.h \
  libmpdemux/ms_hdr.h libmpcodecs/vf.h libmpcodecs/vfcap.h mp_global.h \
- libvo/fastmemcpy.h sub/sub.h m_struct.h sub/eosd.h libmpcodecs/vf.h \
- libmpcodecs/../../utils/mem2_manager.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/system.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gcutil.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h \
- C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/gx_struct.h
+ libvo/fastmemcpy.h sub/sub.h m_struct.h sub/eosd.h libmpcodecs/vf.h
 
 config.h:
 
@@ -319,13 +314,3 @@ m_struct.h:
 sub/eosd.h:
 
 libmpcodecs/vf.h:
-
-libmpcodecs/../../utils/mem2_manager.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/system.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gcutil.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/gx_struct.h:

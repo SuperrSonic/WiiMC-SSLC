@@ -28,13 +28,13 @@
 #include "font_load.h"
 #include "sub.h"
 #include "mp_msg.h"
-
+/*
 #ifdef GEKKO
 #include "../../utils/mem2_manager.h"
 #define malloc(x) mem2_malloc(x,MEM2_OTHER)
 #define free(x) mem2_free(x,MEM2_OTHER)
 #define strdup(x) mem2_strdup(x,MEM2_OTHER)
-#endif
+#endif*/
 
 raw_file* load_raw(char *name,int verbose){
     int bpp;

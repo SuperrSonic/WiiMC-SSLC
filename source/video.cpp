@@ -338,7 +338,7 @@ void SetDfOff()
 }
 
 void
-InitVideo (int argc, char *argv[])
+InitVideo ()
 {
 	VIDEO_Init();
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode

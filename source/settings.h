@@ -132,7 +132,6 @@ struct SWiiSettings {
 	int		dvdDisabled;
 	// Online Media
 	int 	onlineCacheFill;
-	int		youtubeFormat;
 	char	onlinemediaFolder[MAXPATHLEN];
 	// Network
 	SMBSettings smbConf[MAX_SHARES];

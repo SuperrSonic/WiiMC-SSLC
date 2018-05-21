@@ -51,13 +51,13 @@
 #define rgba2u(c)  ( ((-152*_r(c) - 298*_g(c) + 450*_b(c)) >> 10) + 128 )
 #define rgba2v(c)  ( (( 450*_r(c) - 376*_g(c) -  73*_b(c)) >> 10) + 128 )
 
-
+/*
 #ifdef GEKKO
 #include "../../utils/mem2_manager.h"
 #define malloc(x) mem2_malloc(x,MEM2_OTHER)
 #define free(x) mem2_free(x,MEM2_OTHER)
 #define strdup(x) mem2_strdup(x,MEM2_OTHER)
-#endif
+#endif*/
 
 static const struct vf_priv_s {
     int outh, outw;
