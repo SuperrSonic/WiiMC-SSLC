@@ -2977,7 +2977,7 @@ m_config_set_option(mconfig,"subfont-text-scale","1");
 //m_config_set_option(mconfig,"af","volnorm=1:0.25"); // "=2:0.75" sounds too loud and distorted, default "=1:0.25"
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
-m_config_set_option(mconfig,"ass-font-scale","1");
+m_config_set_option(mconfig,"ass-font-scale","2.5");
 //m_config_set_option(mconfig,"ass-force-style", "MarginV=20"); // This messes up stylized subs, but places text subs excellently
 #endif
 SetMPlayerSettings();
