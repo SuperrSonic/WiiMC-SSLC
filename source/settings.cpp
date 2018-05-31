@@ -622,7 +622,7 @@ void DefaultSettings ()
 	WiiSettings.inactivityShutdown = 2;
 	WiiSettings.lockFolders = 0;
 	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
-	WiiSettings.screenDim = 0;
+	WiiSettings.screenDim = CONF_GetScreenSaverMode();
 	WiiSettings.doubleStrike = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
