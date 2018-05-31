@@ -612,7 +612,7 @@ void DefaultSettings ()
 	memset(&WiiSettings, 0, sizeof(SWiiSettings));
 
 	// Global
-	WiiSettings.language = CONF_GetLanguage();
+	WiiSettings.language = CONF_GetLanguage() == 4 ? LANG_SPANISH : LANG_ENGLISH;
 	WiiSettings.volume = 50;
 	WiiSettings.hideExtensions = 1;
 	WiiSettings.exitAction = EXIT_AUTO;

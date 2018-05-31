@@ -3155,10 +3155,10 @@ static void MenuSettingsGlobal()
 			{
 				//case LANG_JAPANESE:				sprintf(options.value[0], "Japanese"); break;
 				case LANG_ENGLISH:				sprintf(options.value[0], "English"); break;
-				//case LANG_GERMAN:				sprintf(options.value[0], "German"); break;
-				//case LANG_FRENCH:				sprintf(options.value[0], "French"); break;
+				//case LANG_GERMAN:				sprintf(options.value[0], "Deutsch"); break;
+				//case LANG_FRENCH:				sprintf(options.value[0], "Français"); break;
 				case LANG_SPANISH:				sprintf(options.value[0], "Español"); break;
-				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italian"); break;
+				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italiano"); break;
 				case LANG_DUTCH:				sprintf(options.value[0], "Dutch"); break;
 				case LANG_SIMP_CHINESE:			sprintf(options.value[0], "Chinese (Simplified)"); break;
 				case LANG_TRAD_CHINESE:			sprintf(options.value[0], "Chinese (Traditional)"); break;
