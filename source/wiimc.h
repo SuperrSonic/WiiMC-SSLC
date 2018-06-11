@@ -40,6 +40,7 @@ void ActivateExitThread();
 
 extern bool ExitRequested;
 extern bool ShutdownRequested;
+extern bool AutobootExit;
 extern FreeTypeGX *fontSystem[];
 extern bool subtitleFontFound;
 extern char loadedFile[];

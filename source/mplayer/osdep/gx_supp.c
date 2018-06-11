@@ -490,12 +490,12 @@ inline void DrawMPlayer()
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
 
-	_CPU_ISR_Disable(level);
+	/*_CPU_ISR_Disable(level);
     if (referenceRetraceCount > retraceCount) {
 		VIDEO_WaitVSync();
     }
 	referenceRetraceCount = retraceCount;
-    _CPU_ISR_Restore(level);
+    _CPU_ISR_Restore(level);*/
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 		GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);

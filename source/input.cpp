@@ -165,10 +165,14 @@ void MPlayerInput()
 	u16 down = PAD_ButtonsDown(0);
 	u16 held = PAD_ButtonsHeld(0);
 
-	if(userInput[0].wpad->btns_d & WPAD_BUTTON_1 || down & PAD_BUTTON_B)
+	if(userInput[0].wpad->btns_d & WPAD_BUTTON_1 || down & PAD_BUTTON_B) {
 		osdLevel ^= 1;
-	else if(ExitRequested || userInput[0].wpad->btns_d & WPAD_BUTTON_HOME || down & PAD_BUTTON_START)
+	} else if(AutobootExit && (userInput[0].wpad->btns_d & WPAD_BUTTON_HOME || down & PAD_BUTTON_START)) {
+		VIDEO_SetBlack (TRUE);
+		ExitRequested = true;
+	} else if(ExitRequested || userInput[0].wpad->btns_d & WPAD_BUTTON_HOME || down & PAD_BUTTON_START) {
 		wiiGotoGui();
+	}
 
 	if(!inDVDMenu)
 	{

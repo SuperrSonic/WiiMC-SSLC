@@ -55,7 +55,7 @@ char loadedFile[1024] = { 0 };
 char loadedDevice[16] = { 0 };
 char loadedFileDisplay[128] = { 0 };
 static bool settingsSet = false;
-static bool AutobootExit = false;
+bool AutobootExit = false;
 
 // MPlayer threads
 #define MPLAYER_STACKSIZE (512*1024)
