@@ -101,7 +101,7 @@ static int generate_tables(ASS_SynthPriv *priv, double radius)
     return 0;
 }
 
-static void resize_tmp(ASS_SynthPriv *priv, int w, int h)
+/*static void resize_tmp(ASS_SynthPriv *priv, int w, int h)
 {
     if (priv->tmp_w >= w && priv->tmp_h >= h)
         return;
@@ -115,7 +115,7 @@ static void resize_tmp(ASS_SynthPriv *priv, int w, int h)
         priv->tmp_h *= 2;
     free(priv->tmp);
     priv->tmp = malloc((priv->tmp_w + 1) * priv->tmp_h * sizeof(short));
-}
+}*/
 
 ASS_SynthPriv *ass_synth_init(double radius)
 {
@@ -302,7 +302,7 @@ static void shift_bitmap(Bitmap *bm, int shift_x, int shift_y)
 /*
  * Gaussian blur.  An fast pure C implementation from MPlayer.
  */
-static void ass_gauss_blur(unsigned char *buffer, unsigned short *tmp2,
+/*static void ass_gauss_blur(unsigned char *buffer, unsigned short *tmp2,
                            int width, int height, int stride, int *m2,
                            int r, int mwidth)
 {
@@ -418,13 +418,13 @@ static void ass_gauss_blur(unsigned char *buffer, unsigned short *tmp2,
         s += stride;
         t += width + 1;
     }
-}
+}*/
 
 /**
  * \brief Blur with [[1,2,1]. [2,4,2], [1,2,1]] kernel
  * This blur is the same as the one employed by vsfilter.
  */
-static void be_blur(Bitmap *bm)
+/*static void be_blur(Bitmap *bm)
 {
     int w = bm->w;
     int h = bm->h;
@@ -450,7 +450,7 @@ static void be_blur(Bitmap *bm)
             old_sum = new_sum;
         }
     }
-}
+}*/
 
 int outline_to_bitmap3(ASS_Library *library, ASS_SynthPriv *priv_blur,
                        FT_Library ftlib, FT_Outline *outline, FT_Outline *border,
@@ -482,15 +482,15 @@ int outline_to_bitmap3(ASS_Library *library, ASS_SynthPriv *priv_blur,
     }
 
     // Apply box blur (multiple passes, if requested)
-    while (be--) {
+    /*while (be--) {
         if (*bm_o)
             be_blur(*bm_o);
         else
             be_blur(*bm_g);
-    }
+    }*/
 
     // Apply gaussian blur
-    if (blur_radius > 0.0) {
+    /*if (blur_radius > 0.0) {
         if (*bm_o)
             resize_tmp(priv_blur, (*bm_o)->w, (*bm_o)->h);
         else
@@ -506,7 +506,7 @@ int outline_to_bitmap3(ASS_Library *library, ASS_SynthPriv *priv_blur,
                            (*bm_g)->w, (*bm_g)->h, (*bm_g)->stride,
                            (int *) priv_blur->gt2, priv_blur->g_r,
                            priv_blur->g_w);
-    }
+    }*/
 
     // Create shadow and fix outline as needed
     if (*bm_o && border_style != 3) {
