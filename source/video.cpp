@@ -30,6 +30,7 @@ static Mtx GXmodelView2D;
 unsigned int *xfb[2] = { NULL, NULL }; // Double buffered
 u8 whichfb = 0; // Switch
 bool need_wait=false;
+bool flip_pending=false;
 
 GXRModeObj *vmode; // Menu video mode
 u8 * videoScreenshot = NULL;
@@ -113,13 +114,19 @@ void StopGX()
  ***************************************************************************/
 void Menu_Render()
 {
-	whichfb ^= 1; // flip framebuffer
+	//whichfb ^= 1; // flip framebuffer
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
 	GX_CopyDisp(xfb[whichfb],GX_TRUE);
-	VIDEO_SetNextFramebuffer(xfb[whichfb]);
+	//VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	GX_DrawDone();
-	VIDEO_WaitVSync();
+	if (flip_pending) {
+		VIDEO_SetNextFramebuffer(xfb[whichfb]);
+		VIDEO_Flush();
+		whichfb ^= 1;
+		flip_pending = false;
+		VIDEO_WaitVSync();
+	}
 
 	++FrameTimer;
 }
@@ -240,6 +247,17 @@ void Draw_VIDEO()
 {
 	need_wait=false;
 	VIDEO_Flush();
+	flip_pending = true;
+}
+
+static void vblank_cb(u32 retraceCnt)
+{
+	if (flip_pending) {
+		VIDEO_SetNextFramebuffer(xfb[whichfb]);
+		VIDEO_Flush();
+		whichfb ^= 1;
+		flip_pending = false;
+	}
 }
 
 void HOffset()
@@ -399,6 +417,8 @@ InitVideo2 ()
 	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+
+	VIDEO_SetPreRetraceCallback(vblank_cb);
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);
 	GX_Flush();

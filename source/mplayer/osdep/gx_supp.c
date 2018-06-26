@@ -41,7 +41,6 @@
 #include "gx_supp.h"
 #include "../../utils/mem2_manager.h"
 #include "../../video.h"
-#include <ogc/machine/processor.h>
 
 #define HASPECT 320
 #define VASPECT 240
@@ -66,8 +65,7 @@ extern bool need_wait;
 extern u8 whichfb;
 extern unsigned int *xfb[2];
 
-static uint32_t retraceCount;
-static uint32_t referenceRetraceCount;
+extern bool flip_pending;
 
 static int hor_pos=0, vert_pos=0;
 static float hor_zoom = 1.0f, vert_zoom = 1.0f;
@@ -157,14 +155,6 @@ void GX_SetScreenPos(int _hor_pos, int _vert_pos, float _hor_zoom, float _vert_z
 	hor_zoom = _hor_zoom;
 	vert_zoom = _vert_zoom;
 	GX_UpdateScaling();
-}
-
-static void retrace_callback(u32 retrace_count)
-{
-   u32 level = 0;
-   _CPU_ISR_Disable(level);
-   retraceCount = retrace_count;
-   _CPU_ISR_Restore(level);
 }
 
 /****************************************************************************
@@ -481,7 +471,6 @@ inline void DrawMPlayer()
 	if (wr>0) DCFlushRange(Yrtexture, Yrtexsize);
 	DCFlushRange(Utexture, UVtexsize);
 	DCFlushRange(Vtexture, UVtexsize);
-	u32 level = 0;
 
 	if(need_wait == true) {
 		GX_WaitDrawDone();
@@ -490,12 +479,8 @@ inline void DrawMPlayer()
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
 
-	/*_CPU_ISR_Disable(level);
-    if (referenceRetraceCount > retraceCount) {
+	if (flip_pending)
 		VIDEO_WaitVSync();
-    }
-	referenceRetraceCount = retraceCount;
-    _CPU_ISR_Restore(level);*/
 
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 		GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
@@ -531,16 +516,12 @@ inline void DrawMPlayer()
 		drawMode = 0;
 	}
 	
-	whichfb ^= 1; // flip framebuffer
+	//whichfb ^= 1; // flip framebuffer
 
 	GX_CopyDisp(xfb[whichfb], GX_TRUE);
 	GX_SetDrawDone();
-	VIDEO_SetNextFramebuffer(xfb[whichfb]);
+	//VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;
-
-	_CPU_ISR_Disable(level);
-    ++referenceRetraceCount;
-    _CPU_ISR_Restore(level);
 }
 
 void GX_AllocTextureMemory()
@@ -560,10 +541,6 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	Mtx44 p;
 
 	need_wait=false;
-	u32 level = 0;
-	_CPU_ISR_Disable(level);
-    referenceRetraceCount = retraceCount;
-    _CPU_ISR_Restore(level);
 
 	// Allocate 32byte aligned texture memory
 	wYl = width < 1024 ? width : 1016;
@@ -605,7 +582,6 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	GX_SetColorUpdate(GX_ENABLE);
 
 	GX_Flush();
-	VIDEO_SetPostRetraceCallback(retrace_callback);
 }
 
 #define LUMA_COPY(type) \
