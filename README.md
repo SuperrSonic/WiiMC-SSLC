@@ -1,12 +1,11 @@
 # WiiMC-SS features:
-- 704(square) screen width.
-- Attractive pointer.
 - GameCube controller support.
 - Enabled ADX decoding.
 - Optional 240p mode.
 - Exposed the volume normalizer filter.
 - Added ".dash" extension, using this extension will skip the deblock filter.
 - Made the deflicker filter optional.
+- Other minor changes and fixes.
 - Removed picture viewer to increase memory.
 - Removed NTFS and EXT libs to increase memory.
 - Disabled some minor codecs to increase memory.
