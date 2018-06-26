@@ -2971,8 +2971,8 @@ m_config_set_option(mconfig,"channels","2");
 m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
-m_config_set_option(mconfig,"subfont-text-scale","1"); // 25 is good if ass=0
-//m_config_set_option(mconfig,"autosync","1"); // No real proof this was useful
+m_config_set_option(mconfig,"subfont-text-scale","1");
+//m_config_set_option(mconfig,"autosync","1"); // Could be useful in 240p mode
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
@@ -4918,6 +4918,19 @@ void wiiDash()
 void wiiElse()
 {
 	m_config_set_option(mconfig,"lavdopts","skiploopfilter=default");
+}
+
+void wiiCacheSmall()
+{
+	stream_cache_size=2*1024; // 2MB cache
+}
+
+void wiiAssOff()
+{
+	m_config_set_option(mconfig,"subfont-osd-scale","25");
+	m_config_set_option(mconfig,"subfont-text-scale","25");
+	m_config_set_option(mconfig,"subpos","90");
+	m_config_set_option(mconfig,"ass","0");
 }
 
 void wiiGotoGui()

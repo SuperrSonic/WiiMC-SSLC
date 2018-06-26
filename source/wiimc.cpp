@@ -129,7 +129,7 @@ void ActivateExitThread()
 static void ShutdownCB()
 {
 	ExitRequested = true;
-	ShutdownRequested = true;
+	//ShutdownRequested = true; // Power button is more responsive when a crash occurs
 	ActivateExitThread();
 }
 
@@ -656,6 +656,18 @@ void wiiSetDoubleStrike()
 	}
 }
 
+void wiiSetAssOff()
+{
+	if (WiiSettings.libass == 0)
+		wiiAssOff();
+}
+
+void wiiSetMem()
+{
+	if (WiiSettings.smallCache == 1)
+		wiiCacheSmall();
+}
+
 extern "C" {
 void SetMPlayerSettings()
 {
@@ -674,6 +686,8 @@ void SetMPlayerSettings()
 	wiiSetVolume(WiiSettings.volume);
 	wiiSetSeekBackward(WiiSettings.skipBackward);
 	wiiSetSeekForward(WiiSettings.skipForward);
+	wiiSetAssOff();
+	wiiSetMem();
 	wiiSetCacheFill(WiiSettings.cacheFill);
 	wiiSetVolNorm();
 	wiiSetVidFull();

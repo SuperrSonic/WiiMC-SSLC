@@ -104,6 +104,8 @@ struct SWiiSettings {
 	int		debug;
 	int		screenDim;
 	int 	doubleStrike;
+	int 	smallCache;
+	int 	libass;
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount
