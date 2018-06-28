@@ -47,7 +47,7 @@ CFLAGS_LIBDVDNAV         = -Ilibdvdnav
 CFLAGS_NO_OMIT_LEAF_FRAME_POINTER = -mno-omit-leaf-frame-pointer
 CFLAGS_STACKREALIGN      = 
 CFLAGS_SVGALIB_HELPER    = 
-CFLAGS_TREMOR_LOW        = 
+CFLAGS_TREMOR_LOW        = -D_LOW_ACCURACY_
 
 EXTRALIBS = -L$(DEVKITPRO)/libogc/lib/wii -L$(DEVKITPRO)/portlibs/ppc/lib
 EXTRALIBS += -static $(COMMONFLAGS) -lfreetype -liconv -lfribidi -lz -ljpeg -ldi -logc -lm

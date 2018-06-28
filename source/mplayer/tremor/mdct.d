@@ -20,10 +20,6 @@ tremor/mdct.o: tremor/mdct.c tremor/ivorbiscodec.h tremor/ogg.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h \
  tremor/misc.h tremor/codec_internal.h tremor/codebook.h tremor/asm_arm.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h \
  tremor/mdct.h tremor/mdct_lookup.h
 
 tremor/ivorbiscodec.h:
@@ -79,14 +75,6 @@ tremor/codec_internal.h:
 tremor/codebook.h:
 
 tremor/asm_arm.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h:
 
 tremor/mdct.h:
 

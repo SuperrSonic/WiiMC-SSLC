@@ -22,12 +22,10 @@ tremor/synthesis.o: tremor/synthesis.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h \
  tremor/ivorbiscodec.h tremor/codec_internal.h tremor/codebook.h \
  tremor/registry.h tremor/backends.h tremor/misc.h tremor/asm_arm.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h \
- config.h tremor/os.h \
+ tremor/os.h config.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/math.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h \
  tremor/block.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
@@ -88,18 +86,14 @@ tremor/misc.h:
 
 tremor/asm_arm.h:
 
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h:
+tremor/os.h:
 
 config.h:
-
-tremor/os.h:
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/math.h:
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h:
+
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h:
 
 tremor/block.h:

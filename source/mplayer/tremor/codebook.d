@@ -24,10 +24,7 @@ tremor/codebook.o: tremor/codebook.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdint.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h \
  tremor/ivorbiscodec.h tremor/codebook.h tremor/misc.h \
- tremor/codec_internal.h tremor/asm_arm.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h \
- c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h \
- config.h tremor/os.h
+ tremor/codec_internal.h tremor/asm_arm.h tremor/os.h config.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h:
 
@@ -89,10 +86,6 @@ tremor/codec_internal.h:
 
 tremor/asm_arm.h:
 
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h:
-
-c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h:
+tremor/os.h:
 
 config.h:
-
-tremor/os.h:

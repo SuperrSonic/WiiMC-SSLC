@@ -28,7 +28,7 @@ tremor/block.o: tremor/block.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h \
  tremor/ivorbiscodec.h tremor/codec_internal.h tremor/codebook.h \
  tremor/window.h tremor/registry.h tremor/backends.h tremor/misc.h \
- tremor/asm_arm.h config.h tremor/block.h
+ tremor/asm_arm.h tremor/block.h
 
 c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
 
@@ -101,7 +101,5 @@ tremor/backends.h:
 tremor/misc.h:
 
 tremor/asm_arm.h:
-
-config.h:
 
 tremor/block.h:
