@@ -4929,7 +4929,7 @@ void wiiAssOff()
 {
 	m_config_set_option(mconfig,"subfont-osd-scale","25");
 	m_config_set_option(mconfig,"subfont-text-scale","25");
-	m_config_set_option(mconfig,"subpos","90");
+	m_config_set_option(mconfig,"subpos","92");
 	m_config_set_option(mconfig,"ass","0");
 }
 

@@ -401,9 +401,9 @@ case CODEC_ID_AC3:
       return ff_ac3_decoder.name; }
 case CODEC_ID_DTS:
     return "dts";
-/*case CODEC_ID_VORBIS:
+case CODEC_ID_VORBIS:
     { extern AVCodec ff_vorbis_decoder;
-      return ff_vorbis_decoder.name; }*/
+      return ff_vorbis_decoder.name; }
 case CODEC_ID_DVAUDIO:
     return "dvaudio";
 case CODEC_ID_WMAV1:
