@@ -604,7 +604,7 @@ msgstr "El archivo Online Media es inválido"
 msgid "Subtitle font file not found. Subtitles will not be visible."
 msgstr "La fuente del subtítulo no se encuentra. El subtítulo no estará visible."
 
-msgid "WiiMC does not have DVD access - AHBPROT is not enabled."
+msgid "WiiMC does not have DVD access."
 msgstr "WiiMC no tiene acceso al DVD."
 
 msgid "Starting Area"

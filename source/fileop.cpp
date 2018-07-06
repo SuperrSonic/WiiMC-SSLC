@@ -961,7 +961,7 @@ static bool MountDVD(bool silent)
 	if(__di_check_ahbprot() != 1)
 	{
 		if(!silent)
-			ErrorPrompt("WiiMC does not have DVD access - AHBPROT is not enabled.");
+			ErrorPrompt("WiiMC does not have DVD access.");
 		return false;
 	}
 	

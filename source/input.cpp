@@ -171,6 +171,8 @@ void MPlayerInput()
 		VIDEO_SetBlack (TRUE);
 		ExitRequested = true;
 	} else if(ExitRequested || userInput[0].wpad->btns_d & WPAD_BUTTON_HOME || down & PAD_BUTTON_START) {
+		if(wiiIsPaused())
+			wiiPause();
 		wiiGotoGui();
 	}
 
@@ -286,8 +288,10 @@ void MPlayerInput()
 		}
 		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_DOWN || down & PAD_BUTTON_DOWN)
 		{
-			if(!wiiIsPaused())
+			if(!wiiIsPaused()) {
 				wiiSetProperty(MP_CMD_SWITCH_AUDIO, 0);
+				wiiRewind();
+			}
 		}
 		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_2 || down & PAD_TRIGGER_L)
 		{
