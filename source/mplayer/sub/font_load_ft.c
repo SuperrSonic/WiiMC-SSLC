@@ -357,7 +357,7 @@ static void outline0(
 }
 
 // gaussian blur
-void blur(
+/*void blur(
 	unsigned char *buffer,
 	unsigned short *tmp2,
 	int width,
@@ -478,7 +478,7 @@ void blur(
 	s+= stride;
 	t+= width + 1;
     }
-}
+}*/
 
 static void resample_alpha(unsigned char *abuf, unsigned char *bbuf, int width, int height, int stride, float factor)
 {
@@ -608,9 +608,9 @@ void render_one_glyph(font_desc_t *desc, int c)
 //    fprintf(stderr, "fg: outline t = %f\n", GetTimer()-t);
 
     if (desc->tables.g_r) {
-	blur(abuffer+off, desc->tables.tmp, width, height, stride,
+	/*blur(abuffer+off, desc->tables.tmp, width, height, stride,
 	     desc->tables.gt2, desc->tables.g_r,
-	     desc->tables.g_w);
+	     desc->tables.g_w);*/
 //	fprintf(stderr, "fg: blur t = %f\n", GetTimer()-t);
     }
 

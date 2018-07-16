@@ -35,7 +35,7 @@ LDFLAGS		=	-g $(MACHDEP) -specs=wiimc.spec -Wl,-wrap,memcpy
 # any extra libraries we wish to link with the project
 #---------------------------------------------------------------------------------
 LIBS    := -lmplayerwii -lavformat -lavcodec -lswscale -lavutil \
-                        -lfribidi -ljpeg -ldi -liso9660 -liconv -lpng -lz \
+                        -ljpeg -ldi -liso9660 -liconv -lpng -lz \
                         -lfat -lwiiuse -lbte -logc -lfreetype -lmxml -ltinysmb -lexif
 
 #---------------------------------------------------------------------------------

@@ -265,7 +265,7 @@ static void USBGeckoOutput()
  ***************************************************************************/
 bool SupportedIOS(u32 ios)
 {
-	if(ios == 58 || ios == 61)
+	if(ios == 58 || ios == 61 || ios == 249)
 		return true;
 
 	return false;
@@ -738,6 +738,7 @@ void SetMPlayerSettings()
 extern "C" { 
 	s32 __STM_Close();
 	s32 __STM_Init();
+	u32 __di_check_ahbprot(void);
 }
 int main(int argc, char *argv[])
 {
@@ -757,6 +758,9 @@ int main(int argc, char *argv[])
 	SYS_SetResetCallback(ResetCB);
 	
 	__exception_setreload(8);
+	
+	if(__di_check_ahbprot() != 1)
+		IOS_ReloadIOS(249);
 
 	DI_Init();
 	WPAD_Init();

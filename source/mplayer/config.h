@@ -302,7 +302,7 @@ char MPLAYER_CSSDIR[512];
 #undef CONFIG_ENCA
 #undef CONFIG_FONTCONFIG
 #define CONFIG_FREETYPE 1
-#define CONFIG_FRIBIDI 1
+#undef CONFIG_FRIBIDI
 
 
 /* networking */

@@ -50,7 +50,7 @@ CFLAGS_SVGALIB_HELPER    =
 CFLAGS_TREMOR_LOW        = 
 
 EXTRALIBS = -L$(DEVKITPRO)/libogc/lib/wii -L$(DEVKITPRO)/portlibs/ppc/lib
-EXTRALIBS += -static $(COMMONFLAGS) -lfreetype -liconv -lfribidi -lz -ljpeg -ldi -logc -lm
+EXTRALIBS += -static $(COMMONFLAGS) -lfreetype -liconv -lz -ljpeg -ldi -logc -lm
 EXTRALIBS_MPLAYER  = 
 EXTRALIBS_MENCODER = 
 

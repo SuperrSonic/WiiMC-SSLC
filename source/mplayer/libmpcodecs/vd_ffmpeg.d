@@ -59,29 +59,7 @@ libmpcodecs/vd_ffmpeg.o: libmpcodecs/vd_ffmpeg.c \
  C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gctypes.h \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdbool.h \
  stream/stream.h stream/http.h libmpdemux/demuxer.h sub/ass_mp.h \
- sub/subreader.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-common.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-config.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-begindecls.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-enddecls.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode-version.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-flags.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-mirroring.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-arabic.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-shape.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-deprecated.h \
- libass/ass.h libass/ass_types.h libmpdemux/stheader.h \
+ sub/subreader.h libass/ass.h libass/ass_types.h libmpdemux/stheader.h \
  libmpdemux/demuxer.h libmpdemux/aviheader.h libmpdemux/ms_hdr.h \
  libmpcodecs/vd.h libmpcodecs/mp_image.h libmpcodecs/mpc_info.h \
  ffmpeg/libavcodec/avcodec.h ffmpeg/libavutil/cpu.h \
@@ -256,48 +234,6 @@ libmpdemux/demuxer.h:
 sub/ass_mp.h:
 
 sub/subreader.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-common.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-config.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-begindecls.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-enddecls.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode-version.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-flags.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-mirroring.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-arabic.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-shape.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-deprecated.h:
 
 libass/ass.h:
 

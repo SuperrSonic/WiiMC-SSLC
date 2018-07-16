@@ -32,29 +32,7 @@ libvo/vo_gekko.o: libvo/vo_gekko.c \
  c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h \
  libmpcodecs/img_format.h libvo/video_out_internal.h libmpcodecs/vfcap.h \
  libmpcodecs/mp_image.h libvo/geometry.h sub/osd.h libvo/aspect.h \
- mp_fifo.h sub/sub.h sub/subreader.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-common.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-config.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-begindecls.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-enddecls.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode-version.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-flags.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-mirroring.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-arabic.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-shape.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets-list.h \
- C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-deprecated.h \
- osdep/keycodes.h osdep/gx_supp.h \
+ mp_fifo.h sub/sub.h sub/subreader.h osdep/keycodes.h osdep/gx_supp.h \
  C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gccore.h \
  C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/dsp.h \
  C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gctypes.h \
@@ -202,48 +180,6 @@ mp_fifo.h:
 sub/sub.h:
 
 sub/subreader.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-common.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-config.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-begindecls.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-enddecls.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-unicode-version.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-flags.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi-types-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-bidi.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining-types-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-joining.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-mirroring.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-arabic.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-shape.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-char-sets-list.h:
-
-C:/MinGW/msys/1.0/opt/devkitpro/portlibs/ppc/include/fribidi/fribidi-deprecated.h:
 
 osdep/keycodes.h:
 

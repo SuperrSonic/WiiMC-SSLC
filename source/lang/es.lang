@@ -595,9 +595,6 @@ msgstr "Rotar"
 msgid "Resolution exceeds maximum allowed (1024x720)!"
 msgstr "La resolución excede el máximo permitido (1024x720)!"
 
-msgid "The current IOS has been altered (fake-signed). Functionality and/or stability may be adversely affected."
-msgstr "El IOS actual ha sido alterado (firma errónea). La funcionalidad y/o estabilidad puede verse afectada."
-
 msgid "Online media file is invalid."
 msgstr "El archivo Online Media es inválido"
 
