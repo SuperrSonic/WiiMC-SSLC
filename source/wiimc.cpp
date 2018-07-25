@@ -265,7 +265,7 @@ static void USBGeckoOutput()
  ***************************************************************************/
 bool SupportedIOS(u32 ios)
 {
-	if(ios == 58 || ios == 61 || ios == 249)
+	if(ios == 58 || ios == 61 || ios == 250)
 		return true;
 
 	return false;
@@ -760,7 +760,7 @@ int main(int argc, char *argv[])
 	__exception_setreload(8);
 	
 	if(__di_check_ahbprot() != 1)
-		IOS_ReloadIOS(249);
+		IOS_ReloadIOS(250);
 
 	DI_Init();
 	WPAD_Init();
