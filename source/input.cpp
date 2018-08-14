@@ -293,6 +293,12 @@ void MPlayerInput()
 				wiiRewind();
 			}
 		}
+		else if(down & PAD_TRIGGER_R)
+		{
+			if(!wiiIsPaused()) {
+				wiiSetProperty(MP_CMD_SWITCH_ANGLE, 0);
+			}
+		}
 		else if(userInput[0].wpad->btns_d & WPAD_BUTTON_2 || down & PAD_TRIGGER_L)
 		{
 			wiiDVDNav(MP_CMD_DVDNAV_MENU);
