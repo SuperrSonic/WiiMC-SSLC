@@ -738,7 +738,7 @@ void SetMPlayerSettings()
 extern "C" { 
 	s32 __STM_Close();
 	s32 __STM_Init();
-	u32 __di_check_ahbprot(void);
+	//u32 __di_check_ahbprot(void);
 }
 int main(int argc, char *argv[])
 {
@@ -759,8 +759,8 @@ int main(int argc, char *argv[])
 	
 	__exception_setreload(8);
 	
-	if(__di_check_ahbprot() != 1)
-		IOS_ReloadIOS(250);
+	/*if(__di_check_ahbprot() != 1)
+		IOS_ReloadIOS(250);*/
 
 	DI_Init();
 	WPAD_Init();
