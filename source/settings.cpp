@@ -341,6 +341,7 @@ prepareSettingsData ()
 	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
 	createXMLSetting("smallCache", "Set cache to 2MB", toStr(WiiSettings.smallCache));
 	createXMLSetting("libass", "ASS Renderer", toStr(WiiSettings.libass));
+	createXMLSetting("saveExit", "Only save to device on exit", toStr(WiiSettings.saveExit));
 	// Videos
 	createXMLSection("Videos", "Videos Settings");
 	createXMLSetting("videoZoomHor", "Horizontal video zoom", FtoStr(WiiSettings.videoZoomHor));
@@ -628,6 +629,7 @@ void DefaultSettings ()
 	WiiSettings.doubleStrike = 0;
 	WiiSettings.smallCache = 0;
 	WiiSettings.libass = 1;
+	WiiSettings.saveExit = 1;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
 	WiiSettings.videoZoomVert = 1;
@@ -719,6 +721,8 @@ static void FixInvalidSettings()
 		WiiSettings.smallCache = 0;
 	if(WiiSettings.libass < 0 || WiiSettings.libass > 1)
 		WiiSettings.libass = 1;
+	if(WiiSettings.saveExit < 0 || WiiSettings.saveExit > 1)
+		WiiSettings.saveExit = 1;
 
 	// Videos
 	if(WiiSettings.videoZoomHor < 0.5 || WiiSettings.videoZoomHor > 1.5)
@@ -1073,6 +1077,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
 				loadXMLSetting(&WiiSettings.smallCache, "smallCache");
 				loadXMLSetting(&WiiSettings.libass, "libass");
+				loadXMLSetting(&WiiSettings.saveExit, "saveExit");
 				// Videos
 				loadXMLSetting(&WiiSettings.videoZoomHor, "videoZoomHor");
 				loadXMLSetting(&WiiSettings.videoZoomVert, "videoZoomVert");

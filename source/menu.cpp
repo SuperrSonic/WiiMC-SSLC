@@ -6257,7 +6257,8 @@ void WiiMenu()
 		if(menuPrevious >= MENU_SETTINGS && menuCurrent < MENU_SETTINGS)
 		{
 			ResumeGui();
-			SaveSettings(NOTSILENT);
+			if(WiiSettings.saveExit == 0)
+				SaveSettings(NOTSILENT);
 			SuspendGui();
 		}
 
