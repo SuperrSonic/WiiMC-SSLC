@@ -297,7 +297,8 @@ static int decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_size)
         av_log(s->avctx, AV_LOG_WARNING, "Unknown profile %d\n", s->profile);
 
     if (!s->profile)
-        memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_epel_pixels_tab, sizeof(s->put_pixels_tab));
+        //memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_epel_pixels_tab, sizeof(s->put_pixels_tab));
+		memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_bilinear_pixels_tab, sizeof(s->put_pixels_tab));
     else    // profile 1-3 use bilinear, 4+ aren't defined so whatever
         memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_bilinear_pixels_tab, sizeof(s->put_pixels_tab));
 
