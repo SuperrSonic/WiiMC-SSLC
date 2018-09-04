@@ -857,6 +857,86 @@ restart:
 error:
 		WiiSettings.language = LANG_ENGLISH;
 	}*/
+	
+	if(WiiSettings.language == LANG_KOREAN)
+	{
+		char filepath[MAXPATHLEN];
+		int newFont;
+
+		switch(WiiSettings.language)
+		{
+			case LANG_KOREAN:
+				if(currentFont == FONT_KOREAN) return;
+				sprintf(filepath, "%s/ko.ttf", appPath);
+				newFont = FONT_KOREAN;
+				break;
+		}
+
+		// try to load font
+restart:
+		FILE *file = fopen (filepath, "rb");
+
+		if(file)
+		{
+			fseeko(file,0,SEEK_END);
+			u32 loadSize = ftello(file);
+
+			if(loadSize == 0)
+			{
+				if(remove(filepath) == 0)
+				{
+					goto restart;
+				}
+				else
+				{
+					ErrorPrompt("Error opening font file!");
+					goto error;
+				}
+			}
+
+			if(ext_font_ttf)
+			{
+				SuspendGui();
+				mem2_free(ext_font_ttf, MEM2_EXTFONT);
+				ext_font_ttf = NULL;
+			}
+
+			if(AddMem2Area(loadSize+1024,MEM2_EXTFONT))
+			{
+				ext_font_ttf = (u8 *)mem2_memalign(32, loadSize, MEM2_EXTFONT); // can be a problem we have to see how to manage it
+				if(ext_font_ttf)
+				{
+					fseeko(file,0,SEEK_SET);
+					fread (ext_font_ttf, 1, loadSize, file);
+				}
+			}
+			fclose(file);
+
+			if(ext_font_ttf)
+			{
+				SuspendGui();
+				DeinitFreeType();
+
+				currentFont = newFont;
+				if(InitFreeType(ext_font_ttf, loadSize))
+				{
+					ResetText();
+					ResumeGui();
+					return;
+				}
+				else
+				{
+					sprintf(error, "Could not change language. The font file is corrupted!");
+				}
+			}
+			else
+			{
+				sprintf(error, "Could not change language. Not enough memory!");
+			}
+		}
+error:
+		WiiSettings.language = LANG_ENGLISH;
+	}
 
 	if(currentFont != FONT_DEFAULT)
 	{
@@ -3161,9 +3241,9 @@ static void MenuSettingsGlobal()
 				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italiano"); break;
 				case LANG_DUTCH:				sprintf(options.value[0], "Dutch"); break;
 				case LANG_SIMP_CHINESE:			sprintf(options.value[0], "Chinese (Simplified)"); break;
-				case LANG_TRAD_CHINESE:			sprintf(options.value[0], "Chinese (Traditional)"); break;
+				case LANG_TRAD_CHINESE:			sprintf(options.value[0], "Chinese (Traditional)"); break;*/
 				case LANG_KOREAN:				sprintf(options.value[0], "Korean"); break;
-				case LANG_ROMANIAN:				sprintf(options.value[0], "Romanian"); break;
+				/*case LANG_ROMANIAN:				sprintf(options.value[0], "Romanian"); break;
 				case LANG_ESTONIAN:				sprintf(options.value[0], "Estonian"); break;
 				case LANG_PORTUGUESE: 			sprintf(options.value[0], "Portuguese"); break;
 				case LANG_BRAZILIAN_PORTUGUESE: sprintf(options.value[0], "Brazilian Portuguese"); break;
