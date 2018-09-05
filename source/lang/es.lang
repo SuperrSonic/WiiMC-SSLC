@@ -310,15 +310,6 @@ msgstr "¡Error cargando archivo!"
 msgid "Resume"
 msgstr "Reiniciar"
 
-msgid "Stop Slideshow"
-msgstr "Parar diapositivas"
-
-msgid "Start Slideshow"
-msgstr "Reproducir diapositivas"
-
-msgid "Slideshow Delay"
-msgstr "Duración diapositivas"
-
 msgid "Online Media Folder"
 msgstr "Carpeta medios online"
 
@@ -382,9 +373,6 @@ msgstr "Error abriendo"
 msgid "Warning"
 msgstr "Atención"
 
-msgid "One or more pictures within this folder exceeds the maximum size (6 MB) and will not be viewable."
-msgstr "Algunas imágenes exceden el tamaño máximo (6 MB) y no serán visualizadas"
-
 msgid "Error loading playlist!"
 msgstr "¡Error cargando lista de reproducción!"
 
@@ -417,12 +405,6 @@ msgstr "Seleccione elemento y pulse el botón + para agregarlo a la lista de rep
 
 msgid "Exit Playlist"
 msgstr "Salir de la lista de reproducción"
-
-msgid "Update successful!"
-msgstr "¡Actualización completada!"
-
-msgid "Update failed!"
-msgstr "¡Error en la actualización!"
 
 msgid "Initializing network..."
 msgstr "Iniciando conexión..."
@@ -529,17 +511,11 @@ msgstr "¡Imposible cambiar idioma. Memoria insuficiente!"
 msgid "Font Required"
 msgstr "Fuente requerida"
 
-msgid "Download font"
-msgstr "Descargar fuente"
-
 msgid "Unable to save font file!"
 msgstr "¡Imposible guardar fuente!"
 
 msgid "Out of Memory"
 msgstr "Fuera de memoria"
-
-msgid "Close MPlayer"
-msgstr "Cerrar MPlayer"
 
 msgid "Subtitle Codepage"
 msgstr "Codificación Subtítulo"
@@ -613,9 +589,6 @@ msgstr "Protector de pantalla"
 msgid "Double Strike"
 msgstr "Modo "Double-Strike""
 
-msgid "Error downloading font file!"
-msgstr "Error descargando la fuente del archivo!"
-
 msgid "Error opening font file!"
 msgstr "Error abriendo la fuente del archivo!"
 
@@ -635,4 +608,4 @@ msgid "Invalid subtitle delay."
 msgstr "No válido el retraso de subtítulos."
 
 msgid "DVD playback is not supported on this Wii."
-msgstr "La reproducción de DVD no es compatible con esta Wii."
+msgstr "La reproducción de DVD no es compatible con esta consola."

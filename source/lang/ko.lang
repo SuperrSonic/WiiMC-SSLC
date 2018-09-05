@@ -310,15 +310,6 @@ msgstr "파일 로딩 오류!"
 msgid "Resume"
 msgstr "재시작"
 
-msgid "Stop Slideshow"
-msgstr "슬라이드쇼 멈춤"
-
-msgid "Start Slideshow"
-msgstr "슬라이드쇼 시작"
-
-msgid "Slideshow Delay"
-msgstr "슬라이드쇼 지연"
-
 msgid "Online Media Folder"
 msgstr "온라인 미디어 폴더"
 
@@ -382,9 +373,6 @@ msgstr "열기 오류"
 msgid "Warning"
 msgstr "경고"
 
-msgid "One or more pictures within this folder exceeds the maximum size (6 MB) and will not be viewable."
-msgstr "이 폴더안에 한개 이상의 그림이 최대 사이즈(6 MB)를 넘으면 볼 수 없읍니다."
-
 msgid "Error loading playlist!"
 msgstr "재생목록 로딩 오류!"
 
@@ -417,12 +405,6 @@ msgstr "파일 위에 포인를 두고 +를 누르면 재생목록에 추가 됩
 
 msgid "Exit Playlist"
 msgstr "재생목록 종료"
-
-msgid "Update successful!"
-msgstr "업데이트 성공!"
-
-msgid "Update failed!"
-msgstr "업데이트 실패"
 
 msgid "Initializing network..."
 msgstr "네트워크 초기화중..."
@@ -529,17 +511,11 @@ msgstr "언어를 바꿀수 없습니다. 메모리가 부족합니다."
 msgid "Font Required"
 msgstr "폰트 파일이 필요합니다."
 
-msgid "Download font"
-msgstr "폰트 다운로드"
-
 msgid "Unable to save font file!"
 msgstr "폰트파일을 저장할 수가 없읍니다."
 
 msgid "Out of Memory"
 msgstr "메모리 초과"
-
-msgid "Close MPlayer"
-msgstr "Mplayer 닫기"
 
 msgid "Subtitle Codepage"
 msgstr "자막 코드페이지"
@@ -612,9 +588,6 @@ msgstr "스크린 번인 감소"
 
 msgid "Double Strike"
 msgstr "더블 스트라이크"
-
-msgid "Error downloading font file!"
-msgstr "폰트 파일 다운로드 중 오류 발생!"
 
 msgid "Error opening font file!"
 msgstr "폰트 파일 여는 중 오류 발생!"
