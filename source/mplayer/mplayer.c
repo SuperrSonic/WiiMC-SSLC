@@ -2972,11 +2972,12 @@ m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
 m_config_set_option(mconfig,"subfont-text-scale","1");
-m_config_set_option(mconfig,"autosync","0"); // 1 might be useful in 240p mode
+//m_config_set_option(mconfig,"autosync","5"); // 1 might be useful in 240p mode
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
+//m_config_set_option(mconfig,"ass-hinting","0");
 #endif
 SetMPlayerSettings();
 

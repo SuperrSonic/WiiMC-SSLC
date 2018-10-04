@@ -33,6 +33,7 @@
 #include "filebrowser.h"
 #include "utils/gettext.h"
 #include "utils/http.h"
+#include "utils/playlog.h"
 #include "filelist.h"
 
 extern "C" {
@@ -668,6 +669,9 @@ static void *GuiThread (void *arg)
 				Menu_DrawRectangle(0,0,screenwidth,screenheight,(GXColor){0, 0, 0, i},1);
 				Menu_Render();
 			}
+			//Update message board time
+			Playlog_Exit();
+			
 			guiShutdown = true;
 			guiHalt = 1;
 			ActivateExitThread();
