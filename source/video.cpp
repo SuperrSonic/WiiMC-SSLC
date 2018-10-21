@@ -292,6 +292,11 @@ void SetDoubleStrikeOff()
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE, GX_DISABLE);
 	GX_Flush();
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    VIDEO_WaitVSync();
 }
 
 void SetDoubleStrike()
@@ -311,6 +316,11 @@ void SetDoubleStrike()
 	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_FALSE,vmode->vfilter);
 	GX_SetFieldMode(GX_DISABLE, GX_ENABLE);
 	GX_Flush();
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    VIDEO_WaitVSync();
 }
 
 void SetVIscale()
@@ -392,12 +402,14 @@ InitVideo2 ()
 
 	VIDEO_Flush ();
 	VIDEO_WaitVSync();
-	if (vmode->viTVMode & VI_NON_INTERLACE)
+	VIDEO_WaitVSync();
+
+/*	if (vmode->viTVMode & VI_NON_INTERLACE)
 		VIDEO_WaitVSync();
 	else
 		while (VIDEO_GetNextField())
 			VIDEO_WaitVSync();
-
+*/
 	VIDEO_SetBlack (FALSE);
 
 	// Initialize GX
