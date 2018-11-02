@@ -612,21 +612,12 @@ static void *GuiThread (void *arg)
 
 		Menu_Render();
 
-		if(userInput[0].wpad->data_present > 0 || userInput[0].pad.btns_d == PAD_BUTTON_A || //OK, I know this looks bad...
-											userInput[0].pad.btns_d == PAD_BUTTON_B ||
-											userInput[0].pad.btns_d == PAD_BUTTON_Y ||
-											userInput[0].pad.btns_d == PAD_BUTTON_X ||
-											userInput[0].pad.btns_d == PAD_BUTTON_UP ||
-											userInput[0].pad.btns_d == PAD_BUTTON_DOWN ||
-											userInput[0].pad.btns_d == PAD_BUTTON_LEFT ||
-											userInput[0].pad.btns_d == PAD_BUTTON_RIGHT ||
-											userInput[0].pad.btns_d == PAD_TRIGGER_Z ||
-											userInput[0].pad.btns_d == PAD_TRIGGER_R ||
-											userInput[0].pad.btns_d == PAD_TRIGGER_L ||
+		if(userInput[0].wpad->data_present > 0 || (userInput[0].pad.btns_d > 0 &&
+											userInput[0].pad.btns_d != 0x1000) ||
 											userInput[0].pad.stickX < -36 ||
 											userInput[0].pad.stickY < -36 ||
 											userInput[0].pad.stickX > 36 ||
-											userInput[0].pad.stickY > 36 || ExitRequested)
+											userInput[0].pad.stickY > 36)
 		{
 			if(ssTimer != 0)
 			{
@@ -669,6 +660,10 @@ static void *GuiThread (void *arg)
 				Menu_DrawRectangle(0,0,screenwidth,screenheight,(GXColor){0, 0, 0, i},1);
 				Menu_Render();
 			}
+			// Turn off dimming on exit
+			if(WiiSettings.screenDim == 1)
+				*HW_VIDIM &= ~1 << 7;
+			
 			//Update message board time
 			Playlog_Exit();
 			
