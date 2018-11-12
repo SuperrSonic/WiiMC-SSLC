@@ -101,6 +101,7 @@ void wiiSetMem();
 void wiiCacheSmall();
 void wiiSetAssOff();
 void wiiAssOff();
+void wiiTHP();
 void wiiSetOnlineCacheFill(int fill);
 void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);

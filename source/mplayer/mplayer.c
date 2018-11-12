@@ -176,6 +176,7 @@ int controlledbygui=1;
 int pause_gui=0;
 int wii_error = 0;
 static int pause_low_cache=0;
+static bool thp_vid = false;
 
 char fileplaying[MAXPATHLEN];
 static char *partitionlabel=NULL;
@@ -4442,6 +4443,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
     }
 #ifdef GEKKO
 playing_file=false;
+thp_vid=false;
 if (controlledbygui == 0)
      VIDEO_SetBlack(TRUE);
 DisableVideoImg();
@@ -4979,6 +4981,11 @@ void wiiMute()
 	mp_input_queue_cmd(cmd);
 }
 
+void wiiTHP()
+{
+	thp_vid = true;
+}
+
 static void wiiSeek(int sec, int mode)
 {
 	if(!playing_file || controlledbygui == 2)
@@ -4988,6 +4995,9 @@ static void wiiSeek(int sec, int mode)
 		return;
 
 	if(!mpctx->demuxer || !mpctx->demuxer->seekable)
+		return;
+
+	if(thp_vid) // THP videos can't seek
 		return;
 
 	//if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)

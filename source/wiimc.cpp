@@ -384,12 +384,12 @@ extern "C" bool FindNextFile(bool load)
 			char ext[7];
 			GetExt(loadedFile, ext);
 
-			if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
-			{
+			if(strcasecmp(ext, "thp") == 0)
+				wiiTHP();
+			else if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 				wiiDash();
-			} else {
+			else
 				wiiElse();
-			}
 
 			// use part after last / for display name, if it's not already the end of the string
 			if(start != NULL && start[1] != 0)
@@ -585,7 +585,9 @@ void LoadMPlayerFile()
 		partitionlabel = GetPartitionLabel(loadedFile);
 	}
 
-	if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
+	if(strcasecmp(ext, "thp") == 0)
+		wiiTHP();
+	else if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 		wiiDash();
 	else
 		wiiElse();
