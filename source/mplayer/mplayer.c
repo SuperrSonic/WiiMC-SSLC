@@ -4442,8 +4442,10 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
     }
 #ifdef GEKKO
 playing_file=false;
-save_restore_point(fileplaying, partitionlabelplaying);
+if (controlledbygui == 0)
+     VIDEO_SetBlack(TRUE);
 DisableVideoImg();
+save_restore_point(fileplaying, partitionlabelplaying);
 end_film_error=stream_error(mpctx->stream);
 printf("mplayer: end film. UNINIT. err: %i\n",stream_error(mpctx->stream));
 
@@ -4470,7 +4472,8 @@ if(ass_library)
     ass_clear_fonts(ass_library);
 #endif
 //remove_subtitles();
-
+if (controlledbygui == 0)
+     VIDEO_SetBlack(FALSE);
 goto play_next_file;
 #else
 
