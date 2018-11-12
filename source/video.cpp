@@ -246,7 +246,7 @@ int DrawMPlayerGui()
 void Draw_VIDEO()
 {
 	need_wait=false;
-	VIDEO_Flush();
+	//VIDEO_Flush();
 	flip_pending = true;
 }
 
