@@ -2275,6 +2275,7 @@ static void MenuBrowse(int menu)
 	{
 		if(!nowPlaying->IsVisible())
 		{
+			StripExt(loadedFileDisplay);
 			nowPlaying->SetText(loadedFileDisplay);
 			nowPlaying->SetVisible(true);
 		}
