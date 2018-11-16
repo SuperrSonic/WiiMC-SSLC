@@ -440,6 +440,11 @@ extern "C" bool FindNextFile(bool load)
 
 	if(load)
 	{
+		// wait for directory parsing to finish (to find subtitles)
+		// Needs testing
+		while(WiiSettings.subtitleVisibility && !ParseDone())
+			usleep(100);
+		
 	    char *partitionlabel = GetPartitionLabel(loadedFile);
 		
 		wiiLoadFile(loadedFile, partitionlabel);
