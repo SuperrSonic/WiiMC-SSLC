@@ -227,12 +227,13 @@ static void get_quants(VP8Context *s)
         } else
             base_qi = yac_qi;
 
-        s->qmat[i].luma_qmul[0]    =       vp8_dc_qlookup[av_clip_uintp2(base_qi + ydc_delta , 7)];
-        s->qmat[i].luma_qmul[1]    =       vp8_ac_qlookup[av_clip_uintp2(base_qi             , 7)];
-        s->qmat[i].luma_dc_qmul[0] =   2 * vp8_dc_qlookup[av_clip_uintp2(base_qi + y2dc_delta, 7)];
-        s->qmat[i].luma_dc_qmul[1] = 155 * vp8_ac_qlookup[av_clip_uintp2(base_qi + y2ac_delta, 7)] / 100;
-        s->qmat[i].chroma_qmul[0]  =       vp8_dc_qlookup[av_clip_uintp2(base_qi + uvdc_delta, 7)];
-        s->qmat[i].chroma_qmul[1]  =       vp8_ac_qlookup[av_clip_uintp2(base_qi + uvac_delta, 7)];
+        s->qmat[i].luma_qmul[0]    =           vp8_dc_qlookup[av_clip_uintp2(base_qi + ydc_delta , 7)];
+        s->qmat[i].luma_qmul[1]    =           vp8_ac_qlookup[av_clip_uintp2(base_qi             , 7)];
+        s->qmat[i].luma_dc_qmul[0] =       2 * vp8_dc_qlookup[av_clip_uintp2(base_qi + y2dc_delta, 7)];
+        /* 101581>>16 is equivalent to 155/100 */
+        s->qmat[i].luma_dc_qmul[1] = (101581 * vp8_ac_qlookup[av_clip_uintp2(base_qi + y2ac_delta, 7)]) >> 16;
+        s->qmat[i].chroma_qmul[0]  =           vp8_dc_qlookup[av_clip_uintp2(base_qi + uvdc_delta, 7)];
+        s->qmat[i].chroma_qmul[1]  =           vp8_ac_qlookup[av_clip_uintp2(base_qi + uvac_delta, 7)];
 
         s->qmat[i].luma_dc_qmul[1] = FFMAX(s->qmat[i].luma_dc_qmul[1], 8);
         s->qmat[i].chroma_qmul[0]  = FFMIN(s->qmat[i].chroma_qmul[0], 132);
@@ -297,8 +298,8 @@ static int decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_size)
         av_log(s->avctx, AV_LOG_WARNING, "Unknown profile %d\n", s->profile);
 
     if (!s->profile)
-        //memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_epel_pixels_tab, sizeof(s->put_pixels_tab));
-		memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_bilinear_pixels_tab, sizeof(s->put_pixels_tab));
+        memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_epel_pixels_tab, sizeof(s->put_pixels_tab));
+		//memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_bilinear_pixels_tab, sizeof(s->put_pixels_tab));
     else    // profile 1-3 use bilinear, 4+ aren't defined so whatever
         memcpy(s->put_pixels_tab, s->vp8dsp.put_vp8_bilinear_pixels_tab, sizeof(s->put_pixels_tab));
 
@@ -331,6 +332,7 @@ static int decode_frame_header(VP8Context *s, const uint8_t *buf, int buf_size)
         memcpy(s->prob->pred8x8c , vp8_pred8x8c_prob_inter , sizeof(s->prob->pred8x8c));
         memcpy(s->prob->mvc      , vp8_mv_default_prob     , sizeof(s->prob->mvc));
         memset(&s->segmentation, 0, sizeof(s->segmentation));
+		memset(&s->lf_delta, 0, sizeof(s->lf_delta));
     }
 
     if (!s->macroblocks_base || /* first frame */
