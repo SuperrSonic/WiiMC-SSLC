@@ -290,7 +290,9 @@ void MPlayerInput()
 		{
 			if(!wiiIsPaused()) {
 				wiiSetProperty(MP_CMD_SWITCH_AUDIO, 0);
-				wiiRewind();
+				/* When changing audio tracks there is a small de-sync */
+				/* So we seek to re-sync */
+				wiiSync();
 			}
 		}
 		else if(down & PAD_TRIGGER_R)

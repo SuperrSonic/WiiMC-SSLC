@@ -1823,6 +1823,33 @@ static int is_at_end(MPContext *mpctx, m_time_size_t *end_at, double pts)
     return 0;
 }
 
+static void wiiSeek(int sec, int mode)
+{
+	if(!playing_file || controlledbygui == 2)
+		return;
+
+	if(!mpctx->stream || !mpctx->stream->seek)
+		return;
+
+	if(!mpctx->demuxer || !mpctx->demuxer->seekable)
+		return;
+
+	if(thp_vid) // THP videos can't seek
+		return;
+
+	//if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)
+	if(strncmp(filename, "mms:", 4) == 0)
+		return;
+
+	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+	cmd->id=MP_CMD_SEEK;
+	cmd->name=strdup("seek");
+	cmd->nargs = 2;
+	cmd->args[0].v.f = sec; // # seconds
+	cmd->args[1].v.i = mode;
+	mp_input_queue_cmd(cmd);
+}
+
 static int check_framedrop(double frame_time)
 {
     // check for frame-drop:
@@ -1838,6 +1865,10 @@ static int check_framedrop(double frame_time)
             mpctx->osd_function != OSD_PAUSE) {
             ++drop_frame_cnt;
             ++dropped_frames;
+		/*	if(dropped_frames > 3) {
+				wiiSeek(1, 0);
+				dropped_frames = 0;
+			}*/
             return frame_dropping;
         } else
             dropped_frames = 0;
@@ -2973,7 +3004,7 @@ m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
 m_config_set_option(mconfig,"subfont-text-scale","1");
-//m_config_set_option(mconfig,"autosync","30"); // autosync/mc both seem to have no effect
+//m_config_set_option(mconfig,"autosync","30"); // autosync seems to have no effect
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
@@ -4986,33 +5017,6 @@ void wiiTHP()
 	thp_vid = true;
 }
 
-static void wiiSeek(int sec, int mode)
-{
-	if(!playing_file || controlledbygui == 2)
-		return;
-
-	if(!mpctx->stream || !mpctx->stream->seek)
-		return;
-
-	if(!mpctx->demuxer || !mpctx->demuxer->seekable)
-		return;
-
-	if(thp_vid) // THP videos can't seek
-		return;
-
-	//if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)
-	if(strncmp(filename, "mms:", 4) == 0)
-		return;
-
-	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
-	cmd->id=MP_CMD_SEEK;
-	cmd->name=strdup("seek");
-	cmd->nargs = 2;
-	cmd->args[0].v.f = sec; // # seconds
-	cmd->args[1].v.i = mode;
-	mp_input_queue_cmd(cmd);
-}
-
 void wiiSeekPos(int sec)
 {
 	wiiSeek(sec, 2);
@@ -5039,6 +5043,11 @@ void wiiFastForward()
 void wiiRewind()
 {
 	wiiSeek(-wiiSeekBackward, 0);
+}
+
+void wiiSync()
+{
+	wiiSeek(-2, 0);
 }
 
 double wiiGetTimeLength()
