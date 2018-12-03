@@ -3009,6 +3009,7 @@ m_config_set_option(mconfig,"subfont-text-scale","1");
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
+m_config_set_option(mconfig,"embeddedfonts","1");
 //m_config_set_option(mconfig,"ass-hinting","0");
 #endif
 SetMPlayerSettings();
