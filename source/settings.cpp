@@ -389,6 +389,7 @@ prepareSettingsData ()
 	createXMLSetting("subtitleCodepage", "Subtitle codepage", WiiSettings.subtitleCodepage);
 	createXMLSetting("subtitleColor", "Subtitle color", WiiSettings.subtitleColor);
 	createXMLSetting("subtitleSize", "Subtitle size", FtoStr(WiiSettings.subtitleSize));
+	createXMLSetting("shadow", "Shadow rendering", toStr(WiiSettings.shadow));
 
 	int datasize = mxmlSaveString(xml, (char *)savebuffer, SAVEBUFFERSIZE, XMLSaveCallback);
 
@@ -683,6 +684,7 @@ void DefaultSettings ()
 	WiiSettings.subtitleCodepage[0] = 0;
 	sprintf(WiiSettings.subtitleColor, "FFFFFF00");
 	WiiSettings.subtitleSize = 2;
+	WiiSettings.shadow = 1;
 }
 
 /****************************************************************************
@@ -852,6 +854,8 @@ static void FixInvalidSettings()
 	
 	if(WiiSettings.subtitleSize > 5 || WiiSettings.subtitleSize < 1)
 		WiiSettings.subtitleSize = 2.0;
+	if(WiiSettings.shadow < 0 || WiiSettings.shadow > 1)
+		WiiSettings.shadow = 1;
 }
 
 /****************************************************************************
@@ -1122,6 +1126,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(WiiSettings.subtitleCodepage, "subtitleCodepage", sizeof(WiiSettings.subtitleCodepage));
 				loadXMLSetting(WiiSettings.subtitleColor, "subtitleColor", sizeof(WiiSettings.subtitleColor));
 				loadXMLSetting(&WiiSettings.subtitleSize, "subtitleSize");
+				loadXMLSetting(&WiiSettings.shadow, "shadow");
 			}
 			mxmlDelete(xml);
 		}

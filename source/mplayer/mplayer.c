@@ -156,7 +156,7 @@ bool FindNextFile(bool load);
 void SetMPlayerSettings();
 bool StartDVDMotor();
 void SetLastDVDMotorTime();
-bool WakeupUSB();
+//bool WakeupUSB();
 void ResumeCacheThread();
 bool CacheThreadSuspended();
 bool DisableVideoImg();
@@ -2716,8 +2716,8 @@ static void pause_loop(void)
   {
 	  if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
 	    StartDVDMotor();
-	  else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
-		WakeupUSB();
+	 // else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
+		//WakeupUSB();
   }
 
   if (cmd && cmd->id == MP_CMD_PAUSE)
@@ -3009,7 +3009,7 @@ m_config_set_option(mconfig,"subfont-text-scale","1");
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
-m_config_set_option(mconfig,"embeddedfonts","1");
+//m_config_set_option(mconfig,"embeddedfonts","1");
 //m_config_set_option(mconfig,"ass-hinting","0");
 #endif
 SetMPlayerSettings();
@@ -4817,8 +4817,8 @@ void PauseAndGotoGUI()
 
 	if ((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0)/* && !dvd_device*/)
 		StartDVDMotor();
-	else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
-		WakeupUSB();
+	//else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
+		//WakeupUSB();
 
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->resume(); // resume audio
@@ -4887,8 +4887,8 @@ static void low_cache_loop(void)
 	SetBufferingStatus(0);
 	if((strncmp(filename, "dvd:", 4) == 0 || strncmp(filename, "dvdnav:", 7) == 0) && !dvd_device)
 		StartDVDMotor();
-	else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
-		WakeupUSB();
+	//else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
+		//WakeupUSB();
 
 	if (cmd && cmd->id == MP_CMD_PAUSE)
 	{ //manual unpause
@@ -4969,6 +4969,11 @@ void wiiAssOff()
 	m_config_set_option(mconfig,"subfont-text-scale","25");
 	m_config_set_option(mconfig,"subpos","92");
 	m_config_set_option(mconfig,"ass","0");
+}
+
+void wiiRemoveShadows()
+{
+	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
 }
 
 void wiiGotoGui()

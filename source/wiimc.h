@@ -102,6 +102,8 @@ void wiiSetMem();
 void wiiCacheSmall();
 void wiiSetAssOff();
 void wiiAssOff();
+void wiiShadowOff();
+void wiiRemoveShadows();
 void wiiTHP();
 void wiiSetOnlineCacheFill(int fill);
 void wiiSetAutoResume(int enable);

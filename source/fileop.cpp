@@ -1032,7 +1032,7 @@ bool StartDVDMotor()
 	}
 	return false;
 }
-
+/*
 bool WakeupUSB()
 {
 	if(USBStorage_IsDVD())
@@ -1040,7 +1040,7 @@ bool WakeupUSB()
 
 	char buf[BYTES_PER_SECTOR];
 	return usb->readSectors(0, 1, buf);
-}
+}*/
 }
 
 bool FindDevice(char * filepath, int * device, int * devnum)

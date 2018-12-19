@@ -675,6 +675,12 @@ void wiiSetMem()
 		wiiCacheSmall();
 }
 
+void wiiShadowOff()
+{
+	if (WiiSettings.shadow == 0)
+		wiiRemoveShadows();
+}
+
 extern "C" {
 void SetMPlayerSettings()
 {
@@ -695,6 +701,7 @@ void SetMPlayerSettings()
 	wiiSetSeekForward(WiiSettings.skipForward);
 	wiiSetAssOff();
 	wiiSetMem();
+	wiiShadowOff();
 	wiiSetCacheFill(WiiSettings.cacheFill);
 	wiiSetVolNorm();
 	wiiSetVidFull();
