@@ -80,7 +80,8 @@ endif
 export OFILES	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) \
 					$(sFILES:.s=.o) $(SFILES:.S=.o) \
 					$(TTFFILES:.ttf=.ttf.o) $(LANGFILES:.lang=.lang.o) \
-					$(PNGFILES:.png=.png.o) $(JPGFILES:.jpg=.jpg.o)
+					$(PNGFILES:.png=.png.o) $(JPGFILES:.jpg=.jpg.o) \
+					$(CURDIR)/source/utils/ehcmodule.elf.o
 #---------------------------------------------------------------------------------
 # build a list of include paths
 #---------------------------------------------------------------------------------

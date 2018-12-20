@@ -19,6 +19,9 @@
 #include <sdcard/wiisd_io.h>
 #include <time.h>
 
+#include "utils/mload.h"
+#include "utils/usb2storage.h"
+
 #include "utils/FreeTypeGX.h"
 #include "utils/gettext.h"
 #include "utils/mem2_manager.h"
@@ -265,7 +268,7 @@ static void USBGeckoOutput()
  ***************************************************************************/
 bool SupportedIOS(u32 ios)
 {
-	if(ios == 58 || ios == 61 || ios == 250)
+	if(ios == 58 || ios == 61 || ios == 202)
 		return true;
 
 	return false;
@@ -773,8 +776,13 @@ int main(int argc, char *argv[])
 	
 	__exception_setreload(8);
 	
-	/*if(__di_check_ahbprot() != 1)
-		IOS_ReloadIOS(250);*/
+	/*if(__di_check_ahbprot() != 1) */
+
+	//if(argc > 2) {
+		//IOS_ReloadIOS(202);
+		//if(mload_init() >= 0 && load_ehci_module())
+			//USB2Enable(true);
+	//}
 
 	DI_Init();
 	WPAD_Init();
@@ -818,7 +826,7 @@ int main(int argc, char *argv[])
 	usleep(200);
 
 	// path sent by the plugin's argument
-	if(argc > 1 && (argv[0][0] == 'u' || argv[0][0] == 's'))
+	if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))
 	{
 		sprintf(loadedFile, argv[1]);
 		AutobootExit = true;
