@@ -149,6 +149,9 @@
 extern int prev_dxs, prev_dys;
 extern int stop_cache_thread;
 
+int monospaced = 0;
+int alt_font = 0;
+
 void wiiPause();
 void SetBufferingStatus(int s);
 void PauseAndGotoGUI();
@@ -3725,11 +3728,15 @@ stream_cache_min_percent=0.2;
     if (ass_enabled && ass_library) {
         for (i = 0; i < mpctx->demuxer->num_attachments; ++i) {
             demux_attachment_t *att = mpctx->demuxer->attachments + i;
-            if (extract_embedded_fonts &&
+           /* if (extract_embedded_fonts &&
                 att->name && att->type && att->data && att->data_size &&
                 (strcmp(att->type, "application/x-truetype-font") == 0 ||
                  strcmp(att->type, "application/x-font") == 0))
-                ass_add_font(ass_library, att->name, att->data, att->data_size);
+                ass_add_font(ass_library, att->name, att->data, att->data_size); */
+			  if (alt_font && att->name && att->type && att->data && att->data_size &&
+			      (strcmp(att->type, "application/x-trueype-font") == 0 ||
+				   strcmp(att->type, "application/x-font")))
+				     monospaced = 1;
         }
     }
 #endif
@@ -4476,6 +4483,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 #ifdef GEKKO
 playing_file=false;
 thp_vid=false;
+monospaced=0; // Go back to original font
 if (controlledbygui == 0)
      VIDEO_SetBlack(TRUE);
 DisableVideoImg();
@@ -4976,6 +4984,23 @@ void wiiRemoveShadows()
 	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
 }
 
+void wiiBoxShadows()
+{
+	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
+	m_config_set_option(mconfig,"ass-force-style","Outline=0");
+	m_config_set_option(mconfig,"ass-force-style","BorderStyle=3");
+}
+
+void wiiUseAltFont()
+{
+	alt_font = 1;
+}
+
+void wiiMainFont()
+{
+	alt_font = 0;
+}
+
 void wiiGotoGui()
 {
 	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
@@ -5101,6 +5126,18 @@ void wiiGetTimeDisplay(char * buf)
 	sprintf(buf, "%02d:%02d:%02d / %02d:%02d:%02d",
 		pts/3600,(pts/60)%60,pts%60,
 		len/3600,(len/60)%60,len%60);
+}
+
+void wiiGetDroppedFrames(char * buf)
+{
+	if(!playing_file || controlledbygui == 2)
+		return;
+
+	if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->d_audio->eof || mpctx->stream->eof)
+		return;
+
+	sprintf(buf, "Dropped Frames: %2d",
+		drop_frame_cnt);
 }
 
 void wiiSetDVDDevice(char * dev)

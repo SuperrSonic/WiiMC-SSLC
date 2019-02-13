@@ -19,8 +19,8 @@
 #include <sdcard/wiisd_io.h>
 #include <time.h>
 
-#include "utils/mload.h"
-#include "utils/usb2storage.h"
+//#include "utils/mload.h"
+//#include "utils/usb2storage.h"
 
 #include "utils/FreeTypeGX.h"
 #include "utils/gettext.h"
@@ -161,7 +161,7 @@ static void SaveLogToSD()
 	FILE *fp;
 	const DISC_INTERFACE* sd = &__io_wiisd;
 
-	if(!WiiSettings.debug) return;
+	if(WiiSettings.debug != 1) return;
 
 	sd->startup();
 	
@@ -207,7 +207,7 @@ static ssize_t __out_write(struct _reent *r, int fd, const char *ptr, size_t len
 	usb_sendbuffer(1, ptr, len);
 	IRQ_Restore(level);
 
-	if(WiiSettings.debug)
+	if(WiiSettings.debug == 1)
 	{
 		if(len >= GECKO_BUFFER_SIZE) len = GECKO_BUFFER_SIZE - 1;
 		
@@ -682,6 +682,14 @@ void wiiShadowOff()
 {
 	if (WiiSettings.shadow == 0)
 		wiiRemoveShadows();
+	else if (WiiSettings.shadow == 2)
+		wiiBoxShadows();
+}
+
+void wiiExtraFont()
+{
+	if (WiiSettings.monofont == 1)
+		wiiUseAltFont();
 }
 
 extern "C" {
@@ -697,7 +705,8 @@ void SetMPlayerSettings()
 	GetExt(loadedFile, ext);
 
 	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
-					WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
+					CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
+					: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 	wiiSetAutoResume(WiiSettings.autoResume);
 	wiiSetVolume(WiiSettings.volume);
 	wiiSetSeekBackward(WiiSettings.skipBackward);
@@ -705,6 +714,7 @@ void SetMPlayerSettings()
 	wiiSetAssOff();
 	wiiSetMem();
 	wiiShadowOff();
+	wiiExtraFont();
 	wiiSetCacheFill(WiiSettings.cacheFill);
 	wiiSetVolNorm();
 	wiiSetVidFull();
@@ -797,9 +807,9 @@ int main(int argc, char *argv[])
                 (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     
                 (32*1024); // padding	
 	AddMem2Area (size, MEM2_VIDEO); 
-	AddMem2Area (3*1024*1024, MEM2_BROWSER);
+	AddMem2Area (4*1024*1024, MEM2_BROWSER);
 	AddMem2Area (7*1024*1024, MEM2_GUI);
-	AddMem2Area (4*1024*1024, MEM2_OTHER); // vars + ttf
+	AddMem2Area (5*1024*1024, MEM2_OTHER); // vars + ttf
 
 	GX_AllocTextureMemory();
 

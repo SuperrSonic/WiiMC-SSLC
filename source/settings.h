@@ -147,6 +147,7 @@ struct SWiiSettings {
 	char	subtitleColor[9];
 	float	subtitleSize;
 	int		shadow;
+	int 	monofont;
 };
 
 int GetLangIndex(char *lang);

@@ -54,6 +54,8 @@ char* ass_border_color = NULL;
 char* ass_styles_file = NULL;
 int ass_hinting = ASS_HINTING_NATIVE + 4; // native hinting for unscaled osd
 
+extern int monospaced;
+
 static void init_style(ASS_Style *style, const char *name, double playres)
 {
 	double fs;
@@ -233,7 +235,7 @@ ASS_Track* ass_read_stream(ASS_Library* library, const char *fname, char *charse
 		buf_alloc = fd->end_pos;
 	for (;;) {
 		int i;
-		if (buf_alloc >= 100*1024*1024) {
+		if (buf_alloc >= 8*1024*1024) {
 			mp_msg(MSGT_ASS, MSGL_INFO, MSGTR_LIBASS_RefusingToLoadSubtitlesLargerThan100M, fname);
 			sz = 0;
 			break;
@@ -297,7 +299,8 @@ void ass_configure_fonts(ASS_Renderer* priv) {
 	dir = get_path("fonts");
 	if (font_fontconfig < 0 && sub_font_name) path = strdup(sub_font_name);
 	else if (font_fontconfig < 0 && font_name) path = strdup(font_name);
-	else path = get_path("subfont.ttf");
+	else if (font_fontconfig < 0 && !monospaced) path = get_path("subfont.ttf");
+	else path = get_path("monospace.ttf");
 	if (font_fontconfig >= 0 && sub_font_name) family = strdup(sub_font_name);
 	else if (font_fontconfig >= 0 && font_name) family = strdup(font_name);
 	else family = 0;

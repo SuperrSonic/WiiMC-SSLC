@@ -173,6 +173,7 @@ static GuiButton *videobarPauseBtn = NULL;
 static GuiButton *videobarForwardBtn = NULL;
 
 static GuiText *videobarTime = NULL;
+static GuiText *videobarDropped = NULL;
 
 static GuiImage *audiobarLeftImg = NULL;
 static GuiImage *audiobarMidImg = NULL;
@@ -4838,6 +4839,7 @@ static void MenuSettingsSubtitles()
 	OptionList options;
 
 	sprintf(options.name[i++], "Visibility");
+	sprintf(options.name[i++], "Monospaced");
 	sprintf(options.name[i++], "Delay");
 	sprintf(options.name[i++], "Language");
 	sprintf(options.name[i++], "Codepage");
@@ -4901,6 +4903,13 @@ static void MenuSettingsSubtitles()
 				WiiSettings.subtitleVisibility ^= 1;
 				break;
 			case 1:
+				WiiSettings.monofont ^= 1;
+				if (WiiSettings.monofont)
+					wiiUseAltFont();
+				else
+					wiiMainFont();
+				break;
+			case 2:
 				char delay[8];
 				sprintf(delay, "%.2f", WiiSettings.subtitleDelay);
 				if(OnScreenKeypad(delay, 7, true))
@@ -4919,13 +4928,13 @@ static void MenuSettingsSubtitles()
 					}
 				}
 				break;
-			case 2:
+			case 3:
 				LanguageWindow(WiiSettings.subtitleLanguage);
 				break;
-			case 3:
+			case 4:
 				CodepageWindow();
 				break;
-			case 4:
+			case 5:
 				if(strcmp(WiiSettings.subtitleColor, "FFFFFF00") == 0) // white
 					sprintf(WiiSettings.subtitleColor, "00000000"); // black
 				else if(strcmp(WiiSettings.subtitleColor, "00000000") == 0) // black
@@ -4935,7 +4944,7 @@ static void MenuSettingsSubtitles()
 				else
 					sprintf(WiiSettings.subtitleColor, "FFFFFF00"); // white
 				break;
-			case 5:
+			case 6:
 				WiiSettings.subtitleSize += 0.5;
 				if(WiiSettings.subtitleSize > 5)
 					WiiSettings.subtitleSize = 1;
@@ -4947,23 +4956,24 @@ static void MenuSettingsSubtitles()
 			firstRun = false;
 
 			sprintf(options.value[0], "%s", WiiSettings.subtitleVisibility ? "On" : "Off");
-			sprintf(options.value[1], "%.2f %s", WiiSettings.subtitleDelay, gettext("sec"));
-			strcpy(options.value[2], languages[GetLangIndex(WiiSettings.subtitleLanguage)].language);
+			sprintf(options.value[1], "%s", WiiSettings.monofont ? "On" : "Off");
+			sprintf(options.value[2], "%.2f %s", WiiSettings.subtitleDelay, gettext("sec"));
+			strcpy(options.value[3], languages[GetLangIndex(WiiSettings.subtitleLanguage)].language);
 			if(GetCodepageIndex() == 0)
-				sprintf(options.value[3], "Default");
+				sprintf(options.value[4], "Default");
 			else
-				sprintf(options.value[3], "%s (%s)", codepages[GetCodepageIndex()].cpname, codepages[GetCodepageIndex()].language);
+				sprintf(options.value[4], "%s (%s)", codepages[GetCodepageIndex()].cpname, codepages[GetCodepageIndex()].language);
 
 			if(strcmp(WiiSettings.subtitleColor, "FFFFFF00") == 0)
-				sprintf(options.value[4], "White");
+				sprintf(options.value[5], "White");
 			else if(strcmp(WiiSettings.subtitleColor, "00000000") == 0)
-				sprintf(options.value[4], "Black");
+				sprintf(options.value[5], "Black");
 			else if(strcmp(WiiSettings.subtitleColor, "FFFF0000") == 0)
-				sprintf(options.value[4], "Yellow");
+				sprintf(options.value[5], "Yellow");
 			else
-				sprintf(options.value[4], "Red");
+				sprintf(options.value[5], "Red");
 
-			sprintf(options.value[5], "%.1f", WiiSettings.subtitleSize);
+			sprintf(options.value[6], "%.1f", WiiSettings.subtitleSize);
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -5126,12 +5136,17 @@ static void VideoProgressCallback(void *ptr)
 		videobarProgressRightImg->SetVisible(false);
 	}
 	char time[50] = { 0 };
+	char frames[50] = { 0 };
 	wiiGetTimeDisplay(time);
+	wiiGetDroppedFrames(frames);
 
 	if(time[0] == 0)
 		videobarTime->SetText(NULL);
 	else
 		videobarTime->SetText(time);
+
+	if(WiiSettings.debug == 2)
+		videobarDropped->SetText(frames);
 }
 
 static void VideoVolumeLevelCallback(void *ptr)
@@ -5736,6 +5751,10 @@ static void SetupGui()
 	videobarTime = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	videobarTime->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	videobarTime->SetPosition(-20, 14);
+	
+	videobarDropped = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
+	videobarDropped->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	videobarDropped->SetPosition(50, 14);
 
 	videobar = new GuiWindow(560, 80);
 
@@ -5757,6 +5776,7 @@ static void SetupGui()
 	videobar->Append(videobarPauseBtn);
 	videobar->Append(videobarForwardBtn);
 	videobar->Append(videobarTime);
+	videobar->Append(videobarDropped);
 
 	videobar->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
 	videobar->SetPosition(0, -30);

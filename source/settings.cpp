@@ -390,6 +390,7 @@ prepareSettingsData ()
 	createXMLSetting("subtitleColor", "Subtitle color", WiiSettings.subtitleColor);
 	createXMLSetting("subtitleSize", "Subtitle size", FtoStr(WiiSettings.subtitleSize));
 	createXMLSetting("shadow", "Shadow rendering", toStr(WiiSettings.shadow));
+	createXMLSetting("monofont", "Use monospaced font", toStr(WiiSettings.monofont));	
 
 	int datasize = mxmlSaveString(xml, (char *)savebuffer, SAVEBUFFERSIZE, XMLSaveCallback);
 
@@ -685,6 +686,7 @@ void DefaultSettings ()
 	sprintf(WiiSettings.subtitleColor, "FFFFFF00");
 	WiiSettings.subtitleSize = 2;
 	WiiSettings.shadow = 1;
+	WiiSettings.monofont = 0;
 }
 
 /****************************************************************************
@@ -854,8 +856,10 @@ static void FixInvalidSettings()
 	
 	if(WiiSettings.subtitleSize > 5 || WiiSettings.subtitleSize < 1)
 		WiiSettings.subtitleSize = 2.0;
-	if(WiiSettings.shadow < 0 || WiiSettings.shadow > 1)
+	if(WiiSettings.shadow < 0 || WiiSettings.shadow > 2)
 		WiiSettings.shadow = 1;
+	if(WiiSettings.monofont < 0 || WiiSettings.monofont > 1)
+		WiiSettings.monofont = 0;
 }
 
 /****************************************************************************
@@ -1127,6 +1131,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(WiiSettings.subtitleColor, "subtitleColor", sizeof(WiiSettings.subtitleColor));
 				loadXMLSetting(&WiiSettings.subtitleSize, "subtitleSize");
 				loadXMLSetting(&WiiSettings.shadow, "shadow");
+				loadXMLSetting(&WiiSettings.monofont, "monofont");
 			}
 			mxmlDelete(xml);
 		}
