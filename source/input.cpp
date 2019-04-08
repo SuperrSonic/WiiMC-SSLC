@@ -150,7 +150,8 @@ void MPlayerResize(float fZoomHorIncr, float fZoomVertIncr)
 	WiiSettings.videoZoomHor += fZoomHorIncr;
 	WiiSettings.videoZoomVert += fZoomVertIncr;
 	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
-		WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
+		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
+			: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 }
 
 void MPlayerInput()

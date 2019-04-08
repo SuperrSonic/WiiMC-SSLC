@@ -640,6 +640,10 @@ void wiiSetVidFull()
 		wiiSetFullScreen();
 	else
 		wiiSetScreenNorm();
+
+	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
+		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
+			: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 }
 
 void wiiSetDf()
@@ -686,6 +690,12 @@ void wiiShadowOff()
 		wiiBoxShadows();
 }
 
+void wiiBoldFont()
+{
+	if (WiiSettings.bold == 1)
+		wiiForceBold();
+}
+
 void wiiExtraFont()
 {
 	if (WiiSettings.monofont == 1)
@@ -704,9 +714,7 @@ void SetMPlayerSettings()
 	char ext[7];
 	GetExt(loadedFile, ext);
 
-	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
-					CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
-					: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
+	wiiSetVidFull();
 	wiiSetAutoResume(WiiSettings.autoResume);
 	wiiSetVolume(WiiSettings.volume);
 	wiiSetSeekBackward(WiiSettings.skipBackward);
@@ -714,10 +722,10 @@ void SetMPlayerSettings()
 	wiiSetAssOff();
 	wiiSetMem();
 	wiiShadowOff();
+	wiiBoldFont();
 	wiiExtraFont();
 	wiiSetCacheFill(WiiSettings.cacheFill);
 	wiiSetVolNorm();
-	wiiSetVidFull();
 	wiiSetOnlineCacheFill(WiiSettings.onlineCacheFill);
 
 	if(strncmp(loadedFile, "dvd", 3) == 0) // always use framedropping for DVD

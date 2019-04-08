@@ -30,7 +30,7 @@ static char * savebuffer = NULL;
 
 LANG languages[LANGUAGE_SIZE] = {
 	{ "Default", "", "" },
-	{ "Abkhazian", "ab", "abk" },
+	/*{ "Abkhazian", "ab", "abk" },
 	{ "Afar", "aa", "aar" },
 	{ "Afrikaans", "af", "afr" },
 	{ "Albanian", "sq", "sqi" },
@@ -56,16 +56,16 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Burmese", "my", "mya" },
 	{ "Byelorussian", "be", "bel" },
 	{ "Cambodian", "km", "khm" },
-	{ "Catalan", "ca", "cat" },
-	{ "Chinese", "zh", "chi" },
-	{ "Corsican", "co", "cos" },
+	{ "Catalan", "ca", "cat" },*/
+	//{ "Chinese", "zh", "chi" },
+	/*{ "Corsican", "co", "cos" },
 	{ "Ceske", "cs", "cze" },
 	{ "Dansk", "da", "dan" },
-	{ "Deutsch", "de", "ger" },
+	{ "Deutsch", "de", "ger" },*/
 	{ "English", "en", "eng" },
-	{ "Esperanto", "eo", "epo" },
+	//{ "Esperanto", "eo", "epo" },
 	{ "Español", "es", "spa" },
-	{ "Estonian", "et", "est" },
+	/*{ "Estonian", "et", "est" },
 	{ "Finnish", "fi", "fin" },
 	{ "Fiji", "fj", "fij" },
 	{ "Faroese", "fo", "fao" },
@@ -87,14 +87,14 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Irish", "ga", "gle" },
 	{ "Islenska", "is", "ice" },
 	{ "Italiano", "it", "ita" },
-	{ "Inuktitut", "iu", "iku" },
+	{ "Inuktitut", "iu", "iku" },*/
 	{ "Japanese", "ja", "jpn" },
-	{ "Javanese", "jw", "jav" },
-	{ "Kannada", "kn", "kan" },
-	{ "Kashmiri", "ks", "kas" },
-	{ "Kazakh", "kk", "kaz" },
-	{ "Korean", "ko", "kor" },
-	{ "Kurdish", "ku", "kur" },
+	//{ "Javanese", "jw", "jav" },
+	//{ "Kannada", "kn", "kan" },
+	//{ "Kashmiri", "ks", "kas" },
+	//{ "Kazakh", "kk", "kaz" },
+	{ "Korean", "ko", "kor" }
+	/*{ "Kurdish", "ku", "kur" },
 	{ "Kinyarwanda", "rw", "kin" },
 	{ "Kirghiz", "ky", "kir" },
 	{ "Kirundi", "rn", "run" },
@@ -167,7 +167,7 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Yiddish", "yi", "yid" },
 	{ "Yoruba", "yo", "yor" },
 	{ "Zhuang", "za", "zha" },
-	{ "Zulu", "zu", "zul" }
+	{ "Zulu", "zu", "zul" }*/
 };
 
 int GetLangIndex(char *lang)
@@ -390,6 +390,7 @@ prepareSettingsData ()
 	createXMLSetting("subtitleColor", "Subtitle color", WiiSettings.subtitleColor);
 	createXMLSetting("subtitleSize", "Subtitle size", FtoStr(WiiSettings.subtitleSize));
 	createXMLSetting("shadow", "Shadow rendering", toStr(WiiSettings.shadow));
+	createXMLSetting("bold", "Force bold font", toStr(WiiSettings.bold));
 	createXMLSetting("monofont", "Use monospaced font", toStr(WiiSettings.monofont));	
 
 	int datasize = mxmlSaveString(xml, (char *)savebuffer, SAVEBUFFERSIZE, XMLSaveCallback);
@@ -686,6 +687,7 @@ void DefaultSettings ()
 	sprintf(WiiSettings.subtitleColor, "FFFFFF00");
 	WiiSettings.subtitleSize = 2;
 	WiiSettings.shadow = 1;
+	WiiSettings.bold = 0;
 	WiiSettings.monofont = 0;
 }
 
@@ -858,6 +860,8 @@ static void FixInvalidSettings()
 		WiiSettings.subtitleSize = 2.0;
 	if(WiiSettings.shadow < 0 || WiiSettings.shadow > 2)
 		WiiSettings.shadow = 1;
+	if(WiiSettings.bold < 0 || WiiSettings.bold > 1)
+		WiiSettings.bold = 0;
 	if(WiiSettings.monofont < 0 || WiiSettings.monofont > 1)
 		WiiSettings.monofont = 0;
 }
@@ -1131,6 +1135,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(WiiSettings.subtitleColor, "subtitleColor", sizeof(WiiSettings.subtitleColor));
 				loadXMLSetting(&WiiSettings.subtitleSize, "subtitleSize");
 				loadXMLSetting(&WiiSettings.shadow, "shadow");
+				loadXMLSetting(&WiiSettings.bold, "bold");
 				loadXMLSetting(&WiiSettings.monofont, "monofont");
 			}
 			mxmlDelete(xml);

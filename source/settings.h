@@ -63,7 +63,8 @@ typedef struct _lang {
 	const char *abbrev2;
 } LANG;
 
-#define LANGUAGE_SIZE 139
+//#define LANGUAGE_SIZE 139
+#define LANGUAGE_SIZE 5
 #define CODEPAGE_SIZE 28
 #define MAX_SHARES 9
 
@@ -147,6 +148,7 @@ struct SWiiSettings {
 	char	subtitleColor[9];
 	float	subtitleSize;
 	int		shadow;
+	int 	bold;
 	int 	monofont;
 };
 
