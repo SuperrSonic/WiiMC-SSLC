@@ -4149,7 +4149,7 @@ static void MenuSettingsOnlineMedia()
 			case 0:
 				WiiSettings.onlineCacheFill += 5;
 
-				if(WiiSettings.onlineCacheFill > 50)
+				if(WiiSettings.onlineCacheFill > 100)
 					WiiSettings.onlineCacheFill = 5;
 				break;
 			/*case 1:

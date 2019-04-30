@@ -34,7 +34,7 @@
 #define http_free(x) mem2_free(x, MEM2_OTHER)
 #define http_memalign(x,y) mem2_memalign(x,y, MEM2_OTHER)
 
-#define MAX_SIZE (1024*1024*15)
+#define MAX_SIZE (1024*1024*30)
 
 extern "C" {
 #include "mplayer/stream/url.h"
@@ -46,7 +46,7 @@ extern "C" {
 #define TCP_BLOCK_RECV_TIMEOUT 	15000 // 15 secs to receive
 #define TCP_BLOCK_SEND_TIMEOUT 	15000 // 15 secs to send
 #define TCP_BLOCK_SIZE 			2048
-#define HTTP_TIMEOUT 			35000 // 35 secs to get an http response
+#define HTTP_TIMEOUT 			3600000 // 1 hour // 35 secs to get an http response
 #define IOS_O_NONBLOCK			0x04
 
 static int _httoi(const char *value)
