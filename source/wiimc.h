@@ -85,6 +85,7 @@ bool wiiPlayingDVD();
 bool wiiInDVDMenu();
 void wiiSetCacheFill(int fill);
 void wiiSetVolNorm();
+void wiiSetVolNorm0();
 void wiiSetVolNorm1();
 void wiiSetVolNorm2();
 void wiiSetVidFull();

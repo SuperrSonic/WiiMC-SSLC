@@ -5291,14 +5291,37 @@ void wiiSetCacheFill(int fill)
 		stream_cache_min_percent = fill;
 }
 
+void wiiSetVolNorm0()
+{
+	//static const char nul_byte[1] = { 0x00 };
+	//m_config_set_option(mconfig,"af_clr", nul_byte);
+
+	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+	cmd->id=MP_CMD_AF_CLR;
+	cmd->name=strdup("af_clr");
+	mp_input_queue_cmd(cmd);
+}
+
 void wiiSetVolNorm1()
 {
-	m_config_set_option(mconfig,"af","volnorm=1:0.25");
+	//m_config_set_option(mconfig,"af","volnorm=1:2.25");
+
+	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+	cmd->id=MP_CMD_AF_SWITCH;
+	cmd->name=strdup("af_switch");
+	mp_input_queue_cmd(cmd);
+	cmd->args[0].v.s = strdup("volnorm=1:0.25");
 }
 
 void wiiSetVolNorm2()
 {
-	m_config_set_option(mconfig,"af","volnorm=2:0.25");
+	//m_config_set_option(mconfig,"af","volnorm=2:0.25");
+
+	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+	cmd->id=MP_CMD_AF_SWITCH;
+	cmd->name=strdup("af_switch");
+	mp_input_queue_cmd(cmd);
+	cmd->args[0].v.s = strdup("volnorm=2:0.25");
 }
 
 void wiiSetOnlineCacheFill(int fill)

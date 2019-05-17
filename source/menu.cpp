@@ -3666,7 +3666,7 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Auto-Play Next Video");
 	sprintf(options.name[i++], "Skip Backward");
 	sprintf(options.name[i++], "Skip Forward");
-	sprintf(options.name[i++], "Videos Files Folder");
+	sprintf(options.name[i++], "Videos Folder");
     if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
        i += 1;
     else
@@ -3811,6 +3811,10 @@ static void MenuSettingsVideos()
 				WiiSettings.audioNorm += 1;
 				if (WiiSettings.audioNorm > 2)
 					WiiSettings.audioNorm = 0;
+				wiiSetVolNorm();
+				/* Only clear filters if they are enabled. */
+				if (WiiSettings.audioNorm == 0)
+					wiiSetVolNorm0();
 				break;
 			case 14:
 				WiiSettings.videoDf ^= 1;
@@ -3894,7 +3898,7 @@ static void MenuSettingsMusic()
 	OptionList options;
 
 	sprintf(options.name[i++], "Play Order");
-	sprintf(options.name[i++], "Music Files Folder");
+	sprintf(options.name[i++], "Music Folder");
 
 	options.length = i;
 		

@@ -223,7 +223,7 @@ msgstr "Retraso de audio"
 msgid "Auto-Resume"
 msgstr "Reinicio automático"
 
-msgid "Videos Files Folder"
+msgid "Videos Folder"
 msgstr "Carpeta de videos"
 
 msgid "Force Fullscreen in 4:3"
@@ -244,7 +244,7 @@ msgstr "Saltar filtro in-loop"
 msgid "Play Order"
 msgstr "Modo de reproducción"
 
-msgid "Music Files Folder"
+msgid "Music Folder"
 msgstr "Carpeta de audio"
 
 msgid "Pictures Files Folder"

@@ -223,7 +223,7 @@ msgstr "오디오 지연"
 msgid "Auto-Resume"
 msgstr "자동 다시재생"
 
-msgid "Videos Files Folder"
+msgid "Videos Folder"
 msgstr "비디오 파일 폴더"
 
 msgid "Force Fullscreen in 4:3"
@@ -244,7 +244,7 @@ msgstr "디블로킹 필터 스킵"
 msgid "Play Order"
 msgstr "재생 명령"
 
-msgid "Music Files Folder"
+msgid "Music Folder"
 msgstr "음악 파일 폴더"
 
 msgid "Pictures Files Folder"
