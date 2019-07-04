@@ -10,6 +10,9 @@
 #ifndef _MUSICPLAYLIST_H_
 #define _MUSICPLAYLIST_H_
 
+// Better move this later
+BROWSERENTRY * VideoPlaylistGetNextShuffle();
+
 BROWSERENTRY * MusicPlaylistGetNextShuffle();
 int MusicPlaylistLoad();
 BROWSERENTRY * MusicPlaylistFindIndex(char *path);

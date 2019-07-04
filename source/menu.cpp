@@ -1684,7 +1684,7 @@ static void CreditsWindow()
 	txt[i] = new GuiText("Programming", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
-	txt[i] = new GuiText("Daigo 'Tengensei'", 20, (GXColor){255, 255, 255, 255});
+	txt[i] = new GuiText("Diego A.", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
 
@@ -1746,7 +1746,7 @@ static void CreditsWindow()
 	backBtn.SetIcon(&backBtnArrow);
 	backBtn.SetTrigger(trigA);
 	backBtn.SetTrigger(trigB);
-	
+
 	creditsWindow.Append(&backBtn);
 
 	SuspendGui();
@@ -3675,6 +3675,7 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Deflicker");
 	sprintf(options.name[i++], "Set VI Width to 720");
 	sprintf(options.name[i++], "Skip Deblocking Filter");
+	//sprintf(options.name[i++], "Delay Frame");
 
 	options.length = i;
 
@@ -3787,7 +3788,10 @@ static void MenuSettingsVideos()
 				WiiSettings.autoResume ^= 1;
 				break;
 			case 8:
-				WiiSettings.autoPlayNextVideo ^= 1;
+				//WiiSettings.autoPlayNextVideo ^= 1;
+				WiiSettings.autoPlayNextVideo++;
+				if (WiiSettings.autoPlayNextVideo > AUTOPLAY_CONTINUOUS)
+					WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
 				break;
 			case 9:
 				bwSkip++;
@@ -3833,6 +3837,10 @@ static void MenuSettingsVideos()
 			case 16:
 				WiiSettings.skipLoop ^= 1;
 				break;
+		/*	case 17:
+				WiiSettings.videoDelay += 1;
+				if (WiiSettings.videoDelay > 15)
+					WiiSettings.videoDelay = 0; */
 		}
 
 		if(ret >= 0 || firstRun)
@@ -3866,7 +3874,21 @@ static void MenuSettingsVideos()
 			strcpy(options.value[5], languages[GetLangIndex(WiiSettings.audioLanguage)].language);
 			sprintf (options.value[6], "%.1f %s", WiiSettings.audioDelay, gettext("sec"));
 			sprintf (options.value[7], "%s", WiiSettings.autoResume ? "On" : "Off");
-			sprintf (options.value[8], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
+			//sprintf (options.value[8], "%s", WiiSettings.autoPlayNextVideo ? "On" : "Off");
+			switch(WiiSettings.autoPlayNextVideo)
+			{
+				case AUTOPLAY_OFF:
+					sprintf (options.value[8], "Off"); break;
+				case AUTOPLAY_ON:
+					sprintf (options.value[8], "Through"); break;
+				case AUTOPLAY_SHUFFLE:
+					sprintf (options.value[8], "Shuffle"); break;
+				case AUTOPLAY_LOOP:
+					sprintf (options.value[8], "Loop"); break;
+				case AUTOPLAY_CONTINUOUS:
+					sprintf (options.value[8], "Continuous"); break;
+			}
+
 			sprintf (options.value[9], "%d %s", WiiSettings.skipBackward, gettext("sec"));
 			sprintf (options.value[10], "%d %s", WiiSettings.skipForward, gettext("sec"));
 			snprintf(options.value[11], 60, "%s", WiiSettings.videosFolder);
@@ -3875,6 +3897,7 @@ static void MenuSettingsVideos()
 			sprintf (options.value[14], "%s", WiiSettings.videoDf ? "On" : "Off");
 			sprintf (options.value[15], "%s", WiiSettings.viWidth ? "On" : "Off");
 			sprintf (options.value[16], "%s", WiiSettings.skipLoop ? "On" : "Off");
+			//sprintf (options.value[17], "%d", WiiSettings.videoDelay);
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3952,7 +3975,7 @@ static void MenuSettingsMusic()
 		{
 			case 0:
 				WiiSettings.playOrder++;
-				if(WiiSettings.playOrder > PLAY_LOOP)
+				if(WiiSettings.playOrder > PLAY_THROUGH)
 					WiiSettings.playOrder = 0;
 				break;
 			case 1:

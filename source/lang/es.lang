@@ -55,6 +55,9 @@ msgstr "Repetitivo"
 msgid "Continuous"
 msgstr "Continuo"
 
+msgid "Through"
+msgstr "Directo"
+
 msgid "Playlist"
 msgstr "Lista de reprodución"
 
@@ -80,10 +83,10 @@ msgid "Settings"
 msgstr "Opciones"
 
 msgid "On"
-msgstr "On"
+msgstr "Sí"
 
 msgid "Off"
-msgstr "Off"
+msgstr "No"
 
 msgid "Always"
 msgstr "Habilitado"

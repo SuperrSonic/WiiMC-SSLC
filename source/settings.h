@@ -85,6 +85,14 @@ enum {
 };
 
 enum {
+	AUTOPLAY_OFF,
+	AUTOPLAY_ON, // Through
+	AUTOPLAY_SHUFFLE,
+	AUTOPLAY_LOOP,
+	AUTOPLAY_CONTINUOUS
+};
+
+enum {
 	SUBTITLE_ALIGN_TOP,
 	SUBTITLE_ALIGN_CENTER,
 	SUBTITLE_ALIGN_BOTTOM
@@ -128,6 +136,7 @@ struct SWiiSettings {
 	int		videoDf;
 	int		viWidth;
 	int		skipLoop;
+	//int 	videoDelay;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
 	char	musicFolder[MAXPATHLEN];

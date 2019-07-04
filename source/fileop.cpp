@@ -15,6 +15,15 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <errno.h>
+
+#ifdef WANT_NTFS
+#include <ntfs.h>
+#endif
+
+#ifdef WANT_EXT2
+#include <ext2.h>
+#endif
+
 #include <fat.h>
 #include <di/di.h>
 #include <iso9660.h>
@@ -461,28 +470,32 @@ static void AddPartition(sec_t sector, int device, int type, int *devnum)
 				return;
 			fatGetVolumeLabel(mount, part[device][*devnum].name);
 			break;
+#ifdef WANT_NTFS
 		case T_NTFS:
-			//if(!ntfsMount(mount, disc, sector, 2, 64, NTFS_DEFAULT | NTFS_RECOVER))
-			//	return;
+			if(!ntfsMount(mount, disc, sector, 2, 64, NTFS_DEFAULT | NTFS_RECOVER))
+				return;
 
-			//name = (char *)ntfsGetVolumeName(mount);
+			name = (char *)ntfsGetVolumeName(mount);
 
-			//if(name && name[0])
-				//strcpy(part[device][*devnum].name, name);
-			//else
-				//part[device][*devnum].name[0] = 0;
-			//break;
+			if(name && name[0])
+				strcpy(part[device][*devnum].name, name);
+			else
+				part[device][*devnum].name[0] = 0;
+			break;
+#endif
+#ifdef WANT_EXT2
 		case T_EXT2:
-			//if(!ext2Mount(mount, disc, sector, 2, 128, EXT2_FLAG_DEFAULT))
-				//return;
+			if(!ext2Mount(mount, disc, sector, 2, 128, EXT2_FLAG_DEFAULT))
+				return;
 
-			//name = (char *)ext2GetVolumeName(mount);
+			name = (char *)ext2GetVolumeName(mount);
 
-			//if(name && name[0])
-				//strcpy(part[device][*devnum].name, name);
-			//else
-				//part[device][*devnum].name[0] = 0;
-			//break;
+			if(name && name[0])
+				strcpy(part[device][*devnum].name, name);
+			else
+				part[device][*devnum].name[0] = 0;
+			break;
+#endif
 		case T_ISO9660:
 		    if (device == DEVICE_USB)
 		    {
@@ -778,14 +791,18 @@ static void UnmountPartitions(int device)
 				sprintf(mount, "%s:", part[device][i].mount);
 				fatUnmount(mount);
 				break;
+#ifdef WANT_NTFS
 			case T_NTFS:
-				//part[device][i].type = 0;
-				//ntfsUnmount(part[device][i].mount, false);
+				part[device][i].type = 0;
+				ntfsUnmount(part[device][i].mount, false);
 				break;
+#endif
+#ifdef WANT_EXT2
 			case T_EXT2:
-				//part[device][i].type = 0;
-				//ext2Unmount(part[device][i].mount);
+				part[device][i].type = 0;
+				ext2Unmount(part[device][i].mount);
 				break;
+#endif
 			case T_ISO9660:
 				part[device][i].type = 0;
 				sprintf(mount, "%s:", part[device][i].mount);

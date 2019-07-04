@@ -180,6 +180,7 @@ int pause_gui=0;
 int wii_error = 0;
 static int pause_low_cache=0;
 static bool thp_vid = false;
+int delay_amount = 0;
 
 char fileplaying[MAXPATHLEN];
 static char *partitionlabel=NULL;
@@ -235,6 +236,8 @@ static int total_frame_cnt;
 static int drop_frame_cnt; // total number of dropped frames
 int benchmark;
 
+//int find_prob = 0;
+
 // options:
 #define DEFAULT_STARTUP_DECODE_RETRY 4
 int auto_quality;
@@ -270,6 +273,8 @@ static m_time_size_t end_at = { .type = END_AT_NONE, .pos = 0 };
 
 // A/V sync:
 int autosync;        // 30 might be a good default value.
+
+float update_audio_rate = 1.0;
 
 // may be changed by GUI:  (FIXME!)
 float rel_seek_secs;
@@ -324,6 +329,9 @@ static int ignore_start;
 static int softsleep;
 
 double force_fps;
+//double first_fps;
+//bool first_thp = true;
+
 static int force_srate;
 static int audio_output_format = AF_FORMAT_UNKNOWN;
 int frame_dropping = 1;        // option  0=no drop  1= drop vo  2= drop decode
@@ -1407,6 +1415,7 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
                            &playback_speed)) {
         new_srate = sh_audio->samplerate;
     } else {
+		/* Audio playback speed */
         new_srate = sh_audio->samplerate * playback_speed;
         if (new_srate != ao_data->samplerate) {
             // limits are taken from libaf/af_resample.c
@@ -1425,6 +1434,14 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
         gui(GUI_SET_AFILTER, sh_audio->afilter);
 #endif
     return result;
+}
+
+static int adjust_samplerate(sh_audio_t *sh_audio, ao_data_t *ao_data)
+{
+	int result;
+	result = update_srate(sh_audio, sh_audio->samplerate * update_audio_rate,
+                                &ao_data->samplerate);
+	return result;
 }
 
 typedef struct mp_osd_msg mp_osd_msg_t;
@@ -2147,6 +2164,84 @@ static void mp_dvdnav_save_smpi(int in_size,
 }
 
 #endif /* CONFIG_DVDNAV */
+/*
+// Compute the relative audio speed difference by taking A/V dsync into account.
+static double compute_audio_drift(struct MPContext *mpctx, double vsync)
+{
+    // Least-squares linear regression, using relative real time for x, and
+    // audio desync for y. Assume speed didn't change for the frames we're
+    // looking at for simplicity. This also should actually use the realtime
+    // (minus paused time) for x, but use vsync scheduling points instead.
+    if (mpctx->sh_video->num_frames_decoded <= 10)
+        return NAN;
+    int num = mpctx->sh_video->num_frames_decoded - 1;
+    double sum_x = 0, sum_y = 0, sum_xy = 0, sum_xx = 0;
+    double x = 0;
+    for (int n = 0; n < num; n++) {
+        struct frame_info *frame = &mpctx->past_frames[n + 1];
+      //  if (frame->num_vsyncs < 0)
+        //    return NAN;
+        double y = frame->av_diff;
+        sum_x += x;
+        sum_y += y;
+        sum_xy += x * y;
+        sum_xx += x * x;
+        x -= frame->num_vsyncs * vsync;
+    }
+    return (sum_x * sum_y - num * sum_xy) / (sum_x * sum_x - num * sum_xx);
+}
+
+static void adjust_audio_resample_speed(struct MPContext *mpctx, double vsync)
+{
+    struct MPOpts *opts = mpctx->opts;
+
+    // Try to smooth out audio timing drifts. This can happen if either
+    // video isn't playing at expected speed, or audio is not playing at
+    // the requested speed. Both are unavoidable.
+    // The audio desync is made up of 2 parts: 1. drift due to rounding
+    // errors and imperfect information, and 2. an offset, due to
+    // unaligned audio/video start, or disruptive events halting audio
+    // or video for a small time.
+    // Instead of trying to be clever, just apply an awfully dumb drift
+    // compensation with a constant factor, which does what we want. In
+    // theory we could calculate the exact drift compensation needed,
+    // but it likely would be wrong anyway, and we'd run into the same
+    // issues again, except with more complex code.
+    // 1 means drifts to positive, -1 means drifts to negative
+    double max_drift = vsync / 2;
+    double av_diff = mpctx->last_av_difference;
+    int new = mpctx->display_sync_drift_dir;
+    if (av_diff * -mpctx->display_sync_drift_dir >= 0)
+        new = 0;
+    if (fabs(av_diff) > max_drift)
+        new = av_diff >= 0 ? 1 : -1;
+
+    bool change = mpctx->display_sync_drift_dir != new;
+    if (new || change) {
+     //   if (change)
+       //     MP_VERBOSE(mpctx, "Change display sync audio drift: %d\n", new);
+        mpctx->display_sync_drift_dir = new;
+
+        double max_correct = opts->sync_max_audio_change / 100;
+        double audio_factor = 1 + max_correct * -mpctx->display_sync_drift_dir;
+
+        if (new == 0) {
+            // If we're resetting, actually try to be clever and pick a speed
+            // which compensates the general drift we're getting.
+            double drift = compute_audio_drift(mpctx, 1);
+            if (isnormal(drift)) {
+                // other = will be multiplied with audio_factor for final speed
+                double other = mpctx->opts->playback_speed * mpctx->speed_factor_v;
+                audio_factor = (mpctx->audio_speed - drift) / other;
+             //   MP_VERBOSE(mpctx, "Compensation factor: %f\n", audio_factor);
+            }
+        }
+
+       // audio_factor = MPCLAMP(audio_factor, 1 - max_correct, 1 + max_correct);
+       // mpctx->speed_factor_a = audio_factor * mpctx->speed_factor_v;
+		adjust_samplerate(mpctx->sh_audio, &ao_data);
+    }
+} */
 
 static void adjust_sync_and_print_status(int between_frames, float timing_error)
 {
@@ -2180,10 +2275,10 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
             // not a good idea to do A-V correction with with bogus values
             if (a_pts == MP_NOPTS_VALUE || v_pts == MP_NOPTS_VALUE)
                 AV_delay = 0;
-            if (AV_delay > 0.5 && drop_frame_cnt > 50 && drop_message == 0) {
-                ++drop_message;
-                mp_msg(MSGT_AVSYNC, MSGL_WARN, MSGTR_SystemTooSlow);
-            }
+         //   if (AV_delay > 0.5 && drop_frame_cnt > 50 && drop_message == 0) {
+          //      ++drop_message;
+           //     mp_msg(MSGT_AVSYNC, MSGL_WARN, MSGTR_SystemTooSlow);
+          //  }
             if (AV_delay > 0.5 && correct_pts && mpctx->delay < -audio_delay - 30) {
 				// This case means that we are supposed to stop video for a long
 				// time, even though audio is already ahead.
@@ -2216,8 +2311,12 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
                 mpctx->delay += x;
                 c_total      += x;
             }
-            if (!quiet)
-                print_status(a_pts - audio_delay, AV_delay, c_total);
+           // if (!quiet)
+             //   print_status(a_pts - audio_delay, AV_delay, c_total);
+		    //playback_speed = 1.006;
+
+			//adjust_samplerate(mpctx->sh_audio, &ao_data);
+			//adjust_audio_resample_speed(mpctx, 1);
         }
     } else {
         // No audio:
@@ -2395,7 +2494,7 @@ static int sleep_until_update(float *time_frame, float *aq_sleep_time)
         // don't try to "catch up".
         // If benchmark is set always output frames as fast as possible
         // without sleeping.
-        if (*time_frame < -0.2 || benchmark)
+        if (*time_frame < -0.2 || thp_vid) // benchmark )
             *time_frame = 0;
     }
 
@@ -3007,8 +3106,11 @@ m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
 m_config_set_option(mconfig,"subfont-text-scale","1");
+// Loop one video, may be useful to set via argument boot
+//m_config_set_option(mconfig,"loop","0");
 //m_config_set_option(mconfig,"autosync","30"); // autosync seems to have no effect
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
+//m_config_set_option(mconfig,"fps","29.9699993133544");
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
@@ -3826,10 +3928,20 @@ stream_cache_min_percent=0.2;
                    );
 
             /* need to set fps here for output encoders to pick it up in their init */
-            if (force_fps) {
-                mpctx->sh_video->fps       = force_fps;
-                mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
-            }
+           // if (force_fps) {
+	/*		   if (first_thp) {
+				   first_fps = mpctx->sh_video->fps;
+				   first_thp = false;
+			   } */
+				   
+       //     if (mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 30) {
+              //  mpctx->sh_video->fps       = force_fps;
+       //         mpctx->sh_video->fps       = 29.969999313354492188;
+                //mpctx->sh_video->fps         = 29.970000000000000000;
+            //    mpctx->sh_video->fps         = 30 / 1.001; //29.97002997002997;
+               // mpctx->sh_video->fps       = first_fps;
+       //         mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
+        //    }
             vo_fps = mpctx->sh_video->fps;
 
             if (!mpctx->sh_video->fps && !force_fps && !correct_pts) {
@@ -3994,11 +4106,14 @@ stream_cache_min_percent=0.2;
             goto goto_next_file;
 
         //if(demuxer->file_format!=DEMUXER_TYPE_AVI) pts_from_bps=0; // it must be 0 for mpeg/asf!
-        if (force_fps && mpctx->sh_video) {
-            vo_fps = mpctx->sh_video->fps = force_fps;
-            mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
-            mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_FPSforced, mpctx->sh_video->fps, mpctx->sh_video->frametime);
-        }
+       // if (force_fps && mpctx->sh_video) {
+   //     if (mpctx->sh_video > 28 && mpctx->sh_video < 30) {
+          //  vo_fps = mpctx->sh_video->fps = 30 / 1.001;
+		//	mpctx->sh_video->fps       = 29.970000000000000000;
+	//		vo_fps = mpctx->sh_video->fps       = 29.969999313354492188;
+    //        mpctx->sh_video->frametime = 1.0f / mpctx->sh_video->fps;
+          //  mp_msg(MSGT_CPLAYER, MSGL_INFO, MSGTR_FPSforced, mpctx->sh_video->fps, mpctx->sh_video->frametime);
+      //  }
 
 #ifdef CONFIG_GUI
         if (use_gui) {
@@ -4791,6 +4906,9 @@ void PauseAndGotoGUI()
 {
 	SetLastDVDMotorTime();
 
+	// Reset video loop mode, which is now ON during video or OFF if in GUI
+	mpctx->loop_times = -1;
+
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->pause(); // pause audio, keep data if possible
 
@@ -4982,6 +5100,7 @@ void wiiAssOff()
 void wiiRemoveShadows()
 {
 	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
+	m_config_set_option(mconfig,"ass-force-style","Outline=1.7");
 }
 
 void wiiBoxShadows()
@@ -5091,11 +5210,11 @@ double wiiGetTimeLength()
 	if(!playing_file || controlledbygui == 2)
 		return 0;
 
-	if(!mpctx->demuxer || !mpctx->stream)
-		return 0;
+	//if(!mpctx->demuxer || !mpctx->stream)
+		//return 0;
 
-	if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
-		return 0;
+	//if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
+		//return 0;
 
 	return demuxer_get_time_length(mpctx->demuxer);
 }
@@ -5105,11 +5224,11 @@ double wiiGetTimePos()
 	if(!playing_file || controlledbygui == 2)
 		return 0;
 
-	if(!mpctx->demuxer || !mpctx->stream)
-		return 0;
+	//if(!mpctx->demuxer || !mpctx->stream)
+		//return 0;
 
-	if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
-		return 0;
+	//if(mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
+		//return 0;
 
 	if (!mpctx->sh_video && mpctx->sh_audio && mpctx->audio_out)
 		return playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
@@ -5122,8 +5241,8 @@ void wiiGetTimeDisplay(char * buf)
 	if(!playing_file || controlledbygui == 2)
 		return;
 
-	if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
-		return;
+	//if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->eof || mpctx->d_audio->eof || mpctx->stream->eof)
+		//return;
 
 	int len = demuxer_get_time_length(mpctx->demuxer);
 	int pts = demuxer_get_current_time(mpctx->demuxer);
@@ -5138,11 +5257,15 @@ void wiiGetDroppedFrames(char * buf)
 	if(!playing_file || controlledbygui == 2)
 		return;
 
-	if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->d_audio->eof || mpctx->stream->eof)
-		return;
+	// This makes the counter disappear before the video ends.
+	//if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->d_audio->eof || mpctx->stream->eof)
+		//return;
 
 	sprintf(buf, "Dropped Frames: %2d",
 		drop_frame_cnt);
+
+	//sprintf(buf, "%9.16f",
+		//mpctx->sh_video->fps);
 }
 
 void wiiSetDVDDevice(char * dev)
@@ -5323,6 +5446,22 @@ void wiiSetVolNorm2()
 	mp_input_queue_cmd(cmd);
 	cmd->args[0].v.s = strdup("volnorm=2:0.25");
 }
+
+/*void wiiSetVideoDelay(int ms)
+{
+	delay_amount = ms;
+} */
+
+void wiiSetLoopOn()
+{
+	m_config_set_option(mconfig,"loop","0");
+}
+
+/*void wiiSetLoopOff()
+{
+	// Turn it off
+	m_config_set_option(mconfig,"loop","-1");
+} */
 
 void wiiSetOnlineCacheFill(int fill)
 {

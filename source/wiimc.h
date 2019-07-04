@@ -112,6 +112,8 @@ void wiiForceBold();
 void wiiUseAltFont();
 void wiiMainFont();
 void wiiTHP();
+void wiiSetLoopOn();
+//void wiiSetVideoDelay(int ms);
 void wiiSetOnlineCacheFill(int fill);
 void wiiSetAutoResume(int enable);
 void wiiSetVolume(int vol);

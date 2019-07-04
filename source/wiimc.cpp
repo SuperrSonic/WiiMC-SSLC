@@ -333,6 +333,45 @@ bool SaneIOS(u32 ios)
 	return res;
 }
 
+/* Pick a random video on the current list */
+static int *shuffleList_vid = NULL;
+static int shuffleIndex_vid = -1;
+//extern int find_prob;
+
+BROWSERENTRY *VideoPlaylistGetNextShuffle()
+{
+	if(shuffleIndex_vid == -1 || shuffleIndex_vid >= browserVideos.numEntries)
+	{
+		// populate new list
+		int i, n, t;
+		int num = browserVideos.numEntries;
+
+		mem2_free(shuffleList_vid, MEM2_BROWSER);
+		shuffleList_vid = (int *)mem2_malloc(num*sizeof(int), MEM2_BROWSER);
+
+		for(i=0; i < num; i++)
+			shuffleList_vid[i] = i;
+
+		// shuffle the list
+		for(i = 0; i < num-1; i++)
+		{
+			n = rand() / (RAND_MAX/(num-i) + 1);
+
+			// swap
+			t = shuffleList_vid[i];
+			shuffleList_vid[i] = shuffleList_vid[i+n];
+			shuffleList_vid[i+n] = t;
+		}
+		shuffleIndex_vid = 0;
+	}
+
+	BROWSERENTRY *s = browserVideos.first;
+	for(int i=0; i < shuffleList_vid[shuffleIndex_vid]; i++)
+		s = s->next;
+	shuffleIndex_vid++;
+
+	return s;
+}
 /****************************************************************************
  * MPlayer interface
  ***************************************************************************/
@@ -366,7 +405,7 @@ extern "C" bool FindNextFile(bool load)
 		if(!load)
 			return false;
 
-		if(!WiiSettings.autoPlayNextVideo || !browserVideos.selIndex)
+		if(!WiiSettings.autoPlayNextVideo || (!browserVideos.selIndex && WiiSettings.autoPlayNextVideo <= AUTOPLAY_ON))
 		{
 			loadedFile[0] = 0;
 			loadedFileDisplay[0] = 0;
@@ -376,12 +415,24 @@ extern "C" bool FindNextFile(bool load)
 				VIDEO_SetBlack (TRUE);
 				ExitRequested = true;
 			}
+			// IF THERE IS ONLY ONE VIDEO IT WILL END UP GOING HERE AND SHUFFLE WILL FAIL!
+			// Shuffle, Loop, and Continuous are included, but only Shuffle needs this.
 			return false;
 		}
 		else
 		{
-			strcpy(loadedFile, browserVideos.selIndex->file);
-			browserVideos.selIndex = browserVideos.selIndex->next;
+			// Continuous: If the last video is over, start from the first video
+			if(WiiSettings.autoPlayNextVideo == AUTOPLAY_CONTINUOUS && browserVideos.selIndex == NULL)
+				browserVideos.selIndex = browserVideos.first;
+
+			if(WiiSettings.autoPlayNextVideo != AUTOPLAY_SHUFFLE)
+				strcpy(loadedFile, browserVideos.selIndex->file);
+			browserVideos.selIndex = WiiSettings.autoPlayNextVideo == AUTOPLAY_SHUFFLE ?
+						VideoPlaylistGetNextShuffle() : browserVideos.selIndex->next;
+
+			// Lower this to get the second video shuffled, instead of the third
+			if(WiiSettings.autoPlayNextVideo == AUTOPLAY_SHUFFLE)
+				strcpy(loadedFile, browserVideos.selIndex->file);
 
 			char *start = strrchr(loadedFile,'/');
 			char ext[7];
@@ -566,7 +617,7 @@ void LoadMPlayerFile()
 	// wait for previous file to end
 	while(controlledbygui == 2)
 		usleep(100);
-	
+
 	char *partitionlabel;
 	char ext[7];
 	GetExt(loadedFile, ext);
@@ -719,6 +770,7 @@ void SetMPlayerSettings()
 	wiiSetVolume(WiiSettings.volume);
 	wiiSetSeekBackward(WiiSettings.skipBackward);
 	wiiSetSeekForward(WiiSettings.skipForward);
+	//wiiSetVideoDelay(WiiSettings.videoDelay);
 	wiiSetAssOff();
 	wiiSetMem();
 	wiiShadowOff();
@@ -727,6 +779,9 @@ void SetMPlayerSettings()
 	wiiSetCacheFill(WiiSettings.cacheFill);
 	wiiSetVolNorm();
 	wiiSetOnlineCacheFill(WiiSettings.onlineCacheFill);
+
+	if(WiiSettings.autoPlayNextVideo == AUTOPLAY_LOOP) // Loop video setting from mplayer
+		wiiSetLoopOn();
 
 	if(strncmp(loadedFile, "dvd", 3) == 0) // always use framedropping for DVD
 		wiiSetProperty(MP_CMD_FRAMEDROPPING, FRAMEDROPPING_AUTO);

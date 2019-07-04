@@ -40,6 +40,8 @@ u32 FrameTimer = 0;
 bool drawGui = false;
 bool pal = false;
 
+//extern float update_audio_rate;
+
 /****************************************************************************
  * TakeScreenshot
  *
@@ -252,6 +254,31 @@ void Draw_VIDEO()
 
 static void vblank_cb(u32 retraceCnt)
 {
+	 // get audio DMA remaining length
+  /* vu16* const _dspReg = (u16*)0xCC005000;
+  u16 remain = _dspReg[29];
+
+  if (remain > 0)
+  {
+    float samplerate;
+
+    if (remain < 5)
+    {
+      samplerate = 47995 / 48000;
+    }
+    else
+    {
+      samplerate = 48005 / 48000;
+    }
+
+   // if (samplerate != snd.sample_rate)
+    //{
+     // audio_set_rate(samplerate, snd.frame_rate);
+	 if (samplerate != update_audio_rate)
+		 update_audio_rate = samplerate;
+    //}
+  } */
+
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();

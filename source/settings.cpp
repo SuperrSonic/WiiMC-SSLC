@@ -363,6 +363,7 @@ prepareSettingsData ()
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
 	createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
 	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
+	//createXMLSetting("videoDelay", "Delay video by ms", toStr(WiiSettings.videoDelay));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
@@ -644,7 +645,7 @@ void DefaultSettings ()
 	WiiSettings.audioLanguage[0] = 0;
 	WiiSettings.audioDelay = 0;
 	WiiSettings.autoResume = 1;
-	WiiSettings.autoPlayNextVideo = 0;
+	WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
 	WiiSettings.skipBackward = 10;
 	WiiSettings.skipForward = 30;
 	WiiSettings.videosFolder[0] = 0;
@@ -653,6 +654,7 @@ void DefaultSettings ()
 	WiiSettings.videoDf = 0;
 	WiiSettings.viWidth = 0;
 	WiiSettings.skipLoop = 0;
+	//WiiSettings.videoDelay = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.musicFolder[0] = 0;
@@ -755,6 +757,8 @@ static void FixInvalidSettings()
 		WiiSettings.viWidth = 0;
 	if(WiiSettings.skipLoop < 0 || WiiSettings.skipLoop > 1)
 		WiiSettings.skipLoop = 0;
+	//if(WiiSettings.videoDelay < 0 || WiiSettings.videoDelay > 1)
+		//WiiSettings.videoDelay = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
@@ -776,8 +780,8 @@ static void FixInvalidSettings()
 		WiiSettings.audioDelay = 0;
 	if(WiiSettings.autoResume != 1 && WiiSettings.autoResume != 0)
 		WiiSettings.autoResume = 1;
-	if(WiiSettings.autoPlayNextVideo != 1 && WiiSettings.autoPlayNextVideo != 0)
-		WiiSettings.autoPlayNextVideo = 1;
+	if(WiiSettings.autoPlayNextVideo < 0 || WiiSettings.autoPlayNextVideo > AUTOPLAY_CONTINUOUS)
+		WiiSettings.autoPlayNextVideo = AUTOPLAY_OFF;
 	if(WiiSettings.skipBackward < 5 || WiiSettings.skipBackward > 1200)
 		WiiSettings.skipBackward = 10;
 	if(WiiSettings.skipForward < 5 || WiiSettings.skipForward > 1200)
@@ -1110,6 +1114,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
 				loadXMLSetting(&WiiSettings.viWidth, "viWidth");
 				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
+				//loadXMLSetting(&WiiSettings.videoDelay, "videoDelay");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));
