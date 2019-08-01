@@ -66,6 +66,7 @@ extern u8 whichfb;
 extern unsigned int *xfb[2];
 
 extern bool flip_pending;
+//extern int delay_amount;
 
 static int hor_pos=0, vert_pos=0;
 static float hor_zoom = 1.0f, vert_zoom = 1.0f;
@@ -522,6 +523,7 @@ inline void DrawMPlayer()
 	GX_SetDrawDone();
 	//VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;
+	//usleep(1000 * delay_amount);
 }
 
 void GX_AllocTextureMemory()

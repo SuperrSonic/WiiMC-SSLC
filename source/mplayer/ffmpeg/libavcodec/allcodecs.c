@@ -77,6 +77,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (AVUI, avui);
     REGISTER_ENCDEC  (AYUV, ayuv);
     REGISTER_DECODER (BMV_VIDEO, bmv_video);
+    REGISTER_DECODER (BINK, bink);
     REGISTER_DECODER (CDXL, cdxl);
     REGISTER_DECODER (DIRAC, dirac);
     REGISTER_DECODER (DSICINVIDEO, dsicinvideo);
@@ -171,6 +172,8 @@ void avcodec_register_all(void)
     REGISTER_DECODER (APE, ape);
     REGISTER_DECODER (ATRAC1, atrac1);
     REGISTER_DECODER (ATRAC3, atrac3);
+    REGISTER_DECODER (BINKAUDIO_DCT, binkaudio_dct);
+    REGISTER_DECODER (BINKAUDIO_RDFT, binkaudio_rdft);
     REGISTER_DECODER (BMV_AUDIO, bmv_audio);
     REGISTER_DECODER (DSICINAUDIO, dsicinaudio);
     REGISTER_ENCDEC  (EAC3, eac3);
@@ -279,6 +282,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (ADPCM_SBPRO_4, adpcm_sbpro_4);
     REGISTER_ENCDEC  (ADPCM_SWF, adpcm_swf);
     REGISTER_DECODER (ADPCM_THP, adpcm_thp);
+    REGISTER_DECODER (ADPCM_THP_LE, adpcm_thp_le);
     REGISTER_DECODER (ADPCM_XA, adpcm_xa);
     REGISTER_ENCDEC  (ADPCM_YAMAHA, adpcm_yamaha);
 

@@ -337,6 +337,8 @@ prepareSettingsData ()
 	createXMLSetting("lockFolders", "Static folders", toStr(WiiSettings.lockFolders));
 	createXMLSetting("startArea", "Starting area", toStr(WiiSettings.startArea));
 	createXMLSetting("debug", "Debug", toStr(WiiSettings.debug));
+	createXMLSetting("artwork", "Artwork Viewer", toStr(WiiSettings.artwork));
+	createXMLSetting("night", "Night Filter", toStr(WiiSettings.night));
 	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
 	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
 	createXMLSetting("smallCache", "Set cache to 2MB", toStr(WiiSettings.smallCache));
@@ -629,6 +631,8 @@ void DefaultSettings ()
 	WiiSettings.inactivityShutdown = 2;
 	WiiSettings.lockFolders = 0;
 	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
+	WiiSettings.artwork = 0;
+	WiiSettings.night = 0;
 	WiiSettings.screenDim = CONF_GetScreenSaverMode();
 	WiiSettings.doubleStrike = 0;
 	WiiSettings.smallCache = 0;
@@ -721,6 +725,10 @@ static void FixInvalidSettings()
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
 	if(WiiSettings.dvdDisabled && WiiSettings.startArea == MENU_DVD)
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
+	if(WiiSettings.artwork < 0 || WiiSettings.artwork > 1)
+		WiiSettings.artwork = 0;
+	if(WiiSettings.night < 0 || WiiSettings.night > 1)
+		WiiSettings.night = 0;
 	if(WiiSettings.screenDim < 0 || WiiSettings.screenDim > 1)
 		WiiSettings.screenDim = 0;
 	if(WiiSettings.doubleStrike < 0 || WiiSettings.doubleStrike > 1)
@@ -1089,6 +1097,8 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.lockFolders, "lockFolders");
 				loadXMLSetting(&WiiSettings.startArea, "startArea");
 				loadXMLSetting(&WiiSettings.debug, "debug");
+				loadXMLSetting(&WiiSettings.artwork, "artwork");
+				loadXMLSetting(&WiiSettings.night, "night");
 				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
 				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
 				loadXMLSetting(&WiiSettings.smallCache, "smallCache");
@@ -1182,6 +1192,8 @@ bool LoadSettings()
 		wiiSetVIscale();
 		wiiSetDf();
 		wiiSetDoubleStrike();
+		if(WiiSettings.night == 1)
+			nightfade_cb();
 
 		sprintf(filepath,"%s/restore_points", appPath);
 		char *buffer = (char *)mem2_malloc(50*1024, MEM2_OTHER);

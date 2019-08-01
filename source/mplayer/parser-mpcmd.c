@@ -205,7 +205,7 @@ m_config_parse_mp_command_line(m_config_t *config, int argc, char **argv)
 		tmp = m_config_check_option(config, opt, (i+1<argc) ? argv[i + 1] : NULL);
 		if(tmp >= 0 && mode != DROP_LOCAL) {
 		  play_tree_t* pt = last_entry ? last_entry : last_parent;
-		  play_tree_set_param(pt,opt, argv[i + 1]);
+		  play_tree_set_param(pt,opt, argv[i + 1], NULL);
 		}
 	      }
 	    } else {

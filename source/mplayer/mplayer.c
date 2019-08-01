@@ -180,7 +180,6 @@ int pause_gui=0;
 int wii_error = 0;
 static int pause_low_cache=0;
 static bool thp_vid = false;
-int delay_amount = 0;
 
 char fileplaying[MAXPATHLEN];
 static char *partitionlabel=NULL;
@@ -236,7 +235,8 @@ static int total_frame_cnt;
 static int drop_frame_cnt; // total number of dropped frames
 int benchmark;
 
-//int find_prob = 0;
+//int find_prob;
+//int ext_lang = 0;
 
 // options:
 #define DEFAULT_STARTUP_DECODE_RETRY 4
@@ -275,6 +275,8 @@ static m_time_size_t end_at = { .type = END_AT_NONE, .pos = 0 };
 int autosync;        // 30 might be a good default value.
 
 float update_audio_rate = 1.0;
+
+bool new_load = true;
 
 // may be changed by GUI:  (FIXME!)
 float rel_seek_secs;
@@ -330,7 +332,6 @@ static int softsleep;
 
 double force_fps;
 //double first_fps;
-//bool first_thp = true;
 
 static int force_srate;
 static int audio_output_format = AF_FORMAT_UNKNOWN;
@@ -967,7 +968,7 @@ static void load_per_protocol_config(m_config_t *conf, const char *const file)
     char protocol[strlen(PROFILE_CFG_PROTOCOL) + strlen(file) + 1];
     m_profile_t *p;
 
-    /* does filename actually uses a protocol ? */
+    /* does filename actually use a protocol ? */
     str = strstr(file, "://");
     if (!str)
         return;
@@ -1854,7 +1855,9 @@ static void wiiSeek(int sec, int mode)
 	if(!mpctx->demuxer || !mpctx->demuxer->seekable)
 		return;
 
-	if(thp_vid) // THP videos can't seek
+	//if(mpctx->demuxer->file_format == 35) // THP videos can't seek
+		//return;                           // No longer an option since brstm seeking
+	if(thp_vid)
 		return;
 
 	//if(strncmp(filename, "http:", 5) == 0 || strncmp(filename, "mms:", 4) == 0)
@@ -1879,6 +1882,11 @@ static int check_framedrop(double frame_time)
         float delay = playback_speed * mpctx->audio_out->get_delay();
         float d     = delay - mpctx->delay;
         ++total_frame_cnt;
+		if (seek_to_sec && new_load && total_frame_cnt > 1 && mpctx->demuxer->file_format == 3) {
+            wiiSeek(seek_to_sec, 0);
+            //end_at.pos += seek_to_sec;
+			new_load = false;
+        }
         // we should avoid dropping too many frames in sequence unless we
         // are too late. and we allow 100ms A-V delay here:
         if (d < -dropped_frames * frame_time - 0.100 &&
@@ -2489,12 +2497,13 @@ static int sleep_until_update(float *time_frame, float *aq_sleep_time)
             frame_time_remaining = 1;
             *time_frame = delay * 0.5;
         }
+		//*time_frame = 0;
     } else {
         // If we're lagging more than 200 ms behind the right playback rate,
         // don't try to "catch up".
         // If benchmark is set always output frames as fast as possible
         // without sleeping.
-        if (*time_frame < -0.2 || thp_vid) // benchmark )
+        if (*time_frame < -0.2 || mpctx->demuxer->file_format == 35) // thp vid  // benchmark )
             *time_frame = 0;
     }
 
@@ -3929,11 +3938,8 @@ stream_cache_min_percent=0.2;
 
             /* need to set fps here for output encoders to pick it up in their init */
            // if (force_fps) {
-	/*		   if (first_thp) {
-				   first_fps = mpctx->sh_video->fps;
-				   first_thp = false;
-			   } */
-				   
+			//   }
+
        //     if (mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 30) {
               //  mpctx->sh_video->fps       = force_fps;
        //         mpctx->sh_video->fps       = 29.969999313354492188;
@@ -4201,7 +4207,7 @@ if (mpctx->sh_video)
 	}
 #endif
 
-        if (seek_to_sec) {
+        if (seek_to_sec && mpctx->demuxer->file_format != 3) {
             seek(mpctx, seek_to_sec, SEEK_ABSOLUTE);
             end_at.pos += seek_to_sec;
         }
@@ -4597,6 +4603,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
     }
 #ifdef GEKKO
 playing_file=false;
+new_load = true; // hack for avi seek
 thp_vid=false;
 monospaced=0; // Go back to original font
 if (controlledbygui == 0)
@@ -5101,6 +5108,7 @@ void wiiRemoveShadows()
 {
 	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
 	m_config_set_option(mconfig,"ass-force-style","Outline=1.7");
+	m_config_set_option(mconfig,"ass-force-style","ScaledBorderAndShadow=no");
 }
 
 void wiiBoxShadows()
@@ -5165,11 +5173,6 @@ void wiiMute()
 	cmd->id=MP_CMD_MUTE;
 	cmd->name=strdup("mute");
 	mp_input_queue_cmd(cmd);
-}
-
-void wiiTHP()
-{
-	thp_vid = true;
 }
 
 void wiiSeekPos(int sec)
@@ -5260,10 +5263,11 @@ void wiiGetDroppedFrames(char * buf)
 	// This makes the counter disappear before the video ends.
 	//if(!mpctx->demuxer || !mpctx->d_audio || !mpctx->stream || mpctx->d_audio->eof || mpctx->stream->eof)
 		//return;
-
+// find_prob
 	sprintf(buf, "Dropped Frames: %2d",
 		drop_frame_cnt);
 
+    //mpctx->demuxer->file_format
 	//sprintf(buf, "%9.16f",
 		//mpctx->sh_video->fps);
 }
@@ -5447,21 +5451,15 @@ void wiiSetVolNorm2()
 	cmd->args[0].v.s = strdup("volnorm=2:0.25");
 }
 
-/*void wiiSetVideoDelay(int ms)
-{
-	delay_amount = ms;
-} */
-
 void wiiSetLoopOn()
 {
 	m_config_set_option(mconfig,"loop","0");
 }
 
-/*void wiiSetLoopOff()
+void wiiTHP()
 {
-	// Turn it off
-	m_config_set_option(mconfig,"loop","-1");
-} */
+	thp_vid = true;
+}
 
 void wiiSetOnlineCacheFill(int fill)
 {
@@ -5588,6 +5586,13 @@ void wiiSetSubtitleLanguage(char *lang)
 
 	if(dvdsub_lang)
 		free(dvdsub_lang);
+
+/*	if(lang[0] == 101 && lang[1] == 115) // es = Espa
+		ext_lang = 1;
+	else if (lang[0] == 101 && lang[1] == 110) // en = English
+		ext_lang = 0;
+	else
+		ext_lang = 0; */
 
 	if(lang[0] == 0)
 		dvdsub_lang = NULL;

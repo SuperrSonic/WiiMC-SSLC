@@ -73,6 +73,7 @@ play_tree_free(play_tree_t* pt, int children) {
     for(i = 0 ; pt->params[i].name != NULL ; i++) {
       free(pt->params[i].name);
       free(pt->params[i].value);
+      free(pt->params[i].image);
     }
     free(pt->params);
   }
@@ -349,7 +350,7 @@ play_tree_remove_file(play_tree_t* pt,const char* file) {
 }
 
 void
-play_tree_set_param(play_tree_t* pt, const char* name, const char* val) {
+play_tree_set_param(play_tree_t* pt, const char* name, const char* val, const char* img) {
   int n = 0;
 
 #ifdef MP_DEBUG
@@ -367,6 +368,7 @@ play_tree_set_param(play_tree_t* pt, const char* name, const char* val) {
   }
   pt->params[n].name = strdup(name);
   pt->params[n].value = val != NULL ? strdup(val) : NULL;
+  pt->params[n].image = img != NULL ? strdup(img) : NULL;
   memset(&pt->params[n+1],0,sizeof(play_tree_param_t));
 
   return;
@@ -392,6 +394,7 @@ play_tree_unset_param(play_tree_t* pt, const char* name) {
 
   free(pt->params[ni].name);
   free(pt->params[ni].value);
+  free(pt->params[ni].image);
 
   if(n > 1) {
     memmove(&pt->params[ni],&pt->params[ni+1],(n-ni)*sizeof(play_tree_param_t));
@@ -421,7 +424,7 @@ play_tree_set_params_from(play_tree_t* dest,play_tree_t* src) {
     return;
 
   for(i = 0; src->params[i].name != NULL ; i++)
-    play_tree_set_param(dest,src->params[i].name,src->params[i].value);
+    play_tree_set_param(dest,src->params[i].name,src->params[i].value, NULL);
   if(src->flags & PLAY_TREE_RND) // pass the random flag too
     dest->flags |= PLAY_TREE_RND;
 

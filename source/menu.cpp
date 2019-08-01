@@ -1892,9 +1892,11 @@ static void *ThumbThread (void *arg)
 				int read = 0;
 				if(loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0)
 					read = http_request(loadIndex->image, NULL, thumbBuffer, 200*1024, SILENT);
+				else if(loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
+					read = 0;
 				else
 					read = LoadFile(thumbBuffer, 200*1024, loadIndex->image, SILENT);
-	
+
 				if(read > 0 && loadIndex == thumbIndex) // file loaded and index has not changed
 				{
 					thumb = new GuiImageData((u8 *)thumbBuffer, read, GX_TF_RGBA8);
@@ -1903,7 +1905,10 @@ static void *ThumbThread (void *arg)
 					{
 						SuspendGui();
 						thumbImg->SetImage(thumb);
-						thumbImg->SetScale(185, screenheight-100);
+						if (thumbImg->GetWidth() == 256)
+							thumbImg->SetScale(256, screenheight-100);
+						else
+							thumbImg->SetScale(185, screenheight-100);
 						thumbImg->SetVisible(true);
 						ResumeGui();
 					}
@@ -2221,7 +2226,7 @@ static void MenuBrowse(int menu)
 	else if(menu == MENU_BROWSE_MUSIC || (menu == MENU_BROWSE_ONLINEMEDIA && wiiAudioOnly()))
 		pagesize = 8;
 
-	if(menu == MENU_BROWSE_ONLINEMEDIA)
+	if(menu == MENU_BROWSE_ONLINEMEDIA || (WiiSettings.artwork && (menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC)))
 	{
 		fileBrowser = new GuiFileBrowser(screenwidth-200, pagesize);
 		fileBrowser->SetRightCutoff();
@@ -2265,6 +2270,12 @@ static void MenuBrowse(int menu)
 			goto done;
 		}
 
+		thumbImg = new GuiImage;
+		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
+		thumbImg->SetVisible(false);
+		thumbImg->SetPosition(-30, 95);
+		mainWindow->Append(thumbImg);
+	} else if ((menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC) && WiiSettings.artwork) {
 		thumbImg = new GuiImage;
 		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 		thumbImg->SetVisible(false);
@@ -2655,8 +2666,9 @@ static void MenuBrowse(int menu)
 				}
 			}
 
-			if(menu == MENU_BROWSE_ONLINEMEDIA && browser.selIndex != currentIndex)
-			{
+			if((menu == MENU_BROWSE_ONLINEMEDIA && browser.selIndex != currentIndex)
+				|| ((WiiSettings.artwork && (menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC)) && browser.selIndex != currentIndex))
+			{	
 				currentIndex = browser.selIndex;
 				thumbIndex = NULL;
 
@@ -2947,7 +2959,7 @@ static void MenuBrowse(int menu)
 done:
 	SuspendParseThread(); // halt parsing
 	SuspendGui();
-	if(menu == MENU_BROWSE_ONLINEMEDIA)
+	if(menu == MENU_BROWSE_ONLINEMEDIA || (WiiSettings.artwork && (menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC)))
 	{
 		thumbThreadHalt = 1;
 		LWP_JoinThread(thumbthread, NULL);
@@ -3099,6 +3111,8 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Inactivity Shutdown");
 	sprintf(options.name[i++], "Browser Folders");
 	sprintf(options.name[i++], "Starting Area");
+	sprintf(options.name[i++], "Artwork Viewer");
+	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
 	sprintf(options.name[i++], "Double Strike");
 
@@ -3210,9 +3224,20 @@ static void MenuSettingsGlobal()
 					WiiSettings.startArea++;
 				break;
 			case 10:
-				WiiSettings.screenDim ^= 1;
+				WiiSettings.artwork ^= 1;
 				break;
 			case 11:
+				WiiSettings.night ^= 1;
+				if (WiiSettings.night == 1) {
+					WiiSettings.videoDf = 0;
+					nightfade_cb();
+				} else
+					nofade_cb();
+				break;
+			case 12:
+				WiiSettings.screenDim ^= 1;
+				break;
+			case 13:
 				WiiSettings.doubleStrike ^= 1;
 				if(WiiSettings.doubleStrike == 1) {
 					SetDoubleStrike();
@@ -3293,8 +3318,10 @@ static void MenuSettingsGlobal()
 				case MENU_BROWSE_ONLINEMEDIA: 	sprintf(options.value[9], "Online Media"); break;
 			}
 			
-			sprintf(options.value[10], "%s", WiiSettings.screenDim ? "On" : "Off");
-			sprintf(options.value[11], "%s", WiiSettings.doubleStrike ? "On" : "Off");
+			sprintf(options.value[10], "%s", WiiSettings.artwork ? "On" : "Off");
+			sprintf(options.value[11], "%s", WiiSettings.night ? "On" : "Off");
+			sprintf(options.value[12], "%s", WiiSettings.screenDim ? "On" : "Off");
+			sprintf(options.value[13], "%s", WiiSettings.doubleStrike ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3822,7 +3849,14 @@ static void MenuSettingsVideos()
 				break;
 			case 14:
 				WiiSettings.videoDf ^= 1;
-				if(WiiSettings.videoDf == 1)
+				if (WiiSettings.night == 1) { // turn off night filter
+					nofade_cb();
+					WiiSettings.night = 0;
+					WiiSettings.videoDf ^= 1;
+				}
+				if (WiiSettings.doubleStrike == 1) // No df in 240p mode
+					WiiSettings.videoDf = 0;
+				if (WiiSettings.videoDf == 1)
 					SetDf();
 				else
 					SetDfOff();
@@ -5743,7 +5777,7 @@ static void SetupGui()
 	videobarVolumeBtn->SetPosition(10, 4);
 	videobarVolumeBtn->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarVolumeBtn->SetImage(videobarVolumeImg);
-	videobarVolumeBtn->SetTooltip(videobarVolumeTip);
+	//videobarVolumeBtn->SetTooltip(videobarVolumeTip);
 	videobarVolumeBtn->SetTrigger(trigA);
 	videobarVolumeBtn->SetSelectable(false);
 	videobarVolumeBtn->SetUpdateCallback(VideoVolumeCallback);
@@ -5753,7 +5787,7 @@ static void SetupGui()
 	videobarBackwardBtn->SetPosition(-60, 4);
 	videobarBackwardBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	videobarBackwardBtn->SetImage(videobarBackwardImg);
-	videobarBackwardBtn->SetTooltip(videobarBackwardTip);
+	//videobarBackwardBtn->SetTooltip(videobarBackwardTip);
 	videobarBackwardBtn->SetTrigger(trigA);
 	videobarBackwardBtn->SetSelectable(false);
 	videobarBackwardBtn->SetUpdateCallback(VideoBackwardCallback);
@@ -5763,7 +5797,7 @@ static void SetupGui()
 	videobarPauseBtn->SetPosition(0, 4);
 	videobarPauseBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	videobarPauseBtn->SetImage(videobarPauseImg);
-	videobarPauseBtn->SetTooltip(videobarPauseTip);
+	//videobarPauseBtn->SetTooltip(videobarPauseTip);
 	videobarPauseBtn->SetTrigger(trigA);
 	videobarPauseBtn->SetSelectable(false);
 	videobarPauseBtn->SetUpdateCallback(VideoPauseCallback);
@@ -5773,7 +5807,7 @@ static void SetupGui()
 	videobarForwardBtn->SetPosition(60, 4);
 	videobarForwardBtn->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	videobarForwardBtn->SetImage(videobarForwardImg);
-	videobarForwardBtn->SetTooltip(videobarForwardTip);
+	//videobarForwardBtn->SetTooltip(videobarForwardTip);
 	videobarForwardBtn->SetTrigger(trigA);
 	videobarForwardBtn->SetSelectable(false);
 	videobarForwardBtn->SetUpdateCallback(VideoForwardCallback);

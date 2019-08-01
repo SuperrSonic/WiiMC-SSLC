@@ -95,6 +95,7 @@ struct play_tree_info {
 struct play_tree_param {
   char* name;
   char* value;
+  char* image;
 };
 
 
@@ -198,7 +199,7 @@ play_tree_remove_file(play_tree_t* pt,const char* file);
 
 /// Add a config paramter to an item.
 void
-play_tree_set_param(play_tree_t* pt, const char* name, const char* val);
+play_tree_set_param(play_tree_t* pt, const char* name, const char* val, const char* img);
 
 /// Remove a config parameter from an item.
 int

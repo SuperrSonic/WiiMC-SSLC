@@ -586,6 +586,12 @@ msgstr "WiiMC no tiene acceso al DVD."
 msgid "Starting Area"
 msgstr "Área de inicio"
 
+msgid "Artwork Viewer"
+msgstr "Carátulas y portadas"
+
+msgid "Night Filter"
+msgstr "Filtro de noche"
+
 msgid "Screen Burn-in Reduction"
 msgstr "Protector de pantalla"
 

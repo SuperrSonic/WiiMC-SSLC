@@ -438,12 +438,14 @@ extern "C" bool FindNextFile(bool load)
 			char ext[7];
 			GetExt(loadedFile, ext);
 
-			if(strcasecmp(ext, "thp") == 0)
-				wiiTHP();
-			else if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
+			if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 				wiiDash();
 			else
 				wiiElse();
+
+			// THP doesn't support seek, yet the demuxer enables it
+			if(strcasecmp(ext, "thp") == 0)
+				wiiTHP();
 
 			// use part after last / for display name, if it's not already the end of the string
 			if(start != NULL && start[1] != 0)
@@ -644,12 +646,14 @@ void LoadMPlayerFile()
 		partitionlabel = GetPartitionLabel(loadedFile);
 	}
 
-	if(strcasecmp(ext, "thp") == 0)
-		wiiTHP();
-	else if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
+	if(WiiSettings.skipLoop == 1 || strcasecmp(ext, "dash") == 0)
 		wiiDash();
 	else
 		wiiElse();
+
+	// THP doesn't support seek, yet the demuxer enables it
+	if(strcasecmp(ext, "thp") == 0)
+		wiiTHP();
 
 	// wait for directory parsing to finish (to find subtitles)	
 	while(WiiSettings.subtitleVisibility && !ParseDone())

@@ -1763,6 +1763,19 @@ static bool ParseDirEntries()
 			}
 			f_entry->length = filestat.st_size;
 
+			/* Video mode thumbnails */
+			if(f_entry && WiiSettings.artwork && (menuCurrent == MENU_BROWSE_VIDEOS || menuCurrent == MENU_BROWSE_MUSIC)) {
+				GetFullPath(f_entry, entry->d_name);
+				/* Remove the extension. */
+				StripExt(entry->d_name);
+
+				/* Add .thumb extension */
+				strcat(entry->d_name, ".jpg");
+
+				f_entry->image = mem2_strdup(entry->d_name, MEM2_BROWSER);
+			//	printf("Thumbs: %s", entry->d_name);
+			}
+
 			if(S_ISDIR(filestat.st_mode)) 
 			{
 				f_entry->type = TYPE_FOLDER;
@@ -2349,6 +2362,9 @@ nomemParsePlaylistFile:
 					DeleteEntryFiles(f_entry);
 					goto nomemParsePlaylistFile;
 				}
+				/* M3U thumbnails */
+				//printf("thumb title: %s", i->params[n].image);
+				f_entry->image = mem2_strdup(i->params[n].image, MEM2_BROWSER);
 				break;
 			}
 		}

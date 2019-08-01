@@ -404,7 +404,7 @@ asx_parse_param(ASX_Parser_t* parser, char** attribs, play_tree_t* pt) {
       mp_msg(MSGT_PLAYTREE,MSGL_WARN,"\n");
     return;
   }
-  play_tree_set_param(pt,name,val);
+  play_tree_set_param(pt,name,val,NULL);
   free(name);
   free(val);
 }
@@ -498,7 +498,7 @@ asx_parse_entry(ASX_Parser_t* parser,char* buffer,char** _attribs) {
       nref++;
 #ifdef GEKKO
 	} else if(strcasecmp(element,"TITLE") == 0) {
-	  play_tree_set_param(ref, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, body);
+	  play_tree_set_param(ref, PLAY_TREE_PARAM_PRETTYFORMAT_TITLE, body, NULL);
 #endif
     } else
       mp_msg(MSGT_PLAYTREE,MSGL_DBG2,"Ignoring element %s\n",element);

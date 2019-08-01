@@ -111,6 +111,8 @@ struct SWiiSettings {
 	int		lockFolders;
 	int		startArea;
 	int		debug;
+	int 	artwork;
+	int 	night;
 	int		screenDim;
 	int 	doubleStrike;
 	int 	smallCache;
@@ -177,10 +179,10 @@ const char validVideoExtensions[][7] =
 	"viv", "vob", "vro", "webm", "wmv", "y4m", ""
 };
 
-const char validAudioExtensions[][5] = 
+const char validAudioExtensions[][6] = 
 {
-	"aac", "ac3", "adx", "aif", "aiff", "amr", "ape", "apl", "asf", "flac", "m4a", 
-	"m4b", "m4p", "mka", "mp2", "mp3", "mpc", "oga", "ogg", "ra", "ram", "rm",
+	"aac", "ac3", "adx", "aif", "aiff", "amr", "ape", "apl", "asf", "bfstm", "brstm",
+	"flac", "m4a", "m4b", "m4p", "mka", "mp2", "mp3", "mpc", "oga", "ogg", "ra", "ram", "rm",
 	"shn", "wav", "wma", "wv", ""
 };
 

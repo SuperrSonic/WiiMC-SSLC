@@ -28,7 +28,7 @@ INCLUDES	:=	source source/mplayer
 
 # Compile settings, NTFS = 191KB, EXT2 = 91KB, Full = 282KB
 ENABLE_NTFS                   = 1
-ENABLE_EXT2                   = 1
+ENABLE_EXT2                   = 0
 
 
 CFLAGS		=	-g -O3 -Wall $(MACHDEP) $(INCLUDE)  \

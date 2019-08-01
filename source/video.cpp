@@ -39,6 +39,9 @@ int screenwidth = 640;
 u32 FrameTimer = 0;
 bool drawGui = false;
 bool pal = false;
+u8 night = 22;
+bool fade_boot = false;
+bool fade_not = false;
 
 //extern float update_audio_rate;
 
@@ -89,7 +92,7 @@ void ResetVideo_Menu()
 	guMtxTransApply (GXmodelView2D, GXmodelView2D, 0.0F, 0.0F, -50.0F);
 	GX_LoadPosMtxImm(GXmodelView2D,GX_PNMTX0);
 
-	guOrtho(p,0,screenheight-0,0,screenwidth-0,0,300);
+	guOrtho(p,0,screenheight,0,screenwidth,0,300);
 	GX_LoadProjectionMtx(p, GX_ORTHOGRAPHIC);
 }
 
@@ -107,6 +110,55 @@ void StopGX()
 	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	VIDEO_WaitVSync();
+}
+
+void nightfade_cb()
+{
+	fade_boot = true;
+	fade_not = false;
+}
+
+void nofade_cb()
+{
+	fade_not = true;
+	fade_boot = false;
+}
+
+void fadein_copyfilter()
+{
+  night++;
+  if (night > 21 && fade_not) {
+    night = 22;
+    fade_not = false;
+  }
+
+  u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
+  u8* vfilter = sharp;
+
+  GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+
+  GX_Flush();
+
+  VIDEO_Configure(vmode);
+  VIDEO_Flush();
+}
+
+void fadeout_copyfilter()
+{
+  night--;
+  if (night < 1 && fade_boot) {
+	  night = 0;
+      fade_boot = false;
+  }
+
+  u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
+  u8* vfilter = sharp;
+
+  GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+  GX_Flush();
+
+  VIDEO_Configure(vmode);
+  VIDEO_Flush();
 }
 
 /****************************************************************************
@@ -130,6 +182,10 @@ void Menu_Render()
 		VIDEO_WaitVSync();
 	}
 
+	if (fade_boot)
+		fadeout_copyfilter();
+	else if (fade_not)
+		fadein_copyfilter();
 	++FrameTimer;
 }
 
@@ -340,7 +396,9 @@ void SetDoubleStrike()
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
-	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_FALSE,vmode->vfilter);
+	u8 sharp[7] = {0,0,21,night,21,0,0};
+	u8* vfilter = sharp;
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
 	GX_SetFieldMode(GX_DISABLE, GX_ENABLE);
 	GX_Flush();
 
@@ -368,28 +426,38 @@ void SetVIscaleback()
 
 void SetDf()
 {
-	if (vmode == &TVNtsc480Prog) {
+	/*if (vmode == &TVNtsc480Prog) {
 		CONF_GetVideo();
 		vmode = &TVNtsc480ProgSoft;
 	} else if (vmode == &TVPal576ProgScale) {
 		CONF_GetVideo();
 		vmode = &TVEurgb60Hz480ProgSoft;
+	} else */ if (vmode == &TVNtsc240Ds || vmode == &TVEurgb60Hz240Ds) {
+		return;
 	}
 
-	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vmode->vfilter);
+	u8 deflicker[7] = {8, 8, 10, 12, 10, 8, 8};
+	u8* vfilter = deflicker;
+
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+	GX_Flush();
 }
 
 void SetDfOff()
 {
-	if (vmode == &TVNtsc480ProgSoft) {
+	/*if (vmode == &TVNtsc480ProgSoft) {
 		CONF_GetVideo();
 		vmode = &TVNtsc480Prog;
 	} else if (vmode == &TVEurgb60Hz480ProgSoft) {
 		CONF_GetVideo();
 		vmode = &TVPal576ProgScale;
-	}
+	}*/
 
-	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_FALSE,vmode->vfilter);
+	u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
+	u8* vfilter = sharp;
+
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+	GX_Flush();
 }
 
 void
