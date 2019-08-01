@@ -111,7 +111,7 @@ typedef struct ass_track {
     double Timer;
     int WrapStyle;
     int ScaledBorderAndShadow;
-    int CorrectPAR;
+	int CorrectPAR;
     int Kerning;
     char *Language;
 

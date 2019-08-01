@@ -1566,9 +1566,9 @@ int demuxer_add_chapter(demuxer_t *demuxer, const char *name, uint64_t start,
     demuxer->chapters[demuxer->num_chapters].name = strdup(name ? name : MSGTR_Unknown);
 
     mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_ID=%d\n", demuxer->num_chapters);
-    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_START=%"PRIu64"\n", demuxer->num_chapters, start);
+    mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_START=%"PRIu64"\n", demuxer->num_chapters, start / 1000000);
     if (end)
-        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_END=%"PRIu64"\n", demuxer->num_chapters, end);
+        mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_END=%"PRIu64"\n", demuxer->num_chapters, end / 1000000);
     if (name)
         mp_msg(MSGT_IDENTIFY, MSGL_INFO, "ID_CHAPTER_%d_NAME=%s\n", demuxer->num_chapters, name);
 
@@ -1658,7 +1658,7 @@ int demuxer_seek_chapter(demuxer_t *demuxer, int chapter, int mode,
         if (current < 0)
             current = 0;
 
-        *seek_pts = demuxer->chapters[current].start / 1000.0;
+        *seek_pts = demuxer->chapters[current].start / 1e9;
 
         if (num_chapters)
             *num_chapters = demuxer->num_chapters;
@@ -1686,7 +1686,7 @@ int demuxer_get_current_chapter(demuxer_t *demuxer)
         sh_audio_t *sh_audio = demuxer->audio->sh;
         uint64_t now;
         now = (sh_video ? sh_video->pts : (sh_audio ? sh_audio->pts : 0))
-              * 1000 + 0.5;
+              * 1e9 + 0.5;
         for (chapter = demuxer->num_chapters - 1; chapter >= 0; --chapter) {
             if (demuxer->chapters[chapter].start <= now)
                 break;
@@ -1729,8 +1729,10 @@ float demuxer_chapter_time(demuxer_t *demuxer, int chapter, float *end)
     if (demuxer->num_chapters && demuxer->chapters && chapter >= 0
         && chapter < demuxer->num_chapters) {
         if (end)
-            *end = demuxer->chapters[chapter].end / 1000.0;
-        return demuxer->chapters[chapter].start / 1000.0;
+          //  *end = demuxer->chapters[chapter].end / 1000.0;
+        //return demuxer->chapters[chapter].start / 1000.0;
+		 *end = demuxer->chapters[chapter].end / 1e9;
+        return demuxer->chapters[chapter].start / 1e9;
     }
     return -1.0;
 }

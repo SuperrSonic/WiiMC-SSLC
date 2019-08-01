@@ -598,7 +598,7 @@ static int process_info_line(ASS_Track *track, char *str)
         track->WrapStyle = atoi(str + 10);
     } else if (!strncmp(str, "ScaledBorderAndShadow:", 22)) {
         track->ScaledBorderAndShadow = parse_bool(str + 22);
-    } else if (!strncmp(str, "CorrectPAR:", 11)) {
+	} else if (!strncmp(str, "CorrectPAR:", 11)) {
         track->CorrectPAR = parse_bool(str + 11);
     } else if (!strncmp(str, "Kerning:", 8)) {
         track->Kerning = parse_bool(str + 8);
@@ -1278,8 +1278,8 @@ ASS_Track *ass_new_track(ASS_Library *library)
 {
     ASS_Track *track = calloc(1, sizeof(ASS_Track));
     track->library = library;
-    track->ScaledBorderAndShadow = 1;
-    track->CorrectPAR = 0;
+    track->ScaledBorderAndShadow = 0; // Normally enabled
+	track->CorrectPAR = 0;
     track->parser_priv = calloc(1, sizeof(ASS_ParserPriv));
     return track;
 }

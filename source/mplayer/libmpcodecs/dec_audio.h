@@ -38,4 +38,6 @@ void uninit_audio(sh_audio_t *sh_audio);
 int init_audio_filters(sh_audio_t *sh_audio, int in_samplerate,
                        int *out_samplerate, int *out_channels, int *out_format);
 
+int update_srate(sh_audio_t *sh_audio, int in_samplerate, int *out_samplerate);
+
 #endif /* MPLAYER_DEC_AUDIO_H */

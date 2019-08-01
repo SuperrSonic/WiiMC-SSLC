@@ -105,6 +105,14 @@ av_dict_get(AVDictionary *m, const char *key, const AVDictionaryEntry *prev, int
 int av_dict_set(AVDictionary **pm, const char *key, const char *value, int flags);
 
 /**
+ * Convenience wrapper for av_dict_set that converts the value to a string
+ * and stores it.
+ *
+ * Note: If AV_DICT_DONT_STRDUP_KEY is set, key will be freed on error.
+ */
+int av_dict_set_int(AVDictionary **pm, const char *key, int value, int flags);
+
+/**
  * Copy entries from one AVDictionary struct into another.
  * @param dst pointer to a pointer to a AVDictionary struct. If *dst is NULL,
  *            this function will allocate a struct for you and put it in *dst

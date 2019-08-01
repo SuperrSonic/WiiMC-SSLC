@@ -188,7 +188,7 @@ static int preinit(const char *arg)
 	subopt_parse(arg, subopts);
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-		mplayerwidth = WIDTH_WIDE; // 480 * (16/9)
+		mplayerwidth = WIDTH_WIDE; // 480 * 16 / 9
 
 	vo_screenheight = mplayerheight;
 	vo_screenwidth = mplayerwidth;

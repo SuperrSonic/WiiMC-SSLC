@@ -100,7 +100,7 @@ typedef struct sh_video {
   double buffered_pts[32];
   int num_buffered_pts;
   // output format: (set by demuxer)
-  float fps;              // frames per second (set only if constant fps)
+  double fps;              // frames per second (set only if constant fps)
   float frametime;        // 1/fps
   float aspect;           // aspect ratio stored in the file (for prescaling)
   float stream_aspect;  // aspect ratio stored in the media headers (e.g. in DVD IFO files)

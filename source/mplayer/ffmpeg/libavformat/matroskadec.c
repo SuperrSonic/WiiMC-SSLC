@@ -1399,6 +1399,8 @@ static void matroska_metadata_creation_time(AVDictionary **metadata, int64_t dat
     av_dict_set(metadata, "creation_time", buffer, 0);
 }
 
+//extern double find_prob;
+
 static int matroska_read_header(AVFormatContext *s)
 {
     MatroskaDemuxContext *matroska = s->priv_data;
@@ -1458,6 +1460,13 @@ static int matroska_read_header(AVFormatContext *s)
         matroska->ctx->duration = matroska->duration * matroska->time_scale
                                   * 1000 / AV_TIME_BASE;
     av_dict_set(&s->metadata, "title", matroska->title, 0);
+	//find_prob = matroska->ctx->duration; //matroska->duration * matroska->time_scale
+                                 // * 1000 / AV_TIME_BASE;
+								 //AV_TIME_BASE = 1000000
+								 //matroska->duration = good is 534618
+								 //matroska->duration = bad  is 534619
+								 //good ctx = 267309000.000000030
+								 //whatsoconfuse
 
     if (matroska->date_utc.size == 8)
         matroska_metadata_creation_time(&s->metadata, AV_RB64(matroska->date_utc.data));
@@ -1703,6 +1712,7 @@ static int matroska_read_header(AVFormatContext *s)
             if (track->default_duration)   // Breaks decoding on certain framerates, only when framedrop is enabled
                 av_reduce(&st->avg_frame_rate.num, &st->avg_frame_rate.den,
                           1000000000, track->default_duration, 30000);
+				//st->avg_frame_rate = av_d2q(1000000000.0/track->default_duration, INT_MAX);
 
             /* export stereo mode flag as metadata tag */
             if (track->video.stereo_mode && track->video.stereo_mode < MATROSKA_VIDEO_STEREO_MODE_COUNT)

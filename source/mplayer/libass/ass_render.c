@@ -2213,12 +2213,12 @@ ass_start_frame(ASS_Renderer *render_priv, ASS_Track *track,
     // PAR correction
    // render_priv->font_scale_x = render_priv->settings.aspect /
      //                           render_priv->settings.storage_aspect;
-    /* PAR correction is now done with a custom setting */
-    if (render_priv->track->CorrectPAR)
-        render_priv->font_scale_x = 1.0 / render_priv->settings.storage_aspect;
-    else
-        render_priv->font_scale_x = render_priv->settings.aspect /
-            render_priv->settings.storage_aspect;
+	 /* PAR correction is now done with a custom setting */
+	if (render_priv->track->CorrectPAR)
+		render_priv->font_scale_x = 1.0 / render_priv->settings.storage_aspect;
+	else
+		render_priv->font_scale_x = render_priv->settings.aspect /
+	        render_priv->settings.storage_aspect;
 
     render_priv->prev_images_root = render_priv->images_root;
     render_priv->images_root = 0;

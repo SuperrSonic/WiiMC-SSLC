@@ -371,6 +371,33 @@ int init_audio_filters(sh_audio_t *sh_audio, int in_samplerate,
     return 1;
 }
 
+int update_srate(sh_audio_t *sh_audio, int in_samplerate, int *out_samplerate)
+{
+	af_stream_t *afs = sh_audio->afilter;
+    if (!afs) {
+	afs = malloc(sizeof(af_stream_t));
+	memset(afs, 0, sizeof(af_stream_t));
+    }
+    afs->input.rate   = in_samplerate;
+
+    afs->output.rate   = *out_samplerate;
+
+    // filter config:
+    memcpy(&afs->cfg, &af_cfg, sizeof(af_cfg_t));
+
+    // let's autoprobe it!
+    if (0 != af_init(afs)) {
+	sh_audio->afilter = NULL;
+	free(afs);
+	return 0;   // failed :(
+    }
+
+    *out_samplerate = afs->output.rate;
+
+    sh_audio->afilter = (void *) afs;
+    return 1;
+}
+
 static int filter_n_bytes(sh_audio_t *sh, int len)
 {
     int error = 0;

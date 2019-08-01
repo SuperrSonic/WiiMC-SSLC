@@ -37,7 +37,7 @@
 #include "help_mp.h"
 #include "osdep/ave-rvl.h"
 
-#define BUFFER_SIZE 	4096 // Why does 1024 work just fine? Original is 4096
+#define BUFFER_SIZE 	4096
 #define BUFFER_COUNT 	32
 
 #define HW_CHANNELS 	2

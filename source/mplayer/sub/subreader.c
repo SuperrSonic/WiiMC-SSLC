@@ -2103,7 +2103,8 @@ static void append_dir_subtitles(struct sub_list *slist, const char *path,
 
     free(tmpresult);
 }
-
+//extern int ext_lang;
+//extern int find_prob;
 /**
  * @brief Load all subtitles matching the subtitle filename
  *
@@ -2175,6 +2176,12 @@ void load_subtitles(const char *fname, float fps, open_sub_func add_f)
     // Sort subs by priority and append them
     qsort(slist.subs, slist.sid, sizeof(*slist.subs), compare_sub_priority);
     for (i = 0; i < slist.sid; i++) {
+		//find_prob = ext_lang;
+		//Right now, assumes multiple external subs are 0=Eng and 1=Esp
+		//This is a bad design but how else could I identify subtitles?
+		//If I want Esp to override English by default then the lang setting
+		//would pick the wrong subtitle.
+       // struct subfn *sub = &slist.subs[i+ext_lang];
         struct subfn *sub = &slist.subs[i];
         add_f(sub->fname, fps, 1);
         free(sub->fname);
