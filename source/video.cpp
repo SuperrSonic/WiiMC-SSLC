@@ -27,7 +27,7 @@ extern "C" {
 static unsigned char *gp_fifo; // must be in MEM1
 static Mtx GXmodelView2D;
 
-unsigned int *xfb[2] = { NULL, NULL }; // Double buffered
+unsigned int *xfb[3] = { NULL, NULL, NULL }; // Double buffered
 u8 whichfb = 0; // Switch
 bool need_wait=false;
 bool flip_pending=false;
@@ -177,7 +177,9 @@ void Menu_Render()
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();
-		whichfb ^= 1;
+		++whichfb;
+		if (whichfb > 2)
+			whichfb = 0;
 		flip_pending = false;
 		VIDEO_WaitVSync();
 	}
@@ -338,7 +340,10 @@ static void vblank_cb(u32 retraceCnt)
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();
-		whichfb ^= 1;
+		//whichfb ^= 1;
+		++whichfb;
+		if(whichfb > 2)
+			whichfb = 0;
 		flip_pending = false;
 	}
 }
@@ -485,14 +490,18 @@ InitVideo2 ()
 	// Allocate framebuffers
 	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	xfb[2] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
 	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
+	DCInvalidateRange(xfb[2], VIDEO_GetFrameBufferSize(vmode));
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
 	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+	xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer (vmode, xfb[2], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
 	VIDEO_Flush ();

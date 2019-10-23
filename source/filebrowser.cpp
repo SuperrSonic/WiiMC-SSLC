@@ -519,7 +519,7 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 
 	if(isInserted[DEVICE_SD])
 	{
-		for(i=0; i < MAX_DEVICES - 9; i++) // After the makefile tweak, it's showing 2 sd cards and usb drives
+		for(i=0; i < MAX_DEVICES; i++)
 		{
 			if(part[DEVICE_SD][i].type > 0)
 			{
@@ -546,7 +546,7 @@ int BrowserChangeFolder(bool updateDir, bool waitParse)
 
 	if(isInserted[DEVICE_USB])
 	{
-		for(i=0; i < MAX_DEVICES - 9; i++)
+		for(i=0; i < MAX_DEVICES; i++)
 		{
 			if(part[DEVICE_USB][i].type > 0)
 			{
