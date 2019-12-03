@@ -1696,6 +1696,9 @@ bool ParseDone()
 	return false;
 }
 
+//int tesy_num = 0;
+//char tesy_cha[50] = { 0 };
+
 static bool ParseDirEntries()
 {
 	if(!dirHandle)
@@ -1766,14 +1769,19 @@ static bool ParseDirEntries()
 			/* Video mode thumbnails */
 			if(f_entry && WiiSettings.artwork && (menuCurrent == MENU_BROWSE_VIDEOS || menuCurrent == MENU_BROWSE_MUSIC)) {
 				GetFullPath(f_entry, entry->d_name);
+			//	sprintf(art_disp, entry->d_name); // Copy display name
+			//	GetDisplay(f_entry, art_disp, 256);
 				/* Remove the extension. */
 				StripExt(entry->d_name);
 
 				/* Add .thumb extension */
 				strcat(entry->d_name, ".jpg");
 
+				f_entry->xml = mem2_strdup(entry->d_name, MEM2_BROWSER);
 				f_entry->image = mem2_strdup(entry->d_name, MEM2_BROWSER);
-			//	printf("Thumbs: %s", entry->d_name);
+				//memset(locate_paths,0,strlen(locate_paths));
+				//memset(actual_path,0,strlen(actual_path));
+				//memset(art_disp,0,strlen(art_disp));
 			}
 
 			if(S_ISDIR(filestat.st_mode)) 
@@ -1958,10 +1966,13 @@ typedef struct
 	char name[MAXJOLIET + 1];
 	char url[MAXPATHLEN + 1];
 	char thumb[MAXJOLIET + 1];
+	char xml[MAXJOLIET + 1];
 	char processor[MAXPATHLEN + 1];
 } PLXENTRY;
 
 #define MAX_PLX_SIZE (512*1024)
+
+int find_iss = 0;
 
 static int ParsePLXPlaylist()
 {
@@ -2070,6 +2081,10 @@ static int ParsePLXPlaylist()
 			else if(strncmp(attribute, "thumb", 5) == 0)
 			{
 				snprintf(newEntry.thumb, MAXJOLIET, "%s", value);
+			}
+			else if(strncmp(attribute, "xml", 3) == 0)
+			{
+				snprintf(newEntry.xml, MAXJOLIET, "%s", value);
 			}
 			else if(strncmp(attribute, "processor", 9) == 0)
 			{
@@ -2182,7 +2197,19 @@ static int ParsePLXPlaylist()
 				return -1;
 			}
 		}	
-		
+
+		if(list[i].xml)
+		{
+			f_entry->xml = mem2_strdup(list[i].xml, MEM2_BROWSER);
+			if(!f_entry->xml) // no mem
+			{
+				DeleteEntryFiles(f_entry);
+				free(list);
+				mem2_free(buffer, MEM2_OTHER);
+				return -1;
+			}
+		}
+
 		if(list[i].type == 2)
 			f_entry->type = TYPE_PLAYLIST;
 		else if(list[i].type == 3)
@@ -2365,6 +2392,7 @@ nomemParsePlaylistFile:
 				/* M3U thumbnails */
 				//printf("thumb title: %s", i->params[n].image);
 				f_entry->image = mem2_strdup(i->params[n].image, MEM2_BROWSER);
+			//	f_entry->xml = mem2_strdup("sd1:/apps/wiimc/The Road to El Dorado.xml", MEM2_BROWSER);
 				break;
 			}
 		}

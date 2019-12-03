@@ -30,7 +30,10 @@ typedef struct _bentry
 	char *file; // full filename
 	char *url; // address
 	char *display; // name for browser display
+	char *xml; // name for xml data
 	char *image;
+	char *year;
+	char *desc;
 	int icon; // icon to display
 	int pos;
 	_bentry *next;

@@ -480,6 +480,9 @@ static void Remove(BROWSERENTRY *i)
 	mem2_free(i->file, MEM2_BROWSER);
 	mem2_free(i->url, MEM2_BROWSER);
 	mem2_free(i->display, MEM2_BROWSER);
+	mem2_free(i->xml, MEM2_BROWSER);
+	mem2_free(i->year, MEM2_BROWSER);
+	mem2_free(i->desc, MEM2_BROWSER);
 	mem2_free(i->image, MEM2_BROWSER);
 	mem2_free(i, MEM2_BROWSER);
 }

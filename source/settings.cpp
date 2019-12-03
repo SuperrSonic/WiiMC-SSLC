@@ -22,6 +22,7 @@
 #include "settings.h"
 #include "utils/gettext.h"
 #include "utils/mem2_manager.h"
+#include "utils/http.h"
 
 #define SAVEBUFFERSIZE (64*1024)
 
@@ -338,6 +339,7 @@ prepareSettingsData ()
 	createXMLSetting("startArea", "Starting area", toStr(WiiSettings.startArea));
 	createXMLSetting("debug", "Debug", toStr(WiiSettings.debug));
 	createXMLSetting("artwork", "Artwork Viewer", toStr(WiiSettings.artwork));
+	createXMLSetting("artworkFolder", "Artwork folder", WiiSettings.artworkFolder);
 	createXMLSetting("night", "Night Filter", toStr(WiiSettings.night));
 	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
 	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
@@ -611,6 +613,97 @@ static void LoadOnlineMediaFile(char * filepath)
 	mem2_free(savebuffer, MEM2_OTHER);
 }
 
+static void RecurseThumbs(mxml_node_t * top, char * path)
+{
+	mxml_node_t * next;
+
+	next = mxmlFindElement(top, top, "image", NULL, NULL, MXML_DESCEND_FIRST);
+
+	while(next != NULL)
+	{
+		const char *number = mxmlElementGetAttr(next, "number");
+		const char *year = mxmlElementGetAttr(next, "year");
+		const char *desc = mxmlElementGetAttr(next, "desc");
+
+		if(number)
+		{
+			//loadXMLVal(&WiiSettings.numThumb, "number");
+			WiiSettings.numThumb = atoi(number); //mem2_strdup(number, MEM2_BROWSER);
+		//	printf("THUMB: %d", WiiSettings.numThumb);
+
+			if(year)
+			{
+				WiiSettings.yearNum = mem2_strdup(year, MEM2_BROWSER);
+			}
+			if(desc)
+			{
+				WiiSettings.descTxt = mem2_strdup(desc, MEM2_BROWSER);
+			}
+		}
+		next = mxmlFindElement(next, top, "image", NULL, NULL, MXML_NO_DESCEND);
+	}
+}
+
+/****************************************************************************
+ * Load number of thumbs, year, and desc from specified file
+ ***************************************************************************/
+void LoadThumbsFile(char * filepath)
+{
+	int offset = 0;
+
+	savebuffer = (char *)mem2_malloc(SAVEBUFFERSIZE, MEM2_OTHER);
+
+	if(!savebuffer)
+		return;
+
+	memset(savebuffer, 0, SAVEBUFFERSIZE);
+	offset = LoadFile(savebuffer, SAVEBUFFERSIZE, filepath, SILENT);
+
+	//printf("GIMMIE %s", filepath);
+	
+	if (offset > 0)
+	{
+		xml = mxmlLoadString(NULL, savebuffer, MXML_TEXT_CALLBACK);
+
+		if(xml)
+		{
+			data = mxmlFindElement(xml, xml, "file", NULL, NULL, MXML_DESCEND);
+			if(data) RecurseThumbs(data, (char *)"");
+			mxmlDelete(xml);
+		}
+	}
+	mem2_free(savebuffer, MEM2_OTHER);
+}
+
+/****************************************************************************
+ * Load number of thumbs, year, and desc from specified HTTP link
+ ***************************************************************************/
+void LoadThumbsFileHTTP(char * filepath)
+{
+	int offset = 0;
+
+	savebuffer = (char *)mem2_malloc(SAVEBUFFERSIZE, MEM2_OTHER);
+
+	if(!savebuffer)
+		return;
+
+	memset(savebuffer, 0, SAVEBUFFERSIZE);
+	offset = http_request(filepath, NULL, savebuffer, SAVEBUFFERSIZE, SILENT);
+
+	if (offset > 0)
+	{
+		xml = mxmlLoadString(NULL, savebuffer, MXML_TEXT_CALLBACK);
+
+		if(xml)
+		{
+			data = mxmlFindElement(xml, xml, "file", NULL, NULL, MXML_DESCEND);
+			if(data) RecurseThumbs(data, (char *)"");
+			mxmlDelete(xml);
+		}
+	}
+	mem2_free(savebuffer, MEM2_OTHER);
+}
+
 /****************************************************************************
  * DefaultSettings
  *
@@ -632,6 +725,7 @@ void DefaultSettings ()
 	WiiSettings.lockFolders = 0;
 	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
 	WiiSettings.artwork = 0;
+	WiiSettings.artworkFolder[0] = 0;
 	WiiSettings.night = 0;
 	WiiSettings.screenDim = CONF_GetScreenSaverMode();
 	WiiSettings.doubleStrike = 0;
@@ -739,6 +833,8 @@ static void FixInvalidSettings()
 		WiiSettings.libass = 1;
 	if(WiiSettings.saveExit < 0 || WiiSettings.saveExit > 1)
 		WiiSettings.saveExit = 1;
+
+	CleanupPath(WiiSettings.artworkFolder);
 
 	// Videos
 	if(WiiSettings.videoZoomHor < 0.5 || WiiSettings.videoZoomHor > 1.5)
@@ -1098,6 +1194,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.startArea, "startArea");
 				loadXMLSetting(&WiiSettings.debug, "debug");
 				loadXMLSetting(&WiiSettings.artwork, "artwork");
+				loadXMLSetting(WiiSettings.artworkFolder, "artworkFolder", sizeof(WiiSettings.artworkFolder));
 				loadXMLSetting(&WiiSettings.night, "night");
 				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
 				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
@@ -1194,6 +1291,8 @@ bool LoadSettings()
 		wiiSetDoubleStrike();
 		if(WiiSettings.night == 1)
 			nightfade_cb();
+		if(WiiSettings.debug == 4)
+			WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC);
 
 		sprintf(filepath,"%s/restore_points", appPath);
 		char *buffer = (char *)mem2_malloc(50*1024, MEM2_OTHER);

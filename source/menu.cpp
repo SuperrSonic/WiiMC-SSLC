@@ -174,6 +174,10 @@ static GuiButton *videobarForwardBtn = NULL;
 
 static GuiText *videobarTime = NULL;
 static GuiText *videobarDropped = NULL;
+static GuiText *videobarMemory = NULL;
+
+static GuiText *fileYear = NULL;
+static GuiText *fileInfo = NULL;
 
 static GuiImage *audiobarLeftImg = NULL;
 static GuiImage *audiobarMidImg = NULL;
@@ -1862,6 +1866,19 @@ static GuiImage *thumbImg;
 static BROWSERENTRY *thumbIndex = NULL;
 static bool thumbLoad = false;
 
+char locate_paths[1024] = { 0 };
+char actual_path[1024] = { 0 };
+char art_disp[256] = { 0 };
+char art_disp_2[256] = { 0 };
+bool same_dir = false;
+bool secure_type = false; // Make sure xml info doesn't stick with other types
+
+char year_txt[32] = { 0 };
+char desc_txt[1024] = { 0 };
+
+unsigned get_inf;
+//int get_num = 0;
+
 static void *ThumbThread (void *arg)
 {
 	GuiImageData *thumb = NULL;
@@ -1890,17 +1907,74 @@ static void *ThumbThread (void *arg)
 			{
 				BROWSERENTRY *loadIndex = thumbIndex;
 				int read = 0;
-				if(loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0)
+				if(loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0) {
 					read = http_request(loadIndex->image, NULL, thumbBuffer, 200*1024, SILENT);
-				else if(loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
+					
+					LoadThumbsFileHTTP(loadIndex->xml);
+					if (WiiSettings.numThumb > 0) {
+						sprintf(year_txt, "%s", WiiSettings.yearNum);
+						sprintf(desc_txt, "%s", WiiSettings.descTxt);
+						
+						WiiSettings.numThumb = 0;
+					}
+					loadIndex->year = mem2_strdup(year_txt, MEM2_BROWSER);
+					loadIndex->desc = mem2_strdup(desc_txt, MEM2_BROWSER);
+					secure_type = false;
+				} else if(loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
 					read = 0;
-				else
-					read = LoadFile(thumbBuffer, 200*1024, loadIndex->image, SILENT);
+				else {
+					StripExt(loadIndex->image);
+					StripExt(loadIndex->xml);
+					sprintf(art_disp, loadIndex->image); // Copy regular path
+					char *slash = strrchr(loadIndex->image, '/');
+					if(slash) snprintf(loadIndex->image, 256, "%s", slash+1);
+					char *slash_2 = strrchr(loadIndex->xml, '/');
+					if(slash_2) snprintf(loadIndex->xml, 256, "%s", slash_2+1);
+					sprintf(art_disp_2, loadIndex->xml); // For LoadThumbsFile to always load xml
+					
+					sprintf(locate_paths, "%s%s.xml", WiiSettings.artworkFolder, art_disp_2);
+					LoadThumbsFile(locate_paths);
+					memset(locate_paths,0,strlen(locate_paths));
+					//printf("THUMBS: %s", locate_paths);
+					if (WiiSettings.numThumb > 0) {
+						int rand_jpg = rand_r(&get_inf) % (WiiSettings.numThumb + 1 - 1) + 1;
+						/* art_disp_2 has the og title(without the _xx appended)
+						 * so it's the best way to maintain the actual_path fresh. */
+						sprintf(actual_path, "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
+						sprintf(year_txt, "%s", WiiSettings.yearNum);
+						sprintf(desc_txt, "%s", WiiSettings.descTxt);
+						
+					//	++get_num;
+				//		printf("THUMBS: %s", actual_path);
+						WiiSettings.numThumb = 0;
+						same_dir = false;
+						secure_type = false;
+					} else {
+						// Try to look for regular art.
+						sprintf(actual_path, "%s%s.jpg", WiiSettings.artworkFolder, loadIndex->image);
+						struct stat st;
+						if(stat(actual_path, &st) == 0) {
+							same_dir = false;
+							secure_type = true;
+						} else
+							same_dir = true;
+					}
+					if (same_dir) {
+						sprintf(actual_path, "%s.jpg", art_disp);
+						same_dir = false;
+						secure_type = true;
+					}
+					loadIndex->year = mem2_strdup(year_txt, MEM2_BROWSER);
+					loadIndex->desc = mem2_strdup(desc_txt, MEM2_BROWSER);
+					loadIndex->image = mem2_strdup(actual_path, MEM2_BROWSER);
+					read = LoadFile(thumbBuffer, 200*1024, actual_path, SILENT);
+				//	printf("THUMBS: %s", loadIndex->year);
+				}
 
 				if(read > 0 && loadIndex == thumbIndex) // file loaded and index has not changed
 				{
 					thumb = new GuiImageData((u8 *)thumbBuffer, read, GX_TF_RGBA8);
-
+					
 					if(thumb->GetImage())
 					{
 						SuspendGui();
@@ -1910,7 +1984,22 @@ static void *ThumbThread (void *arg)
 						else
 							thumbImg->SetScale(185, screenheight-100);
 						thumbImg->SetVisible(true);
+						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
+							fileInfo->SetText(loadIndex->desc);
+						if(WiiSettings.yearNum != NULL && !secure_type)
+							fileYear->SetText(loadIndex->year);
+						/*if(same_dir || secure_type) {
+							fileYear->SetText(NULL);
+							fileInfo->SetText(NULL);
+							same_dir = false;
+							secure_type = false;
+						} */
 						ResumeGui();
+						
+					//	memset(locate_paths,0,strlen(locate_paths));
+					//	memset(art_disp,0,strlen(art_disp));
+					//	memset(actual_path,0,strlen(actual_path));
+					//printf("THUMBS: %d", get_num);
 					}
 					else
 					{
@@ -2275,12 +2364,37 @@ static void MenuBrowse(int menu)
 		thumbImg->SetVisible(false);
 		thumbImg->SetPosition(-30, 95);
 		mainWindow->Append(thumbImg);
+		
+		// PLX desc/year
+		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
+		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
+		fileYear->SetPosition(-26, -108);
+		
+		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
+		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 534 : 400, -92);
+		fileInfo->SetWrap(true, 230);
+		mainWindow->Append(fileInfo);
+		mainWindow->Append(fileYear);
 	} else if ((menu == MENU_BROWSE_VIDEOS || menu == MENU_BROWSE_MUSIC) && WiiSettings.artwork) {
 		thumbImg = new GuiImage;
 		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 		thumbImg->SetVisible(false);
 		thumbImg->SetPosition(-30, 95);
 		mainWindow->Append(thumbImg);
+		
+		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
+		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
+	//	fileYear->SetVisible(false);
+		fileYear->SetPosition(-26, -108);
+		// description
+		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
+		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+	//	fileInfo->SetVisible(false);
+		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 534 : 400, -92);
+		fileInfo->SetWrap(true, 230);
+		mainWindow->Append(fileInfo);
+		mainWindow->Append(fileYear);
 	}
 
 	if(VideoImgVisible() && menu != MENU_BROWSE_MUSIC) // a video is loaded
@@ -2671,6 +2785,15 @@ static void MenuBrowse(int menu)
 			{	
 				currentIndex = browser.selIndex;
 				thumbIndex = NULL;
+				
+				if(WiiSettings.descTxt != NULL) {
+					WiiSettings.descTxt = NULL;
+					fileInfo->SetText(NULL);
+				}
+				if(WiiSettings.yearNum != NULL) {
+					WiiSettings.yearNum = NULL;
+					fileYear->SetText(NULL);
+				}
 
 				if(currentIndex && currentIndex->image)
 				{
@@ -2966,6 +3089,9 @@ done:
 		thumbthread = LWP_THREAD_NULL;
 		mainWindow->Remove(thumbImg);
 		delete thumbImg;
+		// Prevent year/desc to remain stuck in some cases
+		mainWindow->Remove(fileYear);
+		mainWindow->Remove(fileInfo);
 	}
 	mainWindow->Remove(fileBrowser);
 	mainWindow->Remove(&upOneLevelBtn);
@@ -3112,6 +3238,7 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Browser Folders");
 	sprintf(options.name[i++], "Starting Area");
 	sprintf(options.name[i++], "Artwork Viewer");
+	sprintf(options.name[i++], "Art Folder");
 	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
 	sprintf(options.name[i++], "Double Strike");
@@ -3227,6 +3354,10 @@ static void MenuSettingsGlobal()
 				WiiSettings.artwork ^= 1;
 				break;
 			case 11:
+				OnScreenKeyboard(WiiSettings.artworkFolder, MAXPATHLEN);
+				CleanupPath(WiiSettings.artworkFolder);
+				break;
+			case 12:
 				WiiSettings.night ^= 1;
 				if (WiiSettings.night == 1) {
 					WiiSettings.videoDf = 0;
@@ -3234,10 +3365,10 @@ static void MenuSettingsGlobal()
 				} else
 					nofade_cb();
 				break;
-			case 12:
+			case 13:
 				WiiSettings.screenDim ^= 1;
 				break;
-			case 13:
+			case 14:
 				WiiSettings.doubleStrike ^= 1;
 				if(WiiSettings.doubleStrike == 1) {
 					SetDoubleStrike();
@@ -3319,9 +3450,10 @@ static void MenuSettingsGlobal()
 			}
 			
 			sprintf(options.value[10], "%s", WiiSettings.artwork ? "On" : "Off");
-			sprintf(options.value[11], "%s", WiiSettings.night ? "On" : "Off");
-			sprintf(options.value[12], "%s", WiiSettings.screenDim ? "On" : "Off");
-			sprintf(options.value[13], "%s", WiiSettings.doubleStrike ? "On" : "Off");
+			snprintf(options.value[11], 60, "%s", WiiSettings.artworkFolder);
+			sprintf(options.value[12], "%s", WiiSettings.night ? "On" : "Off");
+			sprintf(options.value[13], "%s", WiiSettings.screenDim ? "On" : "Off");
+			sprintf(options.value[14], "%s", WiiSettings.doubleStrike ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -5202,8 +5334,10 @@ static void VideoProgressCallback(void *ptr)
 	}
 	char time[50] = { 0 };
 	char frames[50] = { 0 };
+	char mem[50] = { 0 };
 	wiiGetTimeDisplay(time);
 	wiiGetDroppedFrames(frames);
+	wiiGetMemory(mem);
 
 	if(time[0] == 0)
 		videobarTime->SetText(NULL);
@@ -5212,6 +5346,10 @@ static void VideoProgressCallback(void *ptr)
 
 	if(WiiSettings.debug == 2)
 		videobarDropped->SetText(frames);
+	else if (WiiSettings.debug == 3) {
+		videobarDropped->SetText(frames);
+		videobarMemory->SetText(mem);
+	}
 }
 
 static void VideoVolumeLevelCallback(void *ptr)
@@ -5820,6 +5958,10 @@ static void SetupGui()
 	videobarDropped = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	videobarDropped->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarDropped->SetPosition(50, 14);
+	
+	videobarMemory = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
+	videobarMemory->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	videobarMemory->SetPosition(50, 0);
 
 	videobar = new GuiWindow(560, 80);
 
@@ -5842,6 +5984,7 @@ static void SetupGui()
 	videobar->Append(videobarForwardBtn);
 	videobar->Append(videobarTime);
 	videobar->Append(videobarDropped);
+	videobar->Append(videobarMemory);
 
 	videobar->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
 	videobar->SetPosition(0, -30);

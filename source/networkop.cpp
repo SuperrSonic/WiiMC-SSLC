@@ -117,8 +117,8 @@ void StartNetworkThread()
 	netHalt = 0;
 
 	if(networkthread == LWP_THREAD_NULL)
-		//LWP_CreateThread(&networkthread, netcb, NULL, netstack, 32768, 40);
-		LWP_CreateThread(&networkthread, netcb, NULL, netstack, 8192, 40);
+		LWP_CreateThread(&networkthread, netcb, NULL, netstack, 32768, 50);
+		//LWP_CreateThread(&networkthread, netcb, NULL, netstack, 8192, 40);
 	else
 		LWP_ResumeThread(networkthread);
 }

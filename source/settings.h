@@ -112,12 +112,16 @@ struct SWiiSettings {
 	int		startArea;
 	int		debug;
 	int 	artwork;
+	char 	artworkFolder[MAXPATHLEN];
 	int 	night;
 	int		screenDim;
 	int 	doubleStrike;
 	int 	smallCache;
 	int 	libass;
 	int 	saveExit;
+	int 	numThumb;
+	char* 	yearNum;
+	char* 	descTxt;
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount
@@ -167,6 +171,9 @@ int GetLangIndex(char *lang);
 void DefaultSettings ();
 bool SaveSettings (bool silent);
 bool LoadSettings ();
+
+void LoadThumbsFile(char * filepath);
+void LoadThumbsFileHTTP(char * filepath);
 
 extern struct SWiiSettings WiiSettings;
 

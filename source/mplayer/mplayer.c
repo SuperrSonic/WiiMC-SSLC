@@ -235,7 +235,7 @@ static int total_frame_cnt;
 static int drop_frame_cnt; // total number of dropped frames
 int benchmark;
 
-//int find_prob;
+int find_prob;
 //int ext_lang = 0;
 
 // options:
@@ -322,7 +322,7 @@ unsigned stream_dump_last_print_time;
 int capture_dump;
 
 // A-V sync:
-static float default_max_pts_correction = -1;
+static float default_max_pts_correction = 0;
 static float max_pts_correction; //default_max_pts_correction;
 static float c_total;
 float audio_delay;
@@ -1883,10 +1883,13 @@ static int check_framedrop(double frame_time)
         float d     = delay - mpctx->delay;
         ++total_frame_cnt;
 		if (seek_to_sec && new_load && total_frame_cnt > 1 && mpctx->demuxer->file_format == 3) {
+			VIDEO_SetBlack(TRUE);
             wiiSeek(seek_to_sec, 0);
             //end_at.pos += seek_to_sec;
 			new_load = false;
-        }
+			//VIDEO_SetBlack(FALSE);
+        } else if (seek_to_sec && !new_load && total_frame_cnt > 8 && mpctx->demuxer->file_format == 3)
+			VIDEO_SetBlack(FALSE);
         // we should avoid dropping too many frames in sequence unless we
         // are too late. and we allow 100ms A-V delay here:
         if (d < -dropped_frames * frame_time - 0.100 &&
@@ -5270,6 +5273,16 @@ void wiiGetDroppedFrames(char * buf)
     //mpctx->demuxer->file_format
 	//sprintf(buf, "%9.16f",
 		//mpctx->sh_video->fps);
+}
+
+void wiiGetMemory(char * buf)
+{
+	if(!playing_file || controlledbygui == 2)
+		return;
+
+	sprintf(buf, "m1(%.4f) m2(%.4f)",
+		((float)((char*)SYS_GetArena1Hi()-(char*)SYS_GetArena1Lo()))/0x100000,
+								 ((float)((char*)SYS_GetArena2Hi()-(char*)SYS_GetArena2Lo()))/0x100000);
 }
 
 void wiiSetDVDDevice(char * dev)
