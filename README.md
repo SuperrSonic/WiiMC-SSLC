@@ -7,7 +7,7 @@
 - Added ".dash" extension, using this extension will skip the deblock filter.
 - Made the deflicker filter optional.
 - Added Shuffle, Loop, and Continuous modes for video.
-- Artwork Viewer for videos and music.
+- Artwork Viewer for videos and music, with optional descriptions.
 - Night filter mode.
 - Removed picture viewer to increase memory.
 - Disabled some minor codecs to increase memory.

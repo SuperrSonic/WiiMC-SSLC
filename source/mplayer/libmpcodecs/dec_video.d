@@ -1,61 +1,62 @@
 libmpcodecs/dec_video.o: libmpcodecs/dec_video.c config.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdio.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdarg.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/stdio.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdlib.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/stdlib.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/alloca.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/unistd.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/unistd.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/_ansi.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/newlib.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/config.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/ieeefp.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/features.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stddef.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdarg.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/reent.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/_ansi.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/_types.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/_types.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/_default_types.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/lock.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/stdio.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/unistd.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/unistd.h \
  mp_msg.h config.h help_mp.h mpcommon.h m_config.h m_option.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/string.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/string.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/string.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/cdefs.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/string.h \
  sub/subreader.h libmpdemux/demuxer.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdint.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h \
  stream/stream.h m_option.h stream/url.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/inttypes.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/fcntl.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/fcntl.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_default_fcntl.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/stat.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/inttypes.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/fcntl.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/fcntl.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/_default_fcntl.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/stat.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/time.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/time.h \
  stream/network.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/time.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/network.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gctypes.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/time.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/network.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gctypes.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdbool.h \
  stream/stream.h stream/http.h sub/ass_mp.h sub/subreader.h libass/ass.h \
  libass/ass_types.h sub/ass_mp.h osdep/timer.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_watchdog.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_queue.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_watchdog.h \
+ C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h \
  osdep/shmem.h libmpdemux/demuxer.h libmpdemux/parse_es.h \
  libmpdemux/demuxer.h codec-cfg.h libvo/video_out.h \
  libmpcodecs/img_format.h libmpdemux/stheader.h libmpdemux/aviheader.h \
  ffmpeg/libavutil/common.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/ctype.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/errno.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/errno.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include-fixed/limits.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include-fixed/syslimits.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/limits.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/math.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/fastmath.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/ctype.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/errno.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/errno.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include-fixed/limits.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include-fixed/syslimits.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/limits.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/math.h \
+ c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h \
  ffmpeg/libavutil/attributes.h ffmpeg/libavutil/avconfig.h \
  ffmpeg/libavutil/common.h ffmpeg/libavutil/mem.h \
  ffmpeg/libavutil/error.h ffmpeg/libavutil/avutil.h \
@@ -68,49 +69,49 @@ libmpcodecs/dec_video.o: libmpcodecs/dec_video.c config.h \
 
 config.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdio.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdio.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/_ansi.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/newlib.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/config.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/ieeefp.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/features.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stddef.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdarg.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdarg.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/reent.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/_ansi.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/_default_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/lock.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/stdio.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/stdio.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdlib.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdlib.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/stdlib.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/stdlib.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/alloca.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/alloca.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/unistd.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/unistd.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/unistd.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/unistd.h:
 
 mp_msg.h:
 
@@ -124,17 +125,19 @@ m_config.h:
 
 m_option.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/string.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/string.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/string.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/cdefs.h:
+
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/string.h:
 
 sub/subreader.h:
 
 libmpdemux/demuxer.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdint.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/stdint.h:
 
 stream/stream.h:
 
@@ -142,29 +145,29 @@ m_option.h:
 
 stream/url.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/inttypes.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/inttypes.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/fcntl.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/fcntl.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/fcntl.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/fcntl.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_default_fcntl.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/_default_fcntl.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/stat.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/stat.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/time.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/time.h:
 
 stream/network.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/time.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/time.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/network.h:
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/network.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gctypes.h:
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/gctypes.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include/stdbool.h:
 
 stream/stream.h:
 
@@ -182,9 +185,9 @@ sub/ass_mp.h:
 
 osdep/timer.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_watchdog.h:
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_watchdog.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_queue.h:
+C:/MinGW/msys/1.0/opt/devkitpro/libogc/include/ogc/lwp_queue.h:
 
 osdep/shmem.h:
 
@@ -206,21 +209,21 @@ libmpdemux/aviheader.h:
 
 ffmpeg/libavutil/common.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/ctype.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/ctype.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/errno.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/errno.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/errno.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/sys/errno.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include-fixed/limits.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include-fixed/limits.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include-fixed/syslimits.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/include-fixed/syslimits.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/limits.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/limits.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/math.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/math.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/fastmath.h:
+c:\mingw\msys\1.0\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.3/../../../../powerpc-eabi/include/machine/fastmath.h:
 
 ffmpeg/libavutil/attributes.h:
 
