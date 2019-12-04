@@ -55,6 +55,9 @@ msgstr "반복재생"
 msgid "Continuous"
 msgstr "계속"
 
+msgid "Through"
+msgstr "처음부터 끝까지"	   
+
 msgid "Playlist"
 msgstr "재생목록"
 
@@ -116,7 +119,7 @@ msgid "Close"
 msgstr "닫기"
 
 msgid "DVD"
-msgstr "DVD Video"
+msgstr "DVD 비디오"
 
 msgid "Go back"
 msgstr "뒤로"
@@ -582,6 +585,12 @@ msgstr "WiiMC에는 DVD 액세스가 없습니다."
 
 msgid "Starting Area"
 msgstr "시작 지역"
+
+sgid "Artwork Viewer"
+msgstr "아트워크 뷰어"					  						  
+
+msgid "Night Filter"
+msgstr "야간 필터"										
 
 msgid "Screen Burn-in Reduction"
 msgstr "스크린 번인 감소"
