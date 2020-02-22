@@ -365,6 +365,8 @@ u32 mem2_size(const int i)
 	return info.free_size;
 }
 
+//extern int debug_mem;
+
 #ifdef DEBUG_MEM2_LEVEL
 static void PrintAreaInfo(int index)
 {
@@ -375,7 +377,8 @@ static void PrintAreaInfo(int index)
 	printf("Area: %i. Allocated: %u. Top Allocated: %u\n",index,mem2_areas[index].allocated,mem2_areas[index].top_allocated);
 	__lwp_heap_getinfo(&mem2_areas[index].heap,&info);
 	printf("Area: %i. free blocks: %u  free size: %u  used blocks: %u  used_size: %u\n",index, 
-			info.free_blocks,info.free_size,info.used_blocks,info.used_size); 
+			info.free_blocks,info.free_size,info.used_blocks,info.used_size);
+	//debug_mem = info.free_size,info.used_blocks;
 }
 #endif
 

@@ -322,7 +322,7 @@ unsigned stream_dump_last_print_time;
 int capture_dump;
 
 // A-V sync:
-static float default_max_pts_correction = 0;
+static float default_max_pts_correction = -1;
 static float max_pts_correction; //default_max_pts_correction;
 static float c_total;
 float audio_delay;
@@ -3118,7 +3118,7 @@ m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
 m_config_set_option(mconfig,"subfont-text-scale","1");
-// Loop one video, may be useful to set via argument boot
+//m_config_set_option(mconfig,"mc",".02");
 //m_config_set_option(mconfig,"loop","0");
 //m_config_set_option(mconfig,"autosync","30"); // autosync seems to have no effect
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
@@ -5285,6 +5285,20 @@ void wiiGetMemory(char * buf)
 								 ((float)((char*)SYS_GetArena2Hi()-(char*)SYS_GetArena2Lo()))/0x100000);
 }
 
+void wiiGetFPS(char * buf)
+{
+	if(!playing_file || controlledbygui == 2)
+		return;
+
+	sh_audio_t *const sh_audio = mpctx->sh_audio;
+    sh_video_t *const sh_video = mpctx->sh_video;
+
+	sprintf(buf, "%dx%d %5.3f %dkHz %dch",
+			sh_video->disp_w, sh_video->disp_h, sh_video->fps, sh_audio ? sh_audio->samplerate / 1000 : 0, sh_audio ? sh_audio->channels : 0);
+
+	//(int)(sh_audio->i_bps * 8 / 1000), (int)(sh_video->i_bps * 8 / 1024)
+}
+
 void wiiSetDVDDevice(char * dev)
 {
 	if(dvd_device)
@@ -5466,7 +5480,10 @@ void wiiSetVolNorm2()
 
 void wiiSetLoopOn()
 {
-	m_config_set_option(mconfig,"loop","0");
+	if(mpctx->sh_video)
+		m_config_set_option(mconfig,"loop","0");
+	else
+		m_config_set_option(mconfig,"loop","-1");
 }
 
 void wiiTHP()

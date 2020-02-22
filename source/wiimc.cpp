@@ -627,8 +627,7 @@ void LoadMPlayerFile()
 	wiiSetDVDDevice(NULL);
 
 	if(WiiSettings.dvdMenu && strlen(ext) > 0 && 
-		(strcasecmp(ext, "iso") == 0 || strcasecmp(ext, "ifo") == 0) &&
-		strncmp(loadedFile, "smb", 3) != 0)
+		(strcasecmp(ext, "iso") == 0 || strcasecmp(ext, "ifo") == 0))
 	{
 		if(strcasecmp(ext, "ifo") == 0)
 		{
@@ -874,9 +873,10 @@ int main(int argc, char *argv[])
                 (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     
                 (32*1024); // padding	
 	AddMem2Area (size, MEM2_VIDEO); 
-	AddMem2Area (2.5*1024*1024, MEM2_BROWSER);
+	AddMem2Area (3*1024*1024, MEM2_BROWSER);
 	AddMem2Area (6*1024*1024, MEM2_GUI);
 	AddMem2Area (5*1024*1024, MEM2_OTHER); // vars + ttf
+	AddMem2Area (.125*1024*1024, MEM2_DESC); // desc test
 
 	GX_AllocTextureMemory();
 

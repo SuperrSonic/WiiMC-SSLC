@@ -212,13 +212,13 @@ msgid "Screen Position"
 msgstr "Posición"
 
 msgid "Frame Dropping"
-msgstr "Disminuir cuadros (solo NTSC)"
+msgstr "Disminuir cuadros"
 
 msgid "Aspect Ratio"
 msgstr "Formato pantalla"
 
 msgid "Cache Fill"
-msgstr "Memoria disponible"
+msgstr "Memoria inicial"
 
 msgid "Audio Delay"
 msgstr "Retraso de audio"
@@ -589,8 +589,14 @@ msgstr "Área de inicio"
 msgid "Artwork Viewer"
 msgstr "Carátulas y portadas"
 
+msgid "Artwork Viewer"
+msgstr "Carátulas y portadas"
+
+msgid "Art Folder"
+msgstr "Carpeta de carátulas y portadas"
+
 msgid "Night Filter"
-msgstr "Filtro de noche"
+msgstr "Filtro nocturno"
 
 msgid "Screen Burn-in Reduction"
 msgstr "Protector de pantalla"

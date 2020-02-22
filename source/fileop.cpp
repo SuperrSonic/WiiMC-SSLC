@@ -354,8 +354,12 @@ void StopParseThread()
 
 #define T_FAT		1
 #define T_NTFS		2
+#ifdef WANT_EXT2
 #define T_EXT2		3
 #define T_ISO9660	4
+#else
+#define T_ISO9660	3
+#endif
 
 static const char FAT_SIG[3] = {'F', 'A', 'T'};
 
@@ -650,7 +654,7 @@ static int FindPartitions(int device)
 												sector.ebr.partition.lba_start);
 								next_erb_lba = le32_to_cpu(
 										sector.ebr.next_ebr.lba_start);
-
+#ifdef WANT_EXT2
 								if(sector.ebr.partition.type==PARTITION_TYPE_LINUX)
 								{
 									debug_printf("Partition : type ext2/3/4 found\n");
@@ -658,6 +662,9 @@ static int FindPartitions(int device)
 								}
 								// Check if this partition has a valid NTFS boot record
 								else if (interface->readSectors(part_lba, 1, &sector))
+#else
+								if (interface->readSectors(part_lba, 1, &sector))
+#endif
 								{
 									if (sector.boot.oem_id == NTFS_OEM_ID)
 									{
@@ -695,6 +702,7 @@ static int FindPartitions(int device)
 					} while (next_erb_lba);
 					break;
 				}
+#ifdef WANT_EXT2
 				case PARTITION_TYPE_LINUX:
 				{
 					debug_printf("Partition %i: Claims to be LINUX\n", i + 1);
@@ -703,6 +711,7 @@ static int FindPartitions(int device)
 					AddPartition(part_lba, device, T_EXT2, &devnum);
 					break;
 				}
+#endif
 				// Ignore empty partitions
 				case PARTITION_TYPE_EMPTY:
 					debug_printf("Partition %i: Claims to be empty\n", i + 1);
@@ -733,11 +742,13 @@ static int FindPartitions(int device)
 							debug_printf("Partition : Valid FAT boot sector found\n");
 							AddPartition(part_lba, device, T_FAT, &devnum);
 						}
+#ifdef WANT_EXT2
 						else
 						{
 							debug_printf("Trying : ext partition\n");
 							AddPartition(part_lba, device, T_EXT2, &devnum);
 						}
+#endif
 					}
 					break;
 				}
@@ -767,11 +778,13 @@ static int FindPartitions(int device)
 					AddPartition(i, device, T_FAT, &devnum);
 					break;
 				}
+#ifdef WANT_EXT2
 				else
 				{
 					debug_printf("Trying : ext partition\n");
 					AddPartition(part_lba, device, T_EXT2, &devnum);
 				}
+#endif
 			}
 		}
 	}

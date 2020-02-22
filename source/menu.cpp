@@ -175,6 +175,7 @@ static GuiButton *videobarForwardBtn = NULL;
 static GuiText *videobarTime = NULL;
 static GuiText *videobarDropped = NULL;
 static GuiText *videobarMemory = NULL;
+static GuiText *videobarFPS = NULL;
 
 static GuiText *fileYear = NULL;
 static GuiText *fileInfo = NULL;
@@ -1643,6 +1644,8 @@ SettingWindow(const char *title, GuiWindow *w)
  * THIS MUST NOT BE REMOVED OR DISABLED IN ANY DERIVATIVE WORK
  ***************************************************************************/
 
+//int debug_mem = 0;
+ 
 static void CreditsWindow()
 {
 	int i = 0;
@@ -1910,15 +1913,30 @@ static void *ThumbThread (void *arg)
 				if(loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0) {
 					read = http_request(loadIndex->image, NULL, thumbBuffer, 200*1024, SILENT);
 					
+				//	sprintf(year_txt, "%s", "\0");
+				//	sprintf(desc_txt, "%s", "\0");
+				//	memset(WiiSettings.descTxt,0,strlen(WiiSettings.descTxt));
+				//	memset(WiiSettings.yearNum,0,strlen(WiiSettings.yearNum));
+					
 					LoadThumbsFileHTTP(loadIndex->xml);
+					
 					if (WiiSettings.numThumb > 0) {
 						sprintf(year_txt, "%s", WiiSettings.yearNum);
 						sprintf(desc_txt, "%s", WiiSettings.descTxt);
 						
 						WiiSettings.numThumb = 0;
+						if(WiiSettings.descTxt && WiiSettings.yearNum) {
+						// PLX XMLs would leak otherwise
+							mem2_free(WiiSettings.descTxt, MEM2_DESC);
+							mem2_free(WiiSettings.yearNum, MEM2_DESC);
+						}
 					}
-					loadIndex->year = mem2_strdup(year_txt, MEM2_BROWSER);
-					loadIndex->desc = mem2_strdup(desc_txt, MEM2_BROWSER);
+				//	mem2_free(WiiSettings.descTxt, MEM2_DESC);
+				//	mem2_free(WiiSettings.yearNum, MEM2_DESC);
+					loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
+					loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
+					mem2_free(loadIndex->year, MEM2_DESC);
+					mem2_free(loadIndex->desc, MEM2_DESC);
 					secure_type = false;
 				} else if(loadIndex->image && strncmp(loadIndex->image, "smb", 3) == 0) // SMB crashes
 					read = 0;
@@ -1933,8 +1951,13 @@ static void *ThumbThread (void *arg)
 					sprintf(art_disp_2, loadIndex->xml); // For LoadThumbsFile to always load xml
 					
 					sprintf(locate_paths, "%s%s.xml", WiiSettings.artworkFolder, art_disp_2);
+				//	usleep(6000);
 					LoadThumbsFile(locate_paths);
-					memset(locate_paths,0,strlen(locate_paths));
+				/*	LoadThumbsFile(locate_paths);
+					LoadThumbsFile(locate_paths);
+					LoadThumbsFile(locate_paths);
+					LoadThumbsFile(locate_paths); */
+					//memset(locate_paths,0,strlen(locate_paths));
 					//printf("THUMBS: %s", locate_paths);
 					if (WiiSettings.numThumb > 0) {
 						int rand_jpg = rand_r(&get_inf) % (WiiSettings.numThumb + 1 - 1) + 1;
@@ -1943,6 +1966,8 @@ static void *ThumbThread (void *arg)
 						sprintf(actual_path, "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
 						sprintf(year_txt, "%s", WiiSettings.yearNum);
 						sprintf(desc_txt, "%s", WiiSettings.descTxt);
+						mem2_free(WiiSettings.descTxt, MEM2_DESC);
+						mem2_free(WiiSettings.yearNum, MEM2_DESC);
 						
 					//	++get_num;
 				//		printf("THUMBS: %s", actual_path);
@@ -1964,10 +1989,15 @@ static void *ThumbThread (void *arg)
 						same_dir = false;
 						secure_type = true;
 					}
-					loadIndex->year = mem2_strdup(year_txt, MEM2_BROWSER);
-					loadIndex->desc = mem2_strdup(desc_txt, MEM2_BROWSER);
+					loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
+					loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
 					loadIndex->image = mem2_strdup(actual_path, MEM2_BROWSER);
 					read = LoadFile(thumbBuffer, 200*1024, actual_path, SILENT);
+					mem2_free(loadIndex->year, MEM2_DESC);
+					mem2_free(loadIndex->desc, MEM2_DESC);
+					//memset(art_disp,0,strlen(art_disp));
+					//memset(art_disp_2,0,strlen(art_disp_2));
+					//memset(actual_path,0,strlen(actual_path));
 				//	printf("THUMBS: %s", loadIndex->year);
 				}
 
@@ -1985,9 +2015,10 @@ static void *ThumbThread (void *arg)
 							thumbImg->SetScale(185, screenheight-100);
 						thumbImg->SetVisible(true);
 						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
-							fileInfo->SetText(loadIndex->desc);
+							fileInfo->SetText(WiiSettings.descTxt);
 						if(WiiSettings.yearNum != NULL && !secure_type)
-							fileYear->SetText(loadIndex->year);
+							fileYear->SetText(WiiSettings.yearNum);
+						
 						/*if(same_dir || secure_type) {
 							fileYear->SetText(NULL);
 							fileInfo->SetText(NULL);
@@ -2787,13 +2818,18 @@ static void MenuBrowse(int menu)
 				thumbIndex = NULL;
 				
 				if(WiiSettings.descTxt != NULL) {
-					WiiSettings.descTxt = NULL;
+				//	WiiSettings.descTxt = NULL; //crashes
 					fileInfo->SetText(NULL);
+					memset(WiiSettings.descTxt, 0, sizeof(WiiSettings.descTxt));
 				}
 				if(WiiSettings.yearNum != NULL) {
-					WiiSettings.yearNum = NULL;
+				//	WiiSettings.yearNum = NULL;
 					fileYear->SetText(NULL);
+					memset(WiiSettings.yearNum, 0, sizeof(WiiSettings.yearNum));
 				}
+				
+			//	ShowAreaInfo(MEM2_DESC);
+				//ClearMem2Area(MEM2_DESC);
 
 				if(currentIndex && currentIndex->image)
 				{
@@ -5333,11 +5369,13 @@ static void VideoProgressCallback(void *ptr)
 		videobarProgressRightImg->SetVisible(false);
 	}
 	char time[50] = { 0 };
-	char frames[50] = { 0 };
-	char mem[50] = { 0 };
+	char frames[32] = { 0 };
+	char mem[32] = { 0 };
+	char fps[32] = { 0 };
 	wiiGetTimeDisplay(time);
 	wiiGetDroppedFrames(frames);
 	wiiGetMemory(mem);
+	wiiGetFPS(fps);
 
 	if(time[0] == 0)
 		videobarTime->SetText(NULL);
@@ -5349,6 +5387,10 @@ static void VideoProgressCallback(void *ptr)
 	else if (WiiSettings.debug == 3) {
 		videobarDropped->SetText(frames);
 		videobarMemory->SetText(mem);
+	} else if (WiiSettings.debug == 4) {
+		videobarDropped->SetText(frames);
+		videobarMemory->SetText(mem);
+		videobarFPS->SetText(fps);  // Also includes width/height/samplerate/channels
 	}
 }
 
@@ -5957,11 +5999,15 @@ static void SetupGui()
 	
 	videobarDropped = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	videobarDropped->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
-	videobarDropped->SetPosition(50, 14);
+	videobarDropped->SetPosition(50, 12);
 	
-	videobarMemory = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
+	videobarMemory = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 	videobarMemory->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	videobarMemory->SetPosition(50, 0);
+	
+	videobarFPS = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
+	videobarFPS->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	videobarFPS->SetPosition(50, 28);
 
 	videobar = new GuiWindow(560, 80);
 
@@ -5985,6 +6031,7 @@ static void SetupGui()
 	videobar->Append(videobarTime);
 	videobar->Append(videobarDropped);
 	videobar->Append(videobarMemory);
+	videobar->Append(videobarFPS);
 
 	videobar->SetAlignment(ALIGN_CENTRE, ALIGN_BOTTOM);
 	videobar->SetPosition(0, -30);

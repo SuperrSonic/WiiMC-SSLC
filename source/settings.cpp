@@ -633,12 +633,13 @@ static void RecurseThumbs(mxml_node_t * top, char * path)
 
 			if(year)
 			{
-				WiiSettings.yearNum = mem2_strdup(year, MEM2_BROWSER);
+				WiiSettings.yearNum = mem2_strdup(year, MEM2_DESC);
 			}
 			if(desc)
 			{
-				WiiSettings.descTxt = mem2_strdup(desc, MEM2_BROWSER);
+				WiiSettings.descTxt = mem2_strdup(desc, MEM2_DESC);
 			}
+			//ShowAreaInfo(MEM2_BROWSER);
 		}
 		next = mxmlFindElement(next, top, "image", NULL, NULL, MXML_NO_DESCEND);
 	}
@@ -700,6 +701,9 @@ void LoadThumbsFileHTTP(char * filepath)
 			if(data) RecurseThumbs(data, (char *)"");
 			mxmlDelete(xml);
 		}
+	} else if (WiiSettings.descTxt && WiiSettings.yearNum) {  // Works well
+		WiiSettings.descTxt = NULL;
+		WiiSettings.yearNum = NULL;
 	}
 	mem2_free(savebuffer, MEM2_OTHER);
 }
@@ -1291,7 +1295,7 @@ bool LoadSettings()
 		wiiSetDoubleStrike();
 		if(WiiSettings.night == 1)
 			nightfade_cb();
-		if(WiiSettings.debug == 4)
+		if(WiiSettings.debug == 5)
 			WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC);
 
 		sprintf(filepath,"%s/restore_points", appPath);

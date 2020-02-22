@@ -22,6 +22,7 @@ enum mem2_areas_enum {
 	MEM2_PICTURE,
 	MEM2_INDEX,
 	MEM2_EXTFONT,
+	MEM2_DESC,
 	MEM2_MAX
 };
  

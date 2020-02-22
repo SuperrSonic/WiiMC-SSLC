@@ -74,6 +74,7 @@ double wiiGetTimePos();
 void wiiGetTimeDisplay(char *buf);
 void wiiGetDroppedFrames(char *buf);
 void wiiGetMemory(char *buf);
+void wiiGetFPS(char *buf);
 void wiiSetDVDDevice(char *dev);
 bool wiiAudioOnly();
 char * wiiGetMetaTitle();
