@@ -705,6 +705,8 @@ static ASS_Image *render_text(ASS_Renderer *render_priv, int dst_x, int dst_y)
         if (SKIP_SYMBOL(info->symbol) || !info->bm_s
             || (info->shadow_x == 0 && info->shadow_y == 0) || info->skip)
             continue;
+		if (render_priv->state.style->BorderStyle == 4)
+            continue;
 
         while (info) {
             if (!info->bm_s) {
@@ -1135,9 +1137,22 @@ get_outline_glyph(ASS_Renderer *priv, GlyphInfo *info)
                 advance = info->advance;
 
             draw_opaque_box(priv, v.asc, v.desc, v.border, advance,
-                    double_to_d6(info->border_x * priv->border_scale),
-                    double_to_d6(info->border_y * priv->border_scale));
+					double_to_d6(16 * priv->border_scale),
+                    double_to_d6(4 * priv->border_scale));
+/*                    double_to_d6(info->border_x * priv->border_scale),
+                    double_to_d6(info->border_y * priv->border_scale)); */
+		} else if (priv->state.style->BorderStyle == 4 &&
+                (info->border_x > 0 || info->border_y > 0)) {
+			/* BorderStyle 4, avoid rendering outline too. */
+			//Might be useful to have outline?
+			FT_Vector advance;
 
+            //v.border = calloc(1, sizeof(FT_Outline));
+
+            if (priv->settings.shaper == ASS_SHAPING_SIMPLE || info->drawing)
+                advance = v.advance;
+            else
+                advance = info->advance;
         } else if ((info->border_x > 0 || info->border_y > 0)
                 && double_to_d6(info->scale_x) && double_to_d6(info->scale_y)) {
 
@@ -1665,6 +1680,39 @@ fill_bitmap_hash(ASS_Renderer *priv, GlyphInfo *info,
             (int) (info->shadow_y * priv->border_scale));
 }
 
+static void add_background(ASS_Renderer *render_priv, EventImages *event_images)
+{
+    double size_x = 16*render_priv->border_scale; //render_priv->state.shadow_x > 0 ?
+                    //render_priv->state.shadow_x * render_priv->border_scale : 0;
+    double size_y = 4*render_priv->border_scale; //render_priv->state.shadow_y > 0 ?
+                    //render_priv->state.shadow_y * render_priv->border_scale : 0;
+    int left    = event_images->left - size_x;
+    int top     = event_images->top  - size_y;
+    int right   = event_images->left + event_images->width  + size_x;
+    int bottom  = event_images->top  + event_images->height + size_y;
+    left        = FFMINMAX(left,   0, render_priv->width);
+    top         = FFMINMAX(top,    0, render_priv->height);
+    right       = FFMINMAX(right,  0, render_priv->width);
+    bottom      = FFMINMAX(bottom, 0, render_priv->height);
+    int w = right - left;
+    int h = bottom - top;
+    if (w < 1 || h < 1)
+        return;
+    //void *gbuffer = malloc(w * h); //ass_aligned_alloc(1, w * h, 0);
+    void *gbuffer = memalign(32, w * h);
+	free_list_add(render_priv, gbuffer);
+    if (!gbuffer)
+        return;
+	//ass_aligned_free(nbuffer);
+    memset(gbuffer, 0xFF, w * h);
+    ASS_Image *img = my_draw_bitmap(gbuffer, w, h, w, left, top,
+                                    render_priv->state.c[3]);
+    if (img) {
+        img->next = event_images->imgs;
+        event_images->imgs = img;
+    }
+}
+
 /**
  * \brief Main ass rendering function, glues everything together
  * \param event event to render
@@ -2129,6 +2177,9 @@ ass_render_event(ASS_Renderer *render_priv, ASS_Event *event,
     event_images->shift_direction = (valign == VALIGN_TOP) ? 1 : -1;
     event_images->event = event;
     event_images->imgs = render_text(render_priv, (int) device_x, (int) device_y);
+
+	if (render_priv->state.style->BorderStyle == 4)
+        add_background(render_priv, event_images);
 
     ass_shaper_cleanup(render_priv->shaper, text_info);
     free_render_context(render_priv);

@@ -145,6 +145,10 @@
 #include "../utils/mem2_manager.h"
 #include "../video.h"
 
+// debug_30fps if debug is used 30fps videos will only correct pts every 2 minutes for ~6 seconds.
+// purpose originally was to improve smoothness, but now it's helpful to find a bug that happens to
+// cause a/v desync randomly. Likely related to device mounting/reading.
+bool debug_30fps;
 
 extern int prev_dxs, prev_dys;
 extern int stop_cache_thread;
@@ -2270,7 +2274,7 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 		
 		//test pts auto, on a seek it should also reset to 0
 		//default_max_pts_correction = 0;
-		if (!dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
+		if (debug_30fps && !dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
 			if(pts_counter > 3600) { // ~2 minutes
 				default_max_pts_correction = -1;
 				pts_counter = 0;
@@ -5329,6 +5333,8 @@ void wiiGetFPS(char * buf)
 	sprintf(buf, "%dx%d %5.3f %dkHz %dch",
 			sh_video->disp_w, sh_video->disp_h, sh_video->fps, sh_audio ? sh_audio->samplerate / 1000 : 0, sh_audio ? sh_audio->channels : 0);
 
+	// make use of this debug setting
+		//debug_30fps = true;
 	//(int)(sh_audio->i_bps * 8 / 1000), (int)(sh_video->i_bps * 8 / 1024)
 }
 

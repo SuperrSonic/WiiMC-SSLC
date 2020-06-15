@@ -116,8 +116,8 @@ void change_border(ASS_Renderer *render_priv, double border_x,
         return;
 
     if (border_x < 0 && border_y < 0) {
-        if (render_priv->state.style->BorderStyle == 1 ||
-            render_priv->state.style->BorderStyle == 3)
+        if (render_priv->state.style->BorderStyle == 1) //This makes BorderStyle=3 not work if outline is 0
+            //|| render_priv->state.style->BorderStyle == 3)
             border_x = border_y = render_priv->state.style->Outline;
         else
             border_x = border_y = 1.;
