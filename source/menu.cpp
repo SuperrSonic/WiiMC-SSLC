@@ -5122,7 +5122,7 @@ static void MenuSettingsSubtitles()
 	ResumeGui();
 
 	if(!subtitleFontFound)
-		ErrorPrompt("Subtitle font file not found. Subtitles will not be visible.");
+		InfoPrompt("Subtitle font file not found. Using internal.");
 
 	while(menuCurrent == MENU_SETTINGS_SUBTITLES && !guiShutdown)
 	{
@@ -6375,7 +6375,7 @@ static void SetupGui()
 	nowPlaying = new GuiText(NULL, 18, (GXColor){255, 255, 255, 255});
 	nowPlaying->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	nowPlaying->SetPosition(45, 10);
-	nowPlaying->SetMaxWidth(screenwidth-180);
+	nowPlaying->SetMaxWidth(screenwidth-180-4); // -4 to get it away from Resume text.
 	nowPlaying->SetVisible(false);
 
 	// setup MPlayer window

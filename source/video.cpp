@@ -27,7 +27,8 @@ extern "C" {
 static unsigned char *gp_fifo; // must be in MEM1
 static Mtx GXmodelView2D;
 
-unsigned int *xfb[3] = { NULL, NULL, NULL }; // Double buffered
+unsigned int *xfb[2] = { NULL, NULL }; // Double buffered
+//unsigned int *xfb[3] = { NULL, NULL, NULL };
 u8 whichfb = 0; // Switch
 bool need_wait=false;
 bool flip_pending=false;
@@ -39,6 +40,7 @@ int screenwidth = 640;
 u32 FrameTimer = 0;
 bool drawGui = false;
 bool pal = false;
+bool pal60 = false;
 u8 night = 22;
 bool fade_boot = false;
 bool fade_not = false;
@@ -177,9 +179,10 @@ void Menu_Render()
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();
-		++whichfb;
+		whichfb ^= 1;
+		/*++whichfb;
 		if (whichfb > 2)
-			whichfb = 0;
+			whichfb = 0;*/
 		flip_pending = false;
 		VIDEO_WaitVSync();
 	}
@@ -340,10 +343,10 @@ static void vblank_cb(u32 retraceCnt)
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();
-		//whichfb ^= 1;
-		++whichfb;
+		whichfb ^= 1;
+		/*++whichfb;
 		if(whichfb > 2)
-			whichfb = 0;
+			whichfb = 0;*/
 		flip_pending = false;
 	}
 }
@@ -390,7 +393,7 @@ void SetDoubleStrikeOff()
 void SetDoubleStrike()
 {
 	CONF_GetVideo();
-	if(pal)
+	if(pal60 || pal)
 		vmode = &TVEurgb60Hz240Ds;
 	else
 		vmode = &TVNtsc240Ds;
@@ -472,8 +475,10 @@ InitVideo ()
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
 	vmode->viWidth = 704;
 
-	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale)
+	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale) // 50Hz
 		pal = true;
+	else if (CONF_GetVideo() == CONF_VIDEO_PAL) // 60Hz
+		pal60 = true;
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 		screenwidth = 768;
@@ -490,18 +495,18 @@ InitVideo2 ()
 	// Allocate framebuffers
 	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
-	xfb[2] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	//xfb[2] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
 	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
-	DCInvalidateRange(xfb[2], VIDEO_GetFrameBufferSize(vmode));
+//	DCInvalidateRange(xfb[2], VIDEO_GetFrameBufferSize(vmode));
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
 	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
-	xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
+	//xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer (vmode, xfb[2], COLOR_BLACK);
+	//VIDEO_ClearFrameBuffer (vmode, xfb[2], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
 	VIDEO_Flush ();

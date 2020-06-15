@@ -297,9 +297,10 @@ void ass_configure(ASS_Renderer* priv, int w, int h, int unscaled) {
 void ass_configure_fonts(ASS_Renderer* priv) {
 	char *dir, *path, *family;
 	dir = get_path("fonts");
-	if (font_fontconfig < 0 && sub_font_name) path = strdup(sub_font_name);
-	else if (font_fontconfig < 0 && font_name) path = strdup(font_name);
-	else if (font_fontconfig < 0 && !monospaced) path = get_path("subfont.ttf");
+	//if (font_fontconfig < 0 && sub_font_name) path = strdup(sub_font_name);
+	//else if (font_fontconfig < 0 && font_name) path = strdup(font_name);
+	//else if (font_fontconfig < 0 && !monospaced) path = get_path("subfont.ttf");
+	if (font_fontconfig < 0 && !monospaced) path = get_path("subfont.ttf");
 	else path = get_path("monospace.ttf");
 	if (font_fontconfig >= 0 && sub_font_name) family = strdup(sub_font_name);
 	else if (font_fontconfig >= 0 && font_name) family = strdup(font_name);

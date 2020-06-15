@@ -367,6 +367,7 @@ prepareSettingsData ()
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
 	createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
 	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
+	createXMLSetting("duplicateFrame", "Duplicate Frames", toStr(WiiSettings.duplicateFrame));
 	//createXMLSetting("videoDelay", "Delay video by ms", toStr(WiiSettings.videoDelay));
 	// Music
 	createXMLSection("Music", "Music Settings");
@@ -1225,6 +1226,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
 				loadXMLSetting(&WiiSettings.viWidth, "viWidth");
 				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
+				loadXMLSetting(&WiiSettings.duplicateFrame, "duplicateFrame");
 				//loadXMLSetting(&WiiSettings.videoDelay, "videoDelay");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
@@ -1293,6 +1295,8 @@ bool LoadSettings()
 		wiiSetVIscale();
 		wiiSetDf();
 		wiiSetDoubleStrike();
+		if(WiiSettings.duplicateFrame > 0)
+			wiiDup();
 		if(WiiSettings.night == 1)
 			nightfade_cb();
 		if(WiiSettings.debug == 5)

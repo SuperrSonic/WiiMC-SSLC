@@ -646,7 +646,7 @@ static subtitle *sub_read_line_ssa(stream_t *st,subtitle *current, int utf16) {
  * http://www.eswat.demon.co.uk is where the SSA specs can be found
  */
         int comma;
-        static int max_comma = 32; /* let's use 32 for the case that the */
+        static int max_comma = 12; /* let's use 32 for the case that the */
                     /*  amount of commas increase with newer SSA versions */
 
 	int hour1, min1, sec1, hunsec1,
@@ -720,6 +720,10 @@ static void sub_pp_ssa(subtitle *sub) {
             	so=de=sub->text[--l];
             	while (*so) {
             		if(*so == '{' && so[1]=='\\') {
+					/*	if(so[1]=='\\' && so[2]=='a' && so[3]=='n' && so[4]=='8')
+							sub_pos=50;
+						else
+							sub_pos=92; */
             			for (start=so; *so && *so!='}'; so++);
             			if(*so) so++; else so=start;
             		}
@@ -2587,6 +2591,7 @@ void sub_add_text(subtitle *sub, const char *txt, int len, double endpts, int st
       if (c == '\\' && i + 1 < len) {
         c = txt[++i];
         if (c == 'n' || c == 'N') c = 0;
+		if (c == 'h') c = 0x20; // h is hard space, used in CC converted subs.
       }
       if (c == '\n' || c == '\r') c = 0;
       if (c) {

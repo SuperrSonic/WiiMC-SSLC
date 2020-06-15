@@ -52,7 +52,7 @@ extern char *network_useragent;
 
 bool ExitRequested = false;
 bool ShutdownRequested = false;
-bool subtitleFontFound = false;
+int subtitleFontFound = 0;
 char appPath[1024] = { 0 };
 char loadedFile[1024] = { 0 };
 char loadedDevice[16] = { 0 };
@@ -537,13 +537,19 @@ bool CacheThreadSuspended()
 	return false;
 }
 }
-
+/*
 void show_mem()
 {
 	printf("m1(%.4f) m2(%.4f)\n",
 								((float)((char*)SYS_GetArena1Hi()-(char*)SYS_GetArena1Lo()))/0x100000,
 								 ((float)((char*)SYS_GetArena2Hi()-(char*)SYS_GetArena2Lo()))/0x100000);
-}
+}*/
+
+u8 *font_mem = NULL;
+u8 *mono_mem = NULL;
+unsigned font_mem_size = 0;
+unsigned mono_mem_size = 0;
+int have_mono = 0;
 
 bool InitMPlayer()
 {
@@ -569,10 +575,40 @@ bool InitMPlayer()
 	// check if subtitle font file exists
 	struct stat st;
 	char filepath[1024];
+	char monopath[1024];
 	sprintf(filepath, "%s/subfont.ttf", appPath);
+	sprintf(monopath, "%s/monospace.ttf", appPath);
 
 	if(stat(filepath, &st) == 0)
-		subtitleFontFound = true;
+		subtitleFontFound = 1;
+	if(stat(monopath, &st) == 0)
+		have_mono = 1;
+	
+	// Memory font
+	if(subtitleFontFound) {
+		FILE *fp;
+		fp = fopen(filepath, "rb");
+		
+		fseeko(fp,0,SEEK_END);
+		font_mem_size = ftello(fp);
+		font_mem = (u8 *)mem2_memalign(32, font_mem_size, MEM2_OTHER);
+		
+		fseeko(fp,0,SEEK_SET);
+		fread (font_mem, 1, font_mem_size, fp);
+		fclose(fp);
+	}
+	if(have_mono) {
+		FILE *fp;
+		fp = fopen(monopath, "rb");
+		
+		fseeko(fp,0,SEEK_END);
+		mono_mem_size = ftello(fp);
+		mono_mem = (u8 *)mem2_memalign(32, mono_mem_size, MEM2_OTHER);
+		
+		fseeko(fp,0,SEEK_SET);
+		fread (mono_mem, 1, mono_mem_size, fp);
+		fclose(fp);
+	}
 
 	sprintf(MPLAYER_DATADIR,"%s",appPath);
 	sprintf(MPLAYER_CONFDIR,"%s",appPath);
@@ -799,9 +835,10 @@ void SetMPlayerSettings()
 
 	wiiSetProperty(MP_CMD_AUDIO_DELAY, WiiSettings.audioDelay);
 
-	if(!subtitleFontFound)
-		wiiSetProperty(MP_CMD_SUB_VISIBILITY, 0);
-	else
+	/* Now using internal font as backup. */
+	//if(!subtitleFontFound)
+		//wiiSetProperty(MP_CMD_SUB_VISIBILITY, 0);
+	//else
 		wiiSetProperty(MP_CMD_SUB_VISIBILITY, WiiSettings.subtitleVisibility);
 
 	wiiSetProperty(MP_CMD_SUB_DELAY, WiiSettings.subtitleDelay);
@@ -867,7 +904,7 @@ int main(int argc, char *argv[])
 	FindAppPath(); // Initialize SD and USB devices and look for apps/wiimc
 	
 	StartNetworkThread(); //to set net heap aside MEM2 area
-	usleep(100); //force network thread execution 
+	usleep(100); //force network thread execution
 
 	u32 size = ( (1024*MAX_HEIGHT)+(WIDTH_MULT*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
                 (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     

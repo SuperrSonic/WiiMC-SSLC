@@ -63,7 +63,7 @@ float g_contrast = 0.0f;
 /*** 2D ***/
 extern bool need_wait;
 extern u8 whichfb;
-extern unsigned int *xfb[3];
+extern unsigned int *xfb[2];
 
 extern bool flip_pending;
 //extern int delay_amount;
@@ -573,12 +573,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	GX_SetCullMode(GX_CULL_NONE);
 	GX_SetClipMode(GX_DISABLE);
 	GX_SetZMode(GX_FALSE, GX_ALWAYS, GX_TRUE);
-	
-	++whichfb;
-	if(whichfb > 2)
-		whichfb = 0;
-	
-	GX_CopyDisp(xfb[whichfb], GX_TRUE);
+	GX_CopyDisp(xfb[0], GX_TRUE);
 	GX_SetDispCopyGamma(GX_GM_1_0);
 	guOrtho(p, mplayerheight/2.0, -(mplayerheight/2.0), -(mplayerwidth/2.0), mplayerwidth/2.0, 10.0, 1000.0);
 	GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);

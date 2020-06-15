@@ -324,6 +324,10 @@ int capture_dump;
 // A-V sync:
 static float default_max_pts_correction = -1;
 static float max_pts_correction; //default_max_pts_correction;
+//test smooth
+int dup_frames;
+int pts_counter;
+
 static float c_total;
 float audio_delay;
 static int ignore_start;
@@ -1864,6 +1868,9 @@ static void wiiSeek(int sec, int mode)
 	if(strncmp(filename, "mms:", 4) == 0)
 		return;
 
+	//auto pts correction reset
+	pts_counter = 0;
+
 	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
 	cmd->id=MP_CMD_SEEK;
 	cmd->name=strdup("seek");
@@ -2260,6 +2267,18 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 
     if (mpctx->sh_audio) {
         double a_pts, v_pts;
+		
+		//test pts auto, on a seek it should also reset to 0
+		//default_max_pts_correction = 0;
+		if (!dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
+			if(pts_counter > 3600) { // ~2 minutes
+				default_max_pts_correction = -1;
+				pts_counter = 0;
+			} else if(pts_counter > 180) { // ~6 secs
+				default_max_pts_correction = 0;
+			}
+		} else
+			default_max_pts_correction = -1;
 
         if (autosync)
             /*
@@ -2322,6 +2341,7 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
                 mpctx->delay += x;
                 c_total      += x;
             }
+			pts_counter++;
            // if (!quiet)
              //   print_status(a_pts - audio_delay, AV_delay, c_total);
 		    //playback_speed = 1.006;
@@ -2807,6 +2827,7 @@ static void pause_loop(void)
     else
     {
       DrawMPlayer();
+     // DrawMPlayer(); // Output 60FPS on pause.
       usec_sleep(100);
     }
 
@@ -4355,8 +4376,15 @@ total_time_usage_start=GetTimer();
                     if (!frame_time_remaining && blit_frame) {
                         u64 t2 = GetTimer();
 
-                        if (vo_config_count)
-                            mpctx->video_out->flip_page();
+						//og code
+						//if (vo_config_count)
+							//mpctx->video_out->flip_page();
+                        if (vo_config_count) {
+							mpctx->video_out->flip_page();
+							// Add 60fps duplication setting.
+							if (dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31)
+								mpctx->video_out->flip_page();
+						}
                         mpctx->num_buffered_frames--;
 
                         vout_time_usage += (GetTimer() - t2) * 0.000001;
@@ -5092,6 +5120,11 @@ void wiiDash()
 void wiiElse()
 {
 	m_config_set_option(mconfig,"lavdopts","skiploopfilter=default");
+}
+
+void wiiDup()
+{
+	dup_frames = true;
 }
 
 void wiiCacheSmall()
