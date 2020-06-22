@@ -346,6 +346,7 @@ prepareSettingsData ()
 	createXMLSetting("smallCache", "Set cache to 2MB", toStr(WiiSettings.smallCache));
 	createXMLSetting("libass", "ASS Renderer", toStr(WiiSettings.libass));
 	createXMLSetting("saveExit", "Only save to device on exit", toStr(WiiSettings.saveExit));
+	createXMLSetting("force576p", "Force 576p 50Hz", toStr(WiiSettings.force576p));
 	// Videos
 	createXMLSection("Videos", "Videos Settings");
 	createXMLSetting("videoZoomHor", "Horizontal video zoom", FtoStr(WiiSettings.videoZoomHor));
@@ -737,6 +738,7 @@ void DefaultSettings ()
 	WiiSettings.smallCache = 0;
 	WiiSettings.libass = 1;
 	WiiSettings.saveExit = 1;
+	WiiSettings.force576p = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
 	WiiSettings.videoZoomVert = 1;
@@ -838,6 +840,8 @@ static void FixInvalidSettings()
 		WiiSettings.libass = 1;
 	if(WiiSettings.saveExit < 0 || WiiSettings.saveExit > 1)
 		WiiSettings.saveExit = 1;
+	if(WiiSettings.force576p < 0 || WiiSettings.force576p > 1)
+		WiiSettings.force576p = 0;
 
 	CleanupPath(WiiSettings.artworkFolder);
 
@@ -1206,6 +1210,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.smallCache, "smallCache");
 				loadXMLSetting(&WiiSettings.libass, "libass");
 				loadXMLSetting(&WiiSettings.saveExit, "saveExit");
+				loadXMLSetting(&WiiSettings.force576p, "force576p");
 				// Videos
 				loadXMLSetting(&WiiSettings.videoZoomHor, "videoZoomHor");
 				loadXMLSetting(&WiiSettings.videoZoomVert, "videoZoomVert");
@@ -1295,6 +1300,8 @@ bool LoadSettings()
 		wiiSetVIscale();
 		wiiSetDf();
 		wiiSetDoubleStrike();
+		if(!WiiSettings.doubleStrike)
+			wiiSet576p();
 		if(WiiSettings.duplicateFrame > 0)
 			wiiDup();
 		if(WiiSettings.night == 1)

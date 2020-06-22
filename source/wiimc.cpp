@@ -760,6 +760,18 @@ void wiiSetDoubleStrike()
 	}
 }
 
+void wiiSet576p()
+{
+	if (WiiSettings.force576p == 1) {
+		Set576p();
+		//WiiSettings.videoDf = 0;
+		if(WiiSettings.viWidth == 1)
+			SetVIscale();
+		else
+			SetVIscaleback();
+	}
+}
+
 void wiiSetAssOff()
 {
 	if (WiiSettings.libass == 0)

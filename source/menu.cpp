@@ -1645,7 +1645,7 @@ SettingWindow(const char *title, GuiWindow *w)
  ***************************************************************************/
 
 //int debug_mem = 0;
- 
+
 static void CreditsWindow()
 {
 	int i = 0;
@@ -2009,10 +2009,15 @@ static void *ThumbThread (void *arg)
 					{
 						SuspendGui();
 						thumbImg->SetImage(thumb);
+					//	thumbImg->SetSize(166,233);
 						if (thumbImg->GetWidth() == 256)
 							thumbImg->SetScale(256, screenheight-100);
 						else
 							thumbImg->SetScale(185, screenheight-100);
+						// Should work but because of the 768px difference I increase it depending on size.
+						//thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)192/thumbImg->GetWidth() : (float)138/thumbImg->GetWidth());
+						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)(192+38)/thumbImg->GetWidth() : (float)(138+29)/thumbImg->GetWidth());
 						thumbImg->SetVisible(true);
 						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
 							fileInfo->SetText(WiiSettings.descTxt);
@@ -2403,7 +2408,7 @@ static void MenuBrowse(int menu)
 		
 		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
-		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 534 : 400, -92);
+		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 524 : 396, -92);
 		fileInfo->SetWrap(true, 230);
 		mainWindow->Append(fileInfo);
 		mainWindow->Append(fileYear);
@@ -2422,7 +2427,7 @@ static void MenuBrowse(int menu)
 		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
 	//	fileInfo->SetVisible(false);
-		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 534 : 400, -92);
+		fileInfo->SetPosition(CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? 524 : 396, -92);
 		fileInfo->SetWrap(true, 230);
 		mainWindow->Append(fileInfo);
 		mainWindow->Append(fileYear);
@@ -3278,6 +3283,10 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
 	sprintf(options.name[i++], "Double Strike");
+	if(VIDEO_HaveComponentCable())
+		sprintf(options.name[i++], "Force 576p");
+	else
+		sprintf(options.name[i++], '\0');
 
 	options.length = i;
 
@@ -3405,6 +3414,10 @@ static void MenuSettingsGlobal()
 				WiiSettings.screenDim ^= 1;
 				break;
 			case 14:
+				if(WiiSettings.force576p == 1) {
+					Set576pOff();
+					WiiSettings.force576p = 0;
+				}
 				WiiSettings.doubleStrike ^= 1;
 				if(WiiSettings.doubleStrike == 1) {
 					SetDoubleStrike();
@@ -3412,6 +3425,23 @@ static void MenuSettingsGlobal()
 				} else {
 					SetDoubleStrikeOff();
 					WiiSettings.videoDf = 0;
+				}
+				if(WiiSettings.viWidth == 1)
+						SetVIscale();
+					else
+						SetVIscaleback();
+				break;
+			case 15:
+				if(WiiSettings.doubleStrike == 1) {
+					SetDoubleStrikeOff();
+					WiiSettings.doubleStrike = 0;
+					WiiSettings.videoDf = 0;
+				}
+				WiiSettings.force576p ^= 1;
+				if(WiiSettings.force576p == 1) {
+					Set576p();
+				} else {
+					Set576pOff();
 				}
 				if(WiiSettings.viWidth == 1)
 						SetVIscale();
@@ -3490,6 +3520,7 @@ static void MenuSettingsGlobal()
 			sprintf(options.value[12], "%s", WiiSettings.night ? "On" : "Off");
 			sprintf(options.value[13], "%s", WiiSettings.screenDim ? "On" : "Off");
 			sprintf(options.value[14], "%s", WiiSettings.doubleStrike ? "On" : "Off");
+			sprintf(options.value[15], "%s", WiiSettings.force576p ? "On" : "Off");
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3863,7 +3894,7 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Folder");
     if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-       i += 1;
+       sprintf(options.name[i++], '\0');
     else
         sprintf(options.name[i++], "Force Fullscreen in 4:3");
 	sprintf(options.name[i++], "Volume Normalizer");

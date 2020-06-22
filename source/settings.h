@@ -122,6 +122,7 @@ struct SWiiSettings {
 	int 	numThumb;
 	char* 	yearNum;
 	char* 	descTxt;
+	int 	force576p;
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount

@@ -4533,6 +4533,10 @@ total_time_usage_start=GetTimer();
             }
             mpctx->was_paused = 0;
 
+			//THP can't loop, this will play the next video.
+			if (thp_vid)
+				mpctx->loop_times = -1;
+
             /* Looping. */
             if (mpctx->eof == 1 && mpctx->loop_times >= 0) {
                 mp_msg(MSGT_CPLAYER, MSGL_V, "loop_times = %d, eof = %d\n", mpctx->loop_times, mpctx->eof);
@@ -4641,8 +4645,8 @@ playing_file=false;
 new_load = true; // hack for avi seek
 thp_vid=false;
 monospaced=0; // Go back to original font
-if (controlledbygui == 0)
-     VIDEO_SetBlack(TRUE);
+//if (controlledbygui == 0) // If using 576p it causes the TV to display info each time a video has ended.
+  //   VIDEO_SetBlack(TRUE);
 DisableVideoImg();
 save_restore_point(fileplaying, partitionlabelplaying);
 end_film_error=stream_error(mpctx->stream);
@@ -5334,7 +5338,8 @@ void wiiGetFPS(char * buf)
 			sh_video->disp_w, sh_video->disp_h, sh_video->fps, sh_audio ? sh_audio->samplerate / 1000 : 0, sh_audio ? sh_audio->channels : 0);
 
 	// make use of this debug setting
-		//debug_30fps = true;
+	//debug_30fps = true;
+
 	//(int)(sh_audio->i_bps * 8 / 1000), (int)(sh_video->i_bps * 8 / 1024)
 }
 

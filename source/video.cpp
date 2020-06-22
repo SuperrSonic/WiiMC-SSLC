@@ -416,6 +416,75 @@ void SetDoubleStrike()
     VIDEO_WaitVSync();
 }
 
+void Set576pOff()
+{
+	//Need to check for NTSC
+	pal = false;
+	CONF_GetVideo();
+	vmode = VIDEO_GetPreferredMode(NULL);
+
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE, GX_DISABLE);
+	GX_Flush();
+
+	// Allocate framebuffers
+	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
+	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
+	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
+	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+
+	// Clear framebuffers
+	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	VIDEO_SetNextFramebuffer (xfb[0]);
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    VIDEO_WaitVSync();
+}
+
+void Set576p()
+{
+	CONF_GetVideo();
+	vmode = &TVPal576ProgScale;
+
+	pal = true;
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,576);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE,GX_DISABLE);
+	GX_Flush();
+	
+	// Allocate framebuffers
+	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
+	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
+	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
+	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
+	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+
+	// Clear framebuffers
+	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	VIDEO_SetNextFramebuffer (xfb[0]);
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    VIDEO_WaitVSync();
+}
+
 void SetVIscale()
 {
 	vmode->viWidth = VI_MAX_WIDTH_NTSC;

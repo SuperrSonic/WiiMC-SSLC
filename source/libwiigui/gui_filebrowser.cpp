@@ -220,11 +220,13 @@ void GuiFileBrowser::MakeEntry(int i)
 
 	fileListBg[i] = new GuiImage(bgBrowseEntry);
 	fileListBg[i]->SetTile(width/16);
-	fileListBg[i]->SetPosition(-45, 0);
+	//fileListBg[i]->SetPosition(-45, 0);
+	fileListBg[i]->SetPosition(-52, 0);
 
 	fileListBgOver[i] = new GuiImage(bgBrowseEntryOver);
 	fileListBgOver[i]->SetTile(width/16);
-	fileListBgOver[i]->SetPosition(-45, -2);
+	//fileListBgOver[i]->SetPosition(-45, -2);
+	fileListBgOver[i]->SetPosition(-52, -2);
 
 	fileListIcon[i] = new GuiImage;
 	fileListIcon[i]->SetPosition(0, -2);
