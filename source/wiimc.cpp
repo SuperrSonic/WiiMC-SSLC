@@ -381,6 +381,8 @@ extern "C" bool FindNextFile(bool load)
 
 	if(menuMode == 0 && menuCurrent == MENU_BROWSE_MUSIC)
 	{
+		// go and highlight the file
+		selectLoadedFile = true;
 		// clear any play icons
 		BROWSERENTRY *i = browser.first;
 		while(i)
@@ -732,7 +734,7 @@ void wiiSetVidFull()
 		wiiSetScreenNorm();
 
 	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
-		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
+		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.335
 			: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 }
 
@@ -950,12 +952,13 @@ int main(int argc, char *argv[])
 	LWP_CreateThread(&cthread, mplayercachethread, NULL, cachestack, CACHE_STACKSIZE, 70);
 
 	usleep(200);
-
+	
 	// path sent by the plugin's argument
 	if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))
 	{
 		sprintf(loadedFile, argv[1]);
 		AutobootExit = true;
+		//VIDEO_SetBlack(FALSE);
 	}
 
 	// create GUI thread

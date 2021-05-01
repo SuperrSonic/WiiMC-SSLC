@@ -1278,7 +1278,7 @@ ASS_Track *ass_new_track(ASS_Library *library)
 {
     ASS_Track *track = calloc(1, sizeof(ASS_Track));
     track->library = library;
-    track->ScaledBorderAndShadow = 0; // Normally enabled
+    track->ScaledBorderAndShadow = 0;
 	track->CorrectPAR = 0;
     track->parser_priv = calloc(1, sizeof(ASS_ParserPriv));
     return track;

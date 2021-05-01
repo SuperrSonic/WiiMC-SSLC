@@ -19,7 +19,9 @@
 #include "menu.h"
 #include "wiimc.h"
 #include "utils/mem2_manager.h"
+#include "settings.h"
 
+extern bool AutobootExit; //if autobooting a video, ignore delay.
 
 extern "C" {
 
@@ -45,7 +47,9 @@ u8 night = 22;
 bool fade_boot = false;
 bool fade_not = false;
 
-//extern float update_audio_rate;
+bool delayrender = true; //fixes bottom screen garbage when loaded by channel.
+
+extern bool wiiTiledRender;
 
 /****************************************************************************
  * TakeScreenshot
@@ -55,6 +59,16 @@ bool fade_not = false;
 
 void TakeScreenshot()
 {
+	// Change video mode as fast as soon as possible
+	// otherwise a frame of oversized EFB will pop up.
+/*	if(WiiSettings.tiledRender) {
+	//	VIDEO_SetBlack(TRUE);
+		vmode->fbWidth = 640;
+		VIDEO_Configure(vmode);
+		VIDEO_Flush();
+		//VIDEO_SetBlack(FALSE);
+	}*/
+	
 	GX_SetTexCopySrc(0, 0, vmode->fbWidth, vmode->efbHeight);
 	GX_SetTexCopyDst(vmode->fbWidth, vmode->efbHeight, GX_TF_RGBA8, GX_FALSE);
 	DCInvalidateRange(videoScreenshot, vmode->fbWidth * vmode->efbHeight * 4);
@@ -192,6 +206,12 @@ void Menu_Render()
 	else if (fade_not)
 		fadein_copyfilter();
 	++FrameTimer;
+	
+	if(delayrender && FrameTimer > 4) {
+		if(!AutobootExit)
+			VIDEO_SetBlack(FALSE);
+		delayrender = false;
+	}
 }
 
 /****************************************************************************
@@ -213,6 +233,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 	GXTexObj texObj;
 
 	GX_InitTexObj(&texObj, data, width, height, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
+	//GX_InitTexObjFilterMode(&texObj, GX_LINEAR, GX_NEAR);
 	GX_LoadTexObj(&texObj, GX_TEXMAP0);
 	GX_InvalidateTexAll();
 
@@ -250,6 +271,7 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 	GX_Color4u8(0xFF,0xFF,0xFF,alpha);
 	GX_TexCoord2f32(0, 1);
 	GX_End();
+	
 	GX_LoadPosMtxImm (GXmodelView2D, GX_PNMTX0);
 
 	GX_SetTevOp (GX_TEVSTAGE0, GX_PASSCLR);
@@ -284,10 +306,19 @@ void Menu_DrawRectangle(f32 x, f32 y, f32 width, f32 height, GXColor color, u8 f
 	GX_End();
 }
 
+bool safe_gc;
+extern bool point_on;
+
 int DrawMPlayerGui()
 {
 	UpdatePads();
-	MPlayerInput();
+	if(safe_gc) { // GC controller reads 1 input as 4 inputs when using tiled rendering
+		MPlayerInput();
+		return 0;
+	} else if (!wiiTiledRender)
+		MPlayerInput();
+	else if(point_on)
+		MPlayerInput();
 
 	if(!drawGui && wiiIsPaused())
 		return 1;
@@ -315,31 +346,6 @@ void Draw_VIDEO()
 
 static void vblank_cb(u32 retraceCnt)
 {
-	 // get audio DMA remaining length
-  /* vu16* const _dspReg = (u16*)0xCC005000;
-  u16 remain = _dspReg[29];
-
-  if (remain > 0)
-  {
-    float samplerate;
-
-    if (remain < 5)
-    {
-      samplerate = 47995 / 48000;
-    }
-    else
-    {
-      samplerate = 48005 / 48000;
-    }
-
-   // if (samplerate != snd.sample_rate)
-    //{
-     // audio_set_rate(samplerate, snd.frame_rate);
-	 if (samplerate != update_audio_rate)
-		 update_audio_rate = samplerate;
-    //}
-  } */
-
 	if (flip_pending) {
 		VIDEO_SetNextFramebuffer(xfb[whichfb]);
 		VIDEO_Flush();
@@ -433,12 +439,12 @@ void Set576pOff()
 	GX_Flush();
 
 	// Allocate framebuffers
-	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
+/*	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
 	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
-	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);*/
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
@@ -467,12 +473,12 @@ void Set576p()
 	GX_Flush();
 	
 	// Allocate framebuffers
-	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
+/*	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
 	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
-	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
+	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);*/
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
@@ -495,7 +501,10 @@ void SetVIscale()
 
 void SetVIscaleback()
 {
-	vmode->viWidth = 704;
+	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+		vmode->viWidth = 711;
+	else
+		vmode->viWidth = 704;
 	HOffset();
 	VIDEO_Configure (vmode);
 	VIDEO_Flush();
@@ -537,20 +546,100 @@ void SetDfOff()
 	GX_Flush();
 }
 
+#if 1
+void SetMplTiled()
+{
+	if(vmode->fbWidth == 720 || !wiiTiledRender)
+		return;
+	
+	vmode->viWidth = VI_MAX_WIDTH_NTSC;
+	vmode->fbWidth = VI_MAX_WIDTH_NTSC;
+	HOffset();
+	
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	//GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+	GX_Flush();
+	
+	// Clear framebuffers
+	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	VIDEO_SetNextFramebuffer (xfb[0]);
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+}
+
+void SetMplTiledOff()
+{
+	if(!WiiSettings.tiledRender || !wiiTiledRender)
+		return;
+	
+//	VIDEO_SetBlack(TRUE);
+	//GX_SetScissor(0,0,720,vmode->efbHeight);
+	GX_SetScissorBoxOffset(0, 0);
+	//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
+	//GX_SetDispCopySrc(0, 0, 640, vmode->efbHeight);
+	//GX_SetDispCopyDst(vmode->fbWidth,vmode->xfbHeight);
+	
+//	vmode->viWidth = VI_MAX_WIDTH_NTSC;
+	if(WiiSettings.viWidth)
+		SetVIscale();
+	else
+		SetVIscaleback();
+	vmode->fbWidth = 640;
+	HOffset();
+	
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+	GX_Flush();
+
+	// When loading audio-only this triggers a one frame flicker
+	// Clear framebuffers
+	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	VIDEO_SetNextFramebuffer (xfb[0]);
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+//	VIDEO_SetBlack(FALSE);
+}
+#endif
+
 void
 InitVideo ()
 {
 	VIDEO_Init();
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
+	//vmode = &TVPal576ProgScale;
 	vmode->viWidth = 704;
+	//vmode->fbWidth = 720;
+
+	//static vu32* const _vigReg = (vu32*)0xCC002030;
+	//*_vigReg = 0x1001; //0x1001(30fps), 0x120E(60fps)
 
 	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale) // 50Hz
 		pal = true;
 	else if (CONF_GetVideo() == CONF_VIDEO_PAL) // 60Hz
 		pal60 = true;
 
-	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
+		vmode->viWidth = 711;
 		screenwidth = 768;
+	}
 
 	HOffset();
 
@@ -562,6 +651,9 @@ void
 InitVideo2 ()
 {
 	// Allocate framebuffers
+	//test
+	vmode->fbWidth = 720;
+	vmode->xfbHeight = 576;
 	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	//xfb[2] = (u32 *) SYS_AllocateFramebuffer (vmode);
@@ -571,6 +663,8 @@ InitVideo2 ()
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
 	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
 	//xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
+	vmode->fbWidth = 640;
+	vmode->xfbHeight = 480; //do I have to do this?
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
@@ -588,7 +682,7 @@ InitVideo2 ()
 		while (VIDEO_GetNextField())
 			VIDEO_WaitVSync();
 */
-	VIDEO_SetBlack (FALSE);
+	//VIDEO_SetBlack (FALSE);
 
 	// Initialize GX
 	GXColor background = { 0, 0, 0, 0xff };
@@ -605,15 +699,19 @@ InitVideo2 ()
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
 	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+//	GX_SetDispCopySrc(0, 0, ((vmode->fbWidth >> 1) + 15) & ~15, vmode->efbHeight);
+//	GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
+	
 	VIDEO_SetPreRetraceCallback(vblank_cb);
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);
 	GX_Flush();
 
 	videoScreenshot = (u8 *) mem2_malloc(vmode->fbWidth * vmode->efbHeight * 4, MEM2_VIDEO);
+	//videoScreenshot = (u8 *) mem2_malloc(720 * vmode->efbHeight * 4, MEM2_VIDEO);
 }
 
 }

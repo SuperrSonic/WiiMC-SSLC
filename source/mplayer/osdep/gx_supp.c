@@ -35,6 +35,7 @@
 #include <ogc/lwp.h>
 #include <ogc/lwp_watchdog.h>
 #include <wiiuse/wpad.h>
+#include <ogc/machine/processor.h>
 
 #include "../libvo/video_out.h"
 #include "../libvo/csputils.h"
@@ -67,6 +68,7 @@ extern unsigned int *xfb[2];
 
 extern bool flip_pending;
 //extern int delay_amount;
+extern bool wiiTiledRender;
 
 static int hor_pos=0, vert_pos=0;
 static float hor_zoom = 1.0f, vert_zoom = 1.0f;
@@ -78,6 +80,10 @@ int colorspace = MP_CSP_DEFAULT;
 int levelconv = 1;
 
 /*** 3D GX ***/
+static u8 dlist[32] ATTRIBUTE_ALIGN(32);
+
+extern bool safe_gc;
+extern bool point_on;
 
 /*** Texture memory ***/
 static u8 *Yltexture = NULL;
@@ -153,7 +159,13 @@ void GX_SetScreenPos(int _hor_pos, int _vert_pos, float _hor_zoom, float _vert_z
 {
 	hor_pos = _hor_pos;
 	vert_pos = _vert_pos;
-	hor_zoom = _hor_zoom;
+#if 1
+	if(wiiTiledRender)
+		hor_zoom = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? _hor_zoom+.003f : _hor_zoom-.015f;
+	else
+		hor_zoom = _hor_zoom;
+#endif
+	//hor_zoom = _hor_zoom;
 	vert_zoom = _vert_zoom;
 	GX_UpdateScaling();
 }
@@ -394,6 +406,16 @@ static void draw_initYUV()
 	GX_LoadTexObj(&UtexObj, GX_TEXMAP2);	// MAP2 <- U
 	GX_LoadTexObj(&VtexObj, GX_TEXMAP3);	// MAP3 <- V
 
+#if 1
+	GX_BeginDispList(dlist, 32);
+	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+		GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
+		GX_Position1x8(1); GX_Color1x8(0); GX_TexCoord1x8(1); GX_TexCoord1x8(5); GX_TexCoord1x8(1);
+		GX_Position1x8(2); GX_Color1x8(0); GX_TexCoord1x8(2); GX_TexCoord1x8(6); GX_TexCoord1x8(2);
+		GX_Position1x8(3); GX_Color1x8(0); GX_TexCoord1x8(3); GX_TexCoord1x8(7); GX_TexCoord1x8(3);
+	GX_End();
+	GX_EndDispList();
+#endif
 }
 
 //------- rodries change: to avoid image_buffer intermediate ------
@@ -415,7 +437,7 @@ static void draw_scaling()
 }
 
 void GX_ConfigTextureYUV(u16 width, u16 height, u16 chroma_width, u16 chroma_height)
-{
+{	
 	int wp;
 
 	Ywidth=(width+7)&~7;
@@ -466,6 +488,8 @@ void GX_ConfigTextureYUV(u16 width, u16 height, u16 chroma_width, u16 chroma_hei
 }
 #include "osdep/timer.h"
 
+bool goBackto = false;
+
 inline void DrawMPlayer()
 {
 	DCFlushRange(Yltexture, Yltexsize);
@@ -480,9 +504,13 @@ inline void DrawMPlayer()
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
 
+	u32 level = 0;
+	_CPU_ISR_Disable(level);
 	if (flip_pending)
 		VIDEO_WaitVSync();
+	_CPU_ISR_Restore(level);
 
+	if(!wiiTiledRender || goBackto) {
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
 		GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
 		GX_Position1x8(1); GX_Color1x8(0); GX_TexCoord1x8(1); GX_TexCoord1x8(5); GX_TexCoord1x8(1);
@@ -495,6 +523,11 @@ inline void DrawMPlayer()
 		if(controlledbygui != 2)
 			TakeScreenshot();
 		copyScreen = 2;
+		if(goBackto) {
+			wiiPause();
+			wiiPause();
+			goBackto = false;
+		}
 	}
 	else
 	{
@@ -504,7 +537,7 @@ inline void DrawMPlayer()
 	if(copyScreen == 2)
 	{
 		copyScreen = 0;
-		pause_gui = 1;
+		pause_gui = 1;		
 	}
 	else if(drawMode != 0)
 	{
@@ -518,8 +551,109 @@ inline void DrawMPlayer()
 	}
 	
 	//whichfb ^= 1; // flip framebuffer
+	}
+#if 1
+else {
+	/*u16 xfb_copypt = vmode->fbWidth >> 1;
+	
+	for (int dxs = 0; dxs < 2; dxs++) {
+		u16 efb_offset = (xfb_copypt & ~15) * dxs;
+		GX_SetScissorBoxOffset(efb_offset, 0);
+		GX_CallDispList(dlist, 32);
+		
+		u32 xfb_offset = (xfb_copypt * VI_DISPLAY_PIX_SZ) * dxs;
+		
+		//printf("get size: %d...", xfb_offset);
+		GX_CopyDisp(xfb[whichfb] + xfb_offset, GX_TRUE);
+	}*/
+	
+	if(!point_on) {
+	if(copyScreen == 1) // For GC controller
+	{
+		;
+	//	if(controlledbygui != 2)
+		//	TakeScreenshot();
+		//copyScreen = 2;
+	}
+	else
+	{
+		safe_gc = true;
+		drawMode = DrawMPlayerGui();
+	}
+	}
+	// Switch to tile rendering
+	SetMplTiled();
+	
+	int half_ht = vmode->efbHeight / 2;
+	int half_wh = vmode->fbWidth / 2;
 
-	GX_CopyDisp(xfb[whichfb], GX_TRUE);
+	bool pad_wh = (half_wh / 8) % 2;
+	int corr_wh = half_wh + (8 * pad_wh);
+
+	//whichfb ^= 1;
+	for (int y = 0; y < 2; y++)
+	{
+		for (int x = 0; x < 2; x++)
+		{
+			int hor_offset = (half_wh - (8 * pad_wh)) * x;
+
+			GX_SetScissor(hor_offset, half_ht * y, corr_wh + ((8 * pad_wh) * x), half_ht);
+			GX_SetScissorBoxOffset(hor_offset, half_ht * y);
+			GX_SetDispCopySrc(0, 0, corr_wh, half_ht);
+
+			GX_CallDispList(dlist, 32);
+		/*	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
+				GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
+				GX_Position1x8(1); GX_Color1x8(0); GX_TexCoord1x8(1); GX_TexCoord1x8(5); GX_TexCoord1x8(1);
+				GX_Position1x8(2); GX_Color1x8(0); GX_TexCoord1x8(2); GX_TexCoord1x8(6); GX_TexCoord1x8(2);
+				GX_Position1x8(3); GX_Color1x8(0); GX_TexCoord1x8(3); GX_TexCoord1x8(7); GX_TexCoord1x8(3);
+			GX_End();*/
+		if(copyScreen == 1)
+		{
+			if(controlledbygui != 2) {
+				vmode->fbWidth = 640;
+				VIDEO_Configure(vmode);
+				VIDEO_Flush();
+				SetMplTiledOff();
+				GX_CopyDisp(xfb[whichfb], GX_TRUE);
+				//TakeScreenshot();
+				goBackto = true;
+				break;
+			}
+			copyScreen = 2;
+		}
+		else
+		{
+			safe_gc = false;
+			drawMode = DrawMPlayerGui();
+		}
+
+		if(copyScreen == 2)
+		{
+			copyScreen = 0;
+			pause_gui = 1;
+		}
+		else if(drawMode != 0)
+		{
+			//SetMplTiled();
+			// reconfigure GX for MPlayer
+			Mtx44 p;
+			draw_initYUV();
+			draw_scaling();
+			guOrtho(p, mplayerheight/2, -(mplayerheight/2), -(mplayerwidth/2), mplayerwidth/2, 10, 1000);
+			GX_LoadProjectionMtx (p, GX_ORTHOGRAPHIC);
+			drawMode = 0;
+		}
+
+		//	GX_SetColorUpdate(GX_TRUE);
+			u32 xfb_offset = (((vmode->fbWidth * VI_DISPLAY_PIX_SZ) * (vmode->xfbHeight / 2)) * y) + ((half_wh * VI_DISPLAY_PIX_SZ) * x);
+			GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
+		}
+	}
+#endif
+	}
+	if(!wiiTiledRender)
+		GX_CopyDisp(xfb[whichfb], GX_TRUE);
 	GX_SetDrawDone();
 	//VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;

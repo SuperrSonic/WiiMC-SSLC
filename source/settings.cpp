@@ -347,6 +347,7 @@ prepareSettingsData ()
 	createXMLSetting("libass", "ASS Renderer", toStr(WiiSettings.libass));
 	createXMLSetting("saveExit", "Only save to device on exit", toStr(WiiSettings.saveExit));
 	createXMLSetting("force576p", "Force 576p 50Hz", toStr(WiiSettings.force576p));
+	createXMLSetting("tiledRender", "Render More Pixels", toStr(WiiSettings.tiledRender));
 	// Videos
 	createXMLSection("Videos", "Videos Settings");
 	createXMLSetting("videoZoomHor", "Horizontal video zoom", FtoStr(WiiSettings.videoZoomHor));
@@ -368,11 +369,12 @@ prepareSettingsData ()
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
 	createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
 	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
-	createXMLSetting("duplicateFrame", "Duplicate Frames", toStr(WiiSettings.duplicateFrame));
+	//createXMLSetting("duplicateFrame", "Duplicate Frames", toStr(WiiSettings.duplicateFrame));
 	//createXMLSetting("videoDelay", "Delay video by ms", toStr(WiiSettings.videoDelay));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
+	createXMLSetting("screensaverArt", "Display Art on Screensaver", toStr(WiiSettings.screensaverArt));
 	createXMLSetting("musicFolder", "Music folder", WiiSettings.musicFolder);
 	// DVD
 	createXMLSection("DVD", "DVD Settings");
@@ -739,6 +741,7 @@ void DefaultSettings ()
 	WiiSettings.libass = 1;
 	WiiSettings.saveExit = 1;
 	WiiSettings.force576p = 0;
+	WiiSettings.tiledRender = 0;
 	// Videos
 	WiiSettings.videoZoomHor = 1;
 	WiiSettings.videoZoomVert = 1;
@@ -762,6 +765,7 @@ void DefaultSettings ()
 	//WiiSettings.videoDelay = 0;
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
+	WiiSettings.screensaverArt = ART_NONE;
 	WiiSettings.musicFolder[0] = 0;
 	// DVD
 	WiiSettings.dvdMenu = 1;
@@ -842,6 +846,8 @@ static void FixInvalidSettings()
 		WiiSettings.saveExit = 1;
 	if(WiiSettings.force576p < 0 || WiiSettings.force576p > 1)
 		WiiSettings.force576p = 0;
+	if(WiiSettings.tiledRender < 0 || WiiSettings.tiledRender > 2)
+		WiiSettings.tiledRender = 0;
 
 	CleanupPath(WiiSettings.artworkFolder);
 
@@ -904,6 +910,8 @@ static void FixInvalidSettings()
 	// Music
 	if(WiiSettings.playOrder < 0 || WiiSettings.playOrder > PLAY_THROUGH)
 		WiiSettings.playOrder = PLAY_SINGLE;
+	if(WiiSettings.screensaverArt < 0 || WiiSettings.screensaverArt > 2)
+		WiiSettings.screensaverArt = 0;
 	CleanupPath(WiiSettings.musicFolder);
 
 	// DVD
@@ -1211,6 +1219,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.libass, "libass");
 				loadXMLSetting(&WiiSettings.saveExit, "saveExit");
 				loadXMLSetting(&WiiSettings.force576p, "force576p");
+				loadXMLSetting(&WiiSettings.tiledRender, "tiledRender");
 				// Videos
 				loadXMLSetting(&WiiSettings.videoZoomHor, "videoZoomHor");
 				loadXMLSetting(&WiiSettings.videoZoomVert, "videoZoomVert");
@@ -1231,10 +1240,11 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
 				loadXMLSetting(&WiiSettings.viWidth, "viWidth");
 				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
-				loadXMLSetting(&WiiSettings.duplicateFrame, "duplicateFrame");
+				//loadXMLSetting(&WiiSettings.duplicateFrame, "duplicateFrame");
 				//loadXMLSetting(&WiiSettings.videoDelay, "videoDelay");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
+				loadXMLSetting(&WiiSettings.screensaverArt, "screensaverArt");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));
 				// DVD
 				loadXMLSetting(&WiiSettings.dvdMenu, "dvdMenu");
@@ -1302,10 +1312,18 @@ bool LoadSettings()
 		wiiSetDoubleStrike();
 		if(!WiiSettings.doubleStrike)
 			wiiSet576p();
-		if(WiiSettings.duplicateFrame > 0)
-			wiiDup();
+		//if(WiiSettings.duplicateFrame > 0)
+			//wiiDup();
 		if(WiiSettings.night == 1)
 			nightfade_cb();
+		
+		if(WiiSettings.tiledRender == 1)
+			wiiSetTiledVar();
+		else if(WiiSettings.tiledRender == 2) { // Automatic
+			wiiSetTiledVar();
+			wiiSetTiledAuto();
+		}
+		
 		if(WiiSettings.debug == 5)
 			WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC);
 

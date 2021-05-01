@@ -17,6 +17,12 @@ enum {
 };
 
 enum {
+	ART_NONE = 0,
+	ART_TOP,
+	ART_SIDE
+};
+
+enum {
 	//LANG_JAPANESE = 0,
 	LANG_ENGLISH = 0,
 	//LANG_GERMAN,
@@ -123,6 +129,7 @@ struct SWiiSettings {
 	char* 	yearNum;
 	char* 	descTxt;
 	int 	force576p;
+	int 	tiledRender;
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount
@@ -143,10 +150,11 @@ struct SWiiSettings {
 	int		videoDf;
 	int		viWidth;
 	int		skipLoop;
-	int		duplicateFrame;
+	//int		duplicateFrame;
 	//int 	videoDelay;
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
+	int 	screensaverArt;
 	char	musicFolder[MAXPATHLEN];
 	// DVD
 	int		dvdMenu;

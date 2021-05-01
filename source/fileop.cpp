@@ -76,6 +76,7 @@ static DIR *dirHandle = NULL;
 static bool ParseDirEntries();
 int findLoadedFile = 0;
 bool selectLoadedFile = false;
+bool foundArt = false;
 
 // device thread
 static lwp_t devicethread = LWP_THREAD_NULL;
@@ -1672,6 +1673,7 @@ void FindFile()
 	if(indexFound > 0)
 	{
 		entry->icon = ICON_PLAY;
+		foundArt = true;
 
 		if(!selectLoadedFile) // only move to the file when first returning from the video
 			return;
@@ -1694,9 +1696,11 @@ void FindFile()
 				newIndex = 0;
 
 			browser.pageIndex = newIndex;
-		}
+		} else
+			browser.pageIndex = 0; // fixes music going back.
 		browser.selIndex = entry;
 		findLoadedFile = 2;
+		foundArt = true;
 	}
 	selectLoadedFile = false; // only try to select loaded file once
 }

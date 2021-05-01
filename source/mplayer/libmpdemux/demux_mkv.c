@@ -2545,7 +2545,7 @@ static double fix_timestamp(demuxer_t *demuxer, mkv_track_t *track, double ts)
 		//find_prob++;
         // Assume that timestamps have been rounded to the timecode scale.
        double quant = MPMIN(mkv_d->tc_scale / 1e9, 0.001);
-       //double rts = rint_wii(ts / track->default_duration) * track->default_duration;
+   //    double rts = rint_wii(ts / track->default_duration) * track->default_duration;
        // rts = floor((ts / track->default_duration) + 0.5f) * track->default_duration;
        double rts = rint_wii(ts);// * track->default_duration;
         if (fabs(rts - ts) < quant)
@@ -2566,7 +2566,7 @@ static int handle_block(demuxer_t *demuxer, uint8_t *block, uint64_t length,
     uint32_t *lace_size;
     uint8_t laces, flags;
     int i, num, tmp, use_this_block = 1;
-    float current_pts;
+    double current_pts;
     int16_t time;
 
     /* first byte(s): track num */

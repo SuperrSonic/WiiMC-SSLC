@@ -1712,6 +1712,8 @@ static int matroska_read_header(AVFormatContext *s)
             if (track->default_duration)   // Breaks decoding on certain framerates, only when framedrop is enabled
                 av_reduce(&st->avg_frame_rate.num, &st->avg_frame_rate.den,
                           1000000000, track->default_duration, 30000);
+			//	st->avg_frame_rate.num = 15712911;
+			//	st->avg_frame_rate.den = 524288;
 				//st->avg_frame_rate = av_d2q(1000000000.0/track->default_duration, INT_MAX);
 
             /* export stereo mode flag as metadata tag */

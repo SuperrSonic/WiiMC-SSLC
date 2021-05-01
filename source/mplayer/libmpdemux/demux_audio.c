@@ -149,7 +149,7 @@ static mp3_hdr_t *add_mp3_hdr(mp3_hdr_t **list, off_t st_pos,
   return NULL;
 }
 
-#if 0 /* this code is a mess, clean it up before reenabling */
+#if 1 /* this code is a mess, clean it up before reenabling */
 #define FLAC_SIGNATURE_SIZE 4
 #define FLAC_STREAMINFO_SIZE 34
 #define FLAC_SEEKPOINT_SIZE 18
@@ -213,8 +213,10 @@ get_flac_metadata (demuxer_t* demuxer)
           ptr += 4;
 
           comment = ptr;
-          if (&comment[length] < comments || &comment[length] >= &comments[blk_len])
-            return;
+		  // This breaks Artist from displaying (>=)
+        //  if (&comment[length] < comments || &comment[length] >= &comments[blk_len])
+            //return;
+
           c = comment[length];
           comment[length] = 0;
 
@@ -226,7 +228,7 @@ get_flac_metadata (demuxer_t* demuxer)
             demux_info_add (demuxer, "Album", comment + 6);
           else if (!strncasecmp ("DATE=", comment, 5) && (length - 5 > 0))
             demux_info_add (demuxer, "Year", comment + 5);
-          else if (!strncasecmp ("GENRE=", comment, 6) && (length - 6 > 0))
+       /*   else if (!strncasecmp ("GENRE=", comment, 6) && (length - 6 > 0))
             demux_info_add (demuxer, "Genre", comment + 6);
           else if (!strncasecmp ("Comment=", comment, 8) && (length - 8 > 0))
             demux_info_add (demuxer, "Comment", comment + 8);
@@ -237,7 +239,7 @@ get_flac_metadata (demuxer_t* demuxer)
             buf[30] = '\0';
             sprintf (buf, "%d", atoi (comment + 12));
             demux_info_add(demuxer, "Track", buf);
-          }
+          } */
           comment[length] = c;
 
           ptr += length;
@@ -442,9 +444,40 @@ static int demux_audio_open(demuxer_t* demuxer) {
     mp3_found = NULL;
     if(demuxer->movi_end && (s->flags & MP_STREAM_SEEK) == MP_STREAM_SEEK) {
       if(demuxer->movi_end >= 128) {
-        stream_seek(s,demuxer->movi_end-128);
+#if 1
+        stream_seek(s,demuxer->movi_end-188);
+      stream_read(s,hdr,4);
+      if(!memcmp(hdr,"TAG+",4)) { // Works but is not up to spec.
+	char buf[61];
+	//uint8_t g;
+          demuxer->movi_end -= 188;
+	stream_read(s,buf,60);
+	buf[60] = '\0';
+	demux_info_add(demuxer,"Title",buf);
+	stream_read(s,buf,60);
+	buf[60] = '\0';
+	demux_info_add(demuxer,"Artist",buf);
+	stream_read(s,buf,60);
+	buf[60] = '\0';
+	demux_info_add(demuxer,"Album",buf);
+	stream_read(s,buf,4);
+	buf[4] = '\0';
+	demux_info_add(demuxer,"Year",buf);
+	stream_read(s,buf,30);
+	/*buf[30] = '\0';
+	demux_info_add(demuxer,"Comment",buf);
+	if(buf[28] == 0 && buf[29] != 0) {
+	  uint8_t trk = (uint8_t)buf[29];
+	  sprintf(buf,"%d",trk);
+	  demux_info_add(demuxer,"Track",buf);
+	}
+	g = stream_read_char(s); */
+	//demux_info_add(demuxer,"Genre",genres[g]);
+      }
+#endif
+	  stream_seek(s,demuxer->movi_end-128);
       stream_read(s,hdr,3);
-      if(!memcmp(hdr,"TAG",3)) {
+	  if(!memcmp(hdr,"TAG",3)) {
 	char buf[31];
 	uint8_t g;
           demuxer->movi_end -= 128;
@@ -612,7 +645,7 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	    if (sh_audio->i_bps < 1) // guess value to prevent crash
 	      sh_audio->i_bps = 64 * 1024;
 	    sh_audio->needs_parsing = 1;
-//	    get_flac_metadata (demuxer);
+	    get_flac_metadata (demuxer);
 	    break;
   }
 

@@ -150,9 +150,11 @@ void MPlayerResize(float fZoomHorIncr, float fZoomVertIncr)
 	WiiSettings.videoZoomHor += fZoomHorIncr;
 	WiiSettings.videoZoomVert += fZoomVertIncr;
 	GX_SetScreenPos(WiiSettings.videoXshift, WiiSettings.videoYshift, 
-		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.35
+		CONF_GetAspectRatio() == CONF_ASPECT_4_3 ? WiiSettings.videoFull ? WiiSettings.videoZoomHor * 1.335
 			: WiiSettings.videoZoomHor : WiiSettings.videoZoomHor, WiiSettings.videoZoomVert);
 }
+
+bool point_on;
 
 void MPlayerInput()
 {
@@ -160,8 +162,12 @@ void MPlayerInput()
 	bool inDVDMenu = wiiInDVDMenu();
 	static bool volumeUpdated = false;
 
-	if(userInput[0].wpad->ir.valid)
+	if(userInput[0].wpad->ir.valid) {
 		ir = true;
+		point_on = true;
+		//printf("test pointer: %d", point_on);
+	} else
+		point_on = false;
 
 	u16 down = PAD_ButtonsDown(0);
 	u16 held = PAD_ButtonsHeld(0);

@@ -58,6 +58,15 @@ msgstr "Continuo"
 msgid "Through"
 msgstr "Directo"
 
+msgid "Screensaver Art"
+msgstr "Carátulas en el salvapantallas"
+
+msgid "Top"
+msgstr "Arriba"
+
+msgid "Side"
+msgstr "Al lado"
+
 msgid "Playlist"
 msgstr "Lista de reprodución"
 
@@ -184,7 +193,7 @@ msgstr "Volumen"
 msgid "Exit Action"
 msgstr "Acción al salir"
 
-msgid "Wiimote Rumble"
+msgid "Wii Remote Rumble"
 msgstr "Vibración del mando"
 
 msgid "Hide"
@@ -560,16 +569,13 @@ msgid "Use Last Browsed"
 msgstr "Última Búsqueda"
 
 msgid "Audio Language"
-msgstr "Idioma para el Audio"
+msgstr "Idioma para el audio"
 
 msgid "DVD Support"
 msgstr "Soporte DVD"
 
 msgid "Enabled"
 msgstr "Habilitado"
-
-msgid "Rotate"
-msgstr "Rotar"
 
 msgid "Resolution exceeds maximum allowed (1024x720)!"
 msgstr "La resolución excede el máximo permitido (1024x720)!"
@@ -604,6 +610,12 @@ msgstr "Protector de pantalla"
 msgid "Double Strike"
 msgstr "Modo "Double-Strike""
 
+msgid "Force 576p"
+msgstr "Modo 576p"
+
+msgid "Enhanced Definition"
+msgstr "Definición Aumentada"
+
 msgid "Error opening font file!"
 msgstr "Error abriendo la fuente del archivo!"
 
@@ -614,10 +626,10 @@ msgid "The current IOS is unsupported. Functionality and/or stability may be adv
 msgstr "El IOS actual no es soportado. La funcionalidad y/o estabilidad pueden verse drásticamente afectadas."
 
 msgid "Screensaver Delay"
-msgstr "Retraso del Salvapantallas"
+msgstr "Retraso del salvapantallas"
 
 msgid "Inactivity Shutdown"
-msgstr "Cierre por Inactividad"
+msgstr "Cierre por inactividad"
 
 msgid "Invalid subtitle delay."
 msgstr "No válido el retraso de subtítulos."

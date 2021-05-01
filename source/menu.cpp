@@ -287,6 +287,9 @@ bool menuMode = 0; // 0 - normal GUI, 1 - GUI for MPlayer
 static int slideshow = 0; // slideshow mode
 static u64 ssTimer = 0;
 static vu32* HW_VIDIM = (vu32*)0xCD80001C;
+bool dontdim = false;
+//int adjustSS;
+//bool forwardOK = false;
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
 {	
@@ -428,6 +431,8 @@ static void SuspendGui()
 		usleep(THREAD_SLEEP);
 }
 
+static GuiImage *thumbImg;
+
 static void *ScreensaverThread(void *arg)
 {
 	GuiWindow *oldWindow;
@@ -435,7 +440,12 @@ static void *ScreensaverThread(void *arg)
 	GuiImageData logoLarge(logo_large_png);
 	GuiImage logoLargeImg(&logoLarge);
 	logoLargeImg.SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	static int logoReset;
 
+	// This isn't really needed, it also brings a small problem if one changes the style from the gui.
+	//GuiWindow w(WiiSettings.screensaverArt == ART_SIDE ? logoLargeImg.GetWidth()-140 : logoLargeImg.GetWidth(),
+		//		logoLargeImg.GetHeight()+100);
+	//GuiWindow w(logoLargeImg.GetWidth()-140, logoLargeImg.GetHeight()+100);
 	GuiWindow w(logoLargeImg.GetWidth(), logoLargeImg.GetHeight()+100);
 	w.Append(&logoLargeImg);
 	w.SetPosition(screenwidth/2-w.GetWidth()/2, screenheight/2-w.GetHeight()/2);
@@ -459,6 +469,42 @@ static void *ScreensaverThread(void *arg)
 
 		w.Append(audiobarNowPlayingBtn);
 		audiobarNowPlayingBtn->SetPosition(-8, logoLargeImg.GetHeight()+20);
+		
+		static bool correctss;
+		oldWindow->Remove(thumbImg);
+		if(thumbImg != NULL && audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt) {
+			selectLoadedFile = true;
+			FindFile();
+			if(foundArt) { // found the file
+				w.Append(thumbImg);
+				thumbImg->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+				switch(WiiSettings.screensaverArt) {
+					case ART_TOP:
+						thumbImg->SetPosition(4, -96); // Type Top
+						break;
+					case ART_SIDE:
+						thumbImg->SetPosition(-189, -16); // Type Side
+						// Only do this once per run?
+						w.SetPosition(208, 170);
+						break;
+				} // 16:9 messes up width, og 0=T -170=S
+				w.Remove(&logoLargeImg);
+				dontdim = true;
+				correctss = true;
+				foundArt = false;
+			} else {
+				w.Remove(thumbImg);
+				w.Append(&logoLargeImg);
+				correctss = false;
+			}
+		}
+		
+		if((!thumbImg->IsVisible() && !audiobarNowPlayingBtn->IsVisible()) || !WiiSettings.screensaverArt) {
+			w.Remove(thumbImg);
+			w.Append(&logoLargeImg);
+			correctss = false;
+		}
+		
 		mainWindow = &w;
 		ResumeGui();
 
@@ -472,17 +518,87 @@ static void *ScreensaverThread(void *arg)
 					goto done;
 				usleep(THREAD_SLEEP);
 				threadsleep -= THREAD_SLEEP;
+				
+				// For video showcase
+			/*	if(userInput[0].pad.btns_d & PAD_TRIGGER_Z) {
+					StopMPlayerFile(); // end this song
+					while(controlledbygui == 2) // wait for song to end
+						usleep(THREAD_SLEEP);
+					FindNextFile(true); // find next song
+				} */
 			}
 
+		//	for(j=1;j<4;++j)
+			//	audiobarNowPlaying[j]->GetTextWidth();
+			int al;
+			int max = 188;
+		/*	for(j=1;j<4;++j) {
+				if(audiobarNowPlaying[j]->GetTextWidth() > 185) {
+					max = audiobarNowPlaying[j]->GetTextWidth();
+					break;
+				} else {
+					max = 185;
+					continue;
+				}
+			}*/
+			if(MAX(audiobarNowPlaying[1]->GetTextWidth(), audiobarNowPlaying[2]->GetTextWidth()) > audiobarNowPlaying[3]->GetTextWidth())
+				al = MAX(audiobarNowPlaying[1]->GetTextWidth(), audiobarNowPlaying[2]->GetTextWidth());
+			else
+				al = audiobarNowPlaying[3]->GetTextWidth(); // really grasping at straws here.
+			
+			// Detect really long titles/artists/albums
+			for(int j=1;j<4;++j) {
+				if(audiobarNowPlaying[j]->GetTextWidth() > 347)
+					al = 336;
+			}
+			// Current: give me size: 430,507 // Amadeus
+			// Limit:   give me size: 340,347
+			
+			if(al > max)
+				max = al;
+			
 			int x=0,y=0;
-
+/*
 			while(x < 30 || x > (screenwidth-w.GetWidth()-30))
 				x = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenwidth);
 			while(y < 30 || y > (screenheight-w.GetHeight()-30))
 				y = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenheight);
+*/
+			if(correctss && WiiSettings.screensaverArt == ART_TOP) {
+				while(x < 30 || x > (screenwidth-max-30))
+					x = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenwidth);
+				while(y < 104 || y > (screenheight-w.GetHeight()-30))
+					y = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenheight);
+			} else if(correctss && WiiSettings.screensaverArt == ART_SIDE) {
+				while(x < 210 || x > (screenwidth-max-30))
+					x = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenwidth);
+				while(y < 30 || y > (screenheight-w.GetHeight()-30))
+					y = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenheight);
+			} else {
+				while(x < 30 || x > (screenwidth-w.GetWidth()-30))
+					x = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenwidth);
+				while(y < 30 || y > (screenheight-w.GetHeight()-30))
+					y = (int)(((double)rand() / double(RAND_MAX + 1.0)) * screenheight);
+			}
+			
+			// Sometimes this happens when it shouldn't, fixit
+			if(!audiobarNowPlayingBtn->IsVisible()) {
+				++logoReset;
+				if(logoReset > 1) {
+					w.Remove(thumbImg);
+					w.Append(&logoLargeImg);
+					correctss = false;
+					logoReset = 0;
+				}
+			} else
+				logoReset = 0; //check if this fixes it.
+
+			//printf("give me size: %d,%d -", x, y); //348x172
+			//while(x < 210 solves Type Side.
+			//while(y < 104 solves the Top clipping.
 
 			w.SetPosition(x, y);
-			
+
 			if(WiiSettings.inactivityShutdown > 0 && 
 				!(wiiAudioOnly() && !wiiIsPaused()) &&
 				diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.inactivityShutdown*3600))
@@ -495,6 +611,19 @@ done:
 		SuspendGui();
 		w.Remove(audiobarNowPlayingBtn);
 
+		//artwork
+		w.Remove(thumbImg);
+		oldWindow->Append(thumbImg);
+		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
+		thumbImg->SetPosition(-33, 91);
+		dontdim = false;
+		foundArt = false; // doing this in the loop doesn't work right.
+		// Fixes volume bar covered by artwork.
+		//audiobar->Append(audiobarVolumeLevelTopImg);
+		//audiobar2->Append(audiobarVolumeLevelMidImg);
+		//audiobarVolumeLevelTopImg->SetPosition(-320, -220);
+		//audiobarVolumeLevelTopImg->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
+		
 		for(int i=1; i < 4; i++)
 			audiobarNowPlaying[i]->SetMaxWidth(screenwidth-460);
 
@@ -603,7 +732,10 @@ static void *GuiThread (void *arg)
 					newMenu++;
 				if(newMenu > MENU_SETTINGS)
 					newMenu = MENU_BROWSE_VIDEOS;
-				ChangeMenu(newMenu);
+				
+				// GC controller can crash if screensaver is active.
+				if(screensaverThreadHalt != 0)
+					ChangeMenu(newMenu);
 			}
 			else if(userInput[0].wpad->btns_d & (WPAD_BUTTON_2 | WPAD_CLASSIC_BUTTON_Y) || userInput[0].pad.btns_d & PAD_TRIGGER_L)
 			{
@@ -612,7 +744,10 @@ static void *GuiThread (void *arg)
 					newMenu--;
 				if(newMenu < MENU_BROWSE_VIDEOS)
 					newMenu = MENU_SETTINGS;
-				ChangeMenu(newMenu);
+				
+				// GC controller can crash if screensaver is active.
+				if(screensaverThreadHalt != 0)
+					ChangeMenu(newMenu);
 			}
 		}
 
@@ -640,7 +775,7 @@ static void *GuiThread (void *arg)
 
 			if(diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.screensaverDelay-60))
 				ResumeScreensaverThread();
-			if(WiiSettings.screenDim == 1) {
+			if(WiiSettings.screenDim == 1 && !dontdim) {
 				if(diff_sec(ssTimer, gettime()) > (u32)(WiiSettings.screensaverDelay-60+4)) {
 					*HW_VIDIM |= 1 << 7; // Enable dimming
 					//*HW_VIDIM |= 1 << 5; //luma = 2
@@ -657,6 +792,7 @@ static void *GuiThread (void *arg)
 
 		if(userInput[0].wpad->btns_d & (WPAD_BUTTON_HOME | WPAD_CLASSIC_BUTTON_HOME) || userInput[0].pad.btns_d & PAD_BUTTON_START)
 			ExitRequested = true; // exit program
+			//ResumeScreensaverThread(); // for quicker testing
 
 		if(ExitRequested)
 		{
@@ -1060,7 +1196,8 @@ WindowPrompt(const char *title, wchar_t *msg, const char *btn1Label, const char 
 
 		if(btn1.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_A)
 			choice = 1;
-		else if(btn2.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B)
+		else if(btn2.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
+				userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Because Wii U Pro Controller...
 			choice = 0;
 
 		if(guiShutdown)
@@ -1470,7 +1607,8 @@ bool OnScreenKeyboard(char *var, u32 maxlen)
 
 		if(okBtn.GetState() == STATE_CLICKED)
 			save = 1;
-		else if(cancelBtn.GetState() == STATE_CLICKED)
+		else if(cancelBtn.GetState() == STATE_CLICKED || userInput[0].pad.btns_d == PAD_BUTTON_B ||
+				userInput[0].wpad->btns_d & WPAD_CLASSIC_BUTTON_B) // Wii U Pro Controller
 			save = 0;
 	}
 
@@ -1644,12 +1782,28 @@ SettingWindow(const char *title, GuiWindow *w)
  * THIS MUST NOT BE REMOVED OR DISABLED IN ANY DERIVATIVE WORK
  ***************************************************************************/
 
-//int debug_mem = 0;
+char name[] = "Diego A.";
 
 static void CreditsWindow()
 {
 	int i = 0;
 	int y = 76;
+	
+	//static vu32* const _vigReg = (vu32*)0xCC002030;
+	//static vu32* const _rateReg = (vu32*)0xCC006C00;
+#if 0
+	*_rateReg &= ~(1 << 12); //Disable scaling
+	*_rateReg &= ~(1 << 0);
+	*_rateReg &= ~(1 << 1);
+	*_rateReg &= ~(1 << 2);
+	*_rateReg &= ~(1 << 3);
+	*_rateReg &= ~(1 << 4);
+	*_rateReg &= ~(1 << 5);
+	*_rateReg &= ~(1 << 6);
+	*_rateReg &= ~(1 << 7);
+	*_rateReg &= ~(1 << 8);
+//	*_rateReg |= 1 << 12;
+#endif
 
 	GuiWindow *oldWindow = mainWindow;
 	GuiWindow creditsWindow(screenwidth, screenheight);
@@ -1673,6 +1827,7 @@ static void CreditsWindow()
 	swprintf(appVersion, 20, L"%s %s", gettext("Version"), APPVERSION);
 
 	char iosVersion[30];
+	//sprintf(iosVersion, "0x%4X, 0x%X", *_vigReg, *_rateReg);
 	sprintf(iosVersion, "IOS: %d", IOS_GetVersion());
 
 	txt[i] = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
@@ -1691,7 +1846,7 @@ static void CreditsWindow()
 	txt[i] = new GuiText("Programming", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 	txt[i]->SetPosition(-15,y); i++;
-	txt[i] = new GuiText("Diego A.", 20, (GXColor){255, 255, 255, 255});
+	txt[i] = new GuiText(name, 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
 
@@ -1849,6 +2004,9 @@ void EnableVideoImg()
 	if(!videoImg)
 		return;
 
+	// Tiled rendering messes up screenshot
+	//bgImg->SetAlpha(WiiSettings.tiledRender ? 255 : 200);
+
 	videoImg->SetScaleY(screenheight/(float)vmode->efbHeight);
 	videoImg->SetVisible(true);
 }
@@ -1865,7 +2023,7 @@ bool VideoImgVisible()
  * MenuBrowse
  ***************************************************************************/
 
-static GuiImage *thumbImg;
+//static GuiImage *thumbImg;
 static BROWSERENTRY *thumbIndex = NULL;
 static bool thumbLoad = false;
 
@@ -1879,7 +2037,7 @@ bool secure_type = false; // Make sure xml info doesn't stick with other types
 char year_txt[32] = { 0 };
 char desc_txt[1024] = { 0 };
 
-unsigned get_inf;
+unsigned get_inf = time(0);
 //int get_num = 0;
 
 static void *ThumbThread (void *arg)
@@ -2013,11 +2171,21 @@ static void *ThumbThread (void *arg)
 						if (thumbImg->GetWidth() == 256)
 							thumbImg->SetScale(256, screenheight-100);
 						else
-							thumbImg->SetScale(185, screenheight-100);
+							thumbImg->SetScale(188, screenheight-100);
 						// Should work but because of the 768px difference I increase it depending on size.
 						//thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)192/thumbImg->GetWidth() : (float)138/thumbImg->GetWidth());
 						if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)(192+38)/thumbImg->GetWidth() : (float)(138+29)/thumbImg->GetWidth());
+							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)(192+38)/thumbImg->GetWidth() :
+							(float)(141+30)/thumbImg->GetWidth()); // (float)(141+30) for 141
+						
+						//printf("get that width: %.4f", thumbImg->GetScaleX());
+						
+					/*	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+							//thumbImg->SetScaleX(screenwidth/(float)vmode->fbWidth);
+							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? .89f : .485f); // 16:9 correct
+							//thumbImg->SetScaleX(.75f);
+							//printf("get that width: %.3f", thumbImg->GetScaleX());
+						*/
 						thumbImg->SetVisible(true);
 						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
 							fileInfo->SetText(WiiSettings.descTxt);
@@ -2398,13 +2566,13 @@ static void MenuBrowse(int menu)
 		thumbImg = new GuiImage;
 		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 		thumbImg->SetVisible(false);
-		thumbImg->SetPosition(-30, 95);
+		thumbImg->SetPosition(-33, 91);
 		mainWindow->Append(thumbImg);
 		
 		// PLX desc/year
 		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
 		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
-		fileYear->SetPosition(-26, -108);
+		fileYear->SetPosition(-26, -107);
 		
 		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
@@ -2416,13 +2584,13 @@ static void MenuBrowse(int menu)
 		thumbImg = new GuiImage;
 		thumbImg->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
 		thumbImg->SetVisible(false);
-		thumbImg->SetPosition(-30, 95);
+		thumbImg->SetPosition(-33, 91);
 		mainWindow->Append(thumbImg);
 		
 		fileYear = new GuiText(NULL, 16, (GXColor){200, 200, 200, 255});
 		fileYear->SetAlignment(ALIGN_RIGHT, ALIGN_BOTTOM);
 	//	fileYear->SetVisible(false);
-		fileYear->SetPosition(-26, -108);
+		fileYear->SetPosition(-26, -107);
 		// description
 		fileInfo = new GuiText(NULL, 14, (GXColor){255, 255, 255, 255});
 		fileInfo->SetAlignment(ALIGN_LEFT, ALIGN_BOTTOM);
@@ -2438,6 +2606,15 @@ static void MenuBrowse(int menu)
 		if(!nowPlaying->IsVisible())
 		{
 			StripExt(loadedFileDisplay);
+			
+			/*if(loadedFileDisplay[57] != 0) {
+				loadedFileDisplay[58] = 0x00;
+				loadedFileDisplay[57] = 0x20;
+				loadedFileDisplay[56] = 0x2E;
+				loadedFileDisplay[55] = 0x2E;
+				loadedFileDisplay[54] = 0x2E;
+			}*/
+			
 			nowPlaying->SetText(loadedFileDisplay);
 			nowPlaying->SetVisible(true);
 		}
@@ -3267,12 +3444,13 @@ static void MenuSettingsGlobal()
 	int i = 0;
 	bool firstRun = true;
 	OptionList options;
+	char nulo[1] = {'\0'};
 
 	sprintf(options.name[i++], "Language");
 	sprintf(options.name[i++], "Volume");
 	sprintf(options.name[i++], "File Extensions");
 	sprintf(options.name[i++], "Exit Action");
-	sprintf(options.name[i++], "Wiimote Rumble");
+	sprintf(options.name[i++], "Wii Remote Rumble");
 	sprintf(options.name[i++], "Sleep Timer");
 	sprintf(options.name[i++], "Screensaver Delay");
 	sprintf(options.name[i++], "Inactivity Shutdown");
@@ -3283,10 +3461,12 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
 	sprintf(options.name[i++], "Double Strike");
+	
 	if(VIDEO_HaveComponentCable())
 		sprintf(options.name[i++], "Force 576p");
 	else
-		sprintf(options.name[i++], '\0');
+		sprintf(options.name[i++], nulo);
+	sprintf(options.name[i++], "Enhanced Resolution");
 
 	options.length = i;
 
@@ -3448,6 +3628,18 @@ static void MenuSettingsGlobal()
 					else
 						SetVIscaleback();
 				break;
+			case 16:
+				//WiiSettings.tiledRender ^= 1;
+				WiiSettings.tiledRender++;
+				if (WiiSettings.tiledRender > 2)
+					WiiSettings.tiledRender = 0;
+				if (WiiSettings.tiledRender == 1)
+					wiiSetTiledVar();
+				else if (WiiSettings.tiledRender == 2)
+					wiiSetTiledAuto();
+				else if (!WiiSettings.tiledRender)
+					wiiSetTiledOFF();
+				break;
 		}
 
 		if(ret >= 0 || firstRun)
@@ -3521,6 +3713,16 @@ static void MenuSettingsGlobal()
 			sprintf(options.value[13], "%s", WiiSettings.screenDim ? "On" : "Off");
 			sprintf(options.value[14], "%s", WiiSettings.doubleStrike ? "On" : "Off");
 			sprintf(options.value[15], "%s", WiiSettings.force576p ? "On" : "Off");
+			//sprintf(options.value[16], "%s", WiiSettings.tiledRender ? "On" : "Off");
+			switch(WiiSettings.tiledRender)
+			{
+				case 0:
+					sprintf (options.value[16], "Off"); break;
+				case 1:
+					sprintf (options.value[16], "On"); break;
+				case 2:
+					sprintf (options.value[16], "Auto"); break;
+			}
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -3880,6 +4082,7 @@ static void MenuSettingsVideos()
 	int i = 0;
 	bool firstRun = true;
 	OptionList options;
+	char nulo[1] = {'\0'};
 	
 	sprintf(options.name[i++], "Screen Zoom");
 	sprintf(options.name[i++], "Screen Position");
@@ -3894,7 +4097,7 @@ static void MenuSettingsVideos()
 	sprintf(options.name[i++], "Skip Forward");
 	sprintf(options.name[i++], "Videos Folder");
     if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-       sprintf(options.name[i++], '\0');
+       sprintf(options.name[i++], nulo);
     else
         sprintf(options.name[i++], "Force Fullscreen in 4:3");
 	sprintf(options.name[i++], "Volume Normalizer");
@@ -4154,6 +4357,7 @@ static void MenuSettingsMusic()
 	OptionList options;
 
 	sprintf(options.name[i++], "Play Order");
+	sprintf(options.name[i++], "Screensaver Art");
 	sprintf(options.name[i++], "Music Folder");
 
 	options.length = i;
@@ -4212,6 +4416,11 @@ static void MenuSettingsMusic()
 					WiiSettings.playOrder = 0;
 				break;
 			case 1:
+				WiiSettings.screensaverArt++;
+				if(WiiSettings.screensaverArt > ART_SIDE)
+					WiiSettings.screensaverArt = 0;
+				break;
+			case 2:
 				OnScreenKeyboard(WiiSettings.musicFolder, MAXPATHLEN);
 				CleanupPath(WiiSettings.musicFolder);
 				break;
@@ -4229,7 +4438,13 @@ static void MenuSettingsMusic()
 				case PLAY_LOOP:			sprintf(options.value[0], "Loop"); break;
 				case PLAY_THROUGH:		sprintf(options.value[0], "Through"); break;
 			}
-			snprintf(options.value[1], 60, "%s", WiiSettings.musicFolder);
+			switch(WiiSettings.screensaverArt)
+			{
+				case ART_NONE:		sprintf(options.value[1], "Off"); break;
+				case ART_TOP:		sprintf(options.value[1], "Top"); break;
+				case ART_SIDE:		sprintf(options.value[1], "Side"); break;
+			}
+			snprintf(options.value[2], 60, "%s", WiiSettings.musicFolder);
 
 			optionBrowser.TriggerUpdate();
 		}
@@ -5762,6 +5977,11 @@ static void AudioNowPlayingCallback(void *ptr)
 
 			if(strlen(title) > 0)
 				audiobarNowPlaying[1]->SetText(title);
+			
+			/*if(strlen(title) > 0)
+				adjustSS = strlen(title);
+			else
+				adjustSS = 0;*/
 		}
 		if(!title || title[0] == 0)
 		{
@@ -5895,6 +6115,7 @@ static void SetupGui()
 	btnBottom = new GuiImageData(button_bottom_png);
 	btnBottomOver = new GuiImageData(button_bottom_over_png);
 	arrowRightSmall = new GuiImageData(arrow_right_small_png);
+	// When using 854x screenwidth, this becomes garbled.
 	disabled = new GuiImage(screenwidth,screenheight,(GXColor){0, 0, 0, 100});
 	actionbarLeft = new GuiImageData(actionbar_left_png);	
 	actionbarMid = new GuiImageData(actionbar_mid_png);

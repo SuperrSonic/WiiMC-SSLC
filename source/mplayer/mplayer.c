@@ -150,6 +150,15 @@
 // cause a/v desync randomly. Likely related to device mounting/reading.
 bool debug_30fps;
 
+int http_hack = 1;
+int seek_2_sec = 0;
+bool http_block = true;
+
+bool delay_load = true;
+
+//Improve pacing/sync issues in 30fps videos
+bool halve_fps = true;
+
 extern int prev_dxs, prev_dys;
 extern int stop_cache_thread;
 
@@ -239,7 +248,9 @@ static int total_frame_cnt;
 static int drop_frame_cnt; // total number of dropped frames
 int benchmark;
 
-int find_prob;
+float find_prob;
+bool wiiTiledRender;
+bool wiiTiledAuto;
 //int ext_lang = 0;
 
 // options:
@@ -278,7 +289,7 @@ static m_time_size_t end_at = { .type = END_AT_NONE, .pos = 0 };
 // A/V sync:
 int autosync;        // 30 might be a good default value.
 
-float update_audio_rate = 1.0;
+//float update_audio_rate = 1.0;
 
 bool new_load = true;
 
@@ -1444,14 +1455,14 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
 #endif
     return result;
 }
-
+/*
 static int adjust_samplerate(sh_audio_t *sh_audio, ao_data_t *ao_data)
 {
 	int result;
 	result = update_srate(sh_audio, sh_audio->samplerate * update_audio_rate,
                                 &ao_data->samplerate);
 	return result;
-}
+}*/
 
 typedef struct mp_osd_msg mp_osd_msg_t;
 struct mp_osd_msg {
@@ -1816,7 +1827,7 @@ static double written_audio_pts(sh_audio_t *sh_audio, demux_stream_t *d_audio)
     // first calculate the end pts of audio that has been output by decoder
     double a_pts = calc_a_pts(sh_audio, d_audio);
     // Now a_pts hopefully holds the pts for end of audio from decoder.
-    // Substract data in buffers between decoder and audio out.
+    // Subtract data in buffers between decoder and audio out.
 
     // Decoded but not filtered
     a_pts -= sh_audio->a_buffer_len / (double)sh_audio->o_bps;
@@ -2274,7 +2285,7 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 		
 		//test pts auto, on a seek it should also reset to 0
 		//default_max_pts_correction = 0;
-		if (debug_30fps && !dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
+	/*	if (debug_30fps && !dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31) {
 			if(pts_counter > 3600) { // ~2 minutes
 				default_max_pts_correction = -1;
 				pts_counter = 0;
@@ -2282,7 +2293,20 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 				default_max_pts_correction = 0;
 			}
 		} else
-			default_max_pts_correction = -1;
+			default_max_pts_correction = -1; */
+		
+		//if (!dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31 && halve_fps) {
+		if (mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31 && halve_fps) {
+			//after checking if it's 30fps switch fps
+				static vu16* const _vigReg = (vu16*)0xCC002030;
+				if(*_vigReg == 0x120E || *_vigReg == 0x1107) {
+					*_vigReg = 0x1001; //0x1001(30fps), 0x120E(480p60fps) 0x1107(480i60fps)
+					halve_fps = false;
+				}
+		} // else if (mpctx->sh_video->fps !> 28 && mpctx->sh_video->fps !< 31 && !halve_fps && ) {
+		/*	static vu16* const _vigReg = (vu16*)0xCC002030;
+			*_vigReg = 0x120E;
+		}*/
 
         if (autosync)
             /*
@@ -2309,11 +2333,21 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
             // not a good idea to do A-V correction with with bogus values
             if (a_pts == MP_NOPTS_VALUE || v_pts == MP_NOPTS_VALUE)
                 AV_delay = 0;
+			//find_prob = AV_delay;
          //   if (AV_delay > 0.5 && drop_frame_cnt > 50 && drop_message == 0) {
           //      ++drop_message;
            //     mp_msg(MSGT_AVSYNC, MSGL_WARN, MSGTR_SystemTooSlow);
           //  }
-            if (AV_delay > 0.5 && correct_pts && mpctx->delay < -audio_delay - 30) {
+      /*      if (AV_delay > 0.5 && correct_pts && mpctx->delay < -audio_delay - 30) {
+			//Let's talk about this here, it solves an issue regarding broken files.
+			//Take that in and also the fact that it stops video randomly in files with subtitles
+			//oh this has to go. -nocorrect-pts is too buggy.
+			
+			mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+			cmd->id=MP_CMD_PAUSE;
+			cmd->name=strdup("pause");
+			mp_input_queue_cmd(cmd);
+			
 				// This case means that we are supposed to stop video for a long
 				// time, even though audio is already ahead.
 				// This happens e.g. when initial audio pts is 10000, video
@@ -2321,11 +2355,11 @@ static void adjust_sync_and_print_status(int between_frames, float timing_error)
 				// This is common in ogg streams.
 				// Only check for -correct-pts since this case does not cause
 				// issues with -nocorrect-pts.
-				mp_msg(MSGT_AVSYNC, MSGL_WARN, "Timing looks severely broken, resetting\n");
-				AV_delay = 0;
-				timing_error = 0;
-				mpctx->delay = -audio_delay;
-			}
+			//	mp_msg(MSGT_AVSYNC, MSGL_WARN, "Timing looks severely broken, resetting\n");
+			//	AV_delay = 0;
+			//	timing_error = 0;
+			//	mpctx->delay = -audio_delay;
+			}*/
             if (autosync)
                 x = AV_delay * 0.1f;
             else
@@ -2698,7 +2732,12 @@ static double update_video(int *blit_frame)
     //--------------------  Decode a frame: -----------------------
     double frame_time;
     *blit_frame = 0; // Don't blit if we hit EOF
-    if (!correct_pts) {
+	//Sigh, with correct-pts video will randomly halt and desync for some time,
+	//without correct-pts subtitles and the time counter will jitter on some videos.
+	//My solution is to use correct-pts but enable the code below.
+	//This fixes the jitters and I get no more video freezes.
+	//PROBLEM: Variable FPS plays at 60fps, need exception.
+    if (correct_pts) {
         unsigned char *start = NULL;
         void *decoded_frame  = NULL;
         int drop_frame       = 0;
@@ -3148,6 +3187,7 @@ m_config_set_option(mconfig,"subfont-text-scale","1");
 //m_config_set_option(mconfig,"autosync","30"); // autosync seems to have no effect
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 //m_config_set_option(mconfig,"fps","29.9699993133544");
+//m_config_set_option(mconfig,"nocorrect-pts","1"); // Check fps drops when playing subs. Seems to work but buggy.
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
@@ -4049,6 +4089,13 @@ stream_cache_min_percent=0.2;
     }
 
 #ifdef GEKKO
+  if(wiiTiledAuto && mpctx->sh_video) {
+   if(mpctx->sh_video->disp_w > 670)
+     wiiTiledRender = true;
+   else if(mpctx->sh_video)
+     wiiTiledRender = false;
+  }
+
 /*
   // check if video has a higher resolution than the Wii can handle
   if(mpctx->sh_video && (mpctx->sh_video->disp_w > MAX_WIDTH || mpctx->sh_video->disp_h > MAX_HEIGHT))
@@ -4257,6 +4304,12 @@ mpctx->eof=0;
 
 GetRelativeTime();
 total_time_usage_start=GetTimer();
+
+// Delay here, fixes slowdown when loading video from slow SD cards
+	if(delay_load && !strncmp(fileplaying,"sd",2)) {
+		sleep(2);
+		delay_load = false;
+	}
 #endif
 
         while (!mpctx->eof) {
@@ -4374,7 +4427,6 @@ total_time_usage_start=GetTimer();
                 
 
 //====================== FLIP PAGE (VIDEO BLT): =========================
-
                 if (!edl_needs_reset) {
                     current_module = "flip_page";
                     if (!frame_time_remaining && blit_frame) {
@@ -4385,9 +4437,9 @@ total_time_usage_start=GetTimer();
 							//mpctx->video_out->flip_page();
                         if (vo_config_count) {
 							mpctx->video_out->flip_page();
-							// Add 60fps duplication setting.
-							if (dup_frames && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31)
-								mpctx->video_out->flip_page();
+							// 60fps duplication setting.
+							//if (dup_frames == 1 && mpctx->sh_video->fps > 28 && mpctx->sh_video->fps < 31)
+								//mpctx->video_out->flip_page();
 						}
                         mpctx->num_buffered_frames--;
 
@@ -4537,6 +4589,38 @@ total_time_usage_start=GetTimer();
 			if (thp_vid)
 				mpctx->loop_times = -1;
 
+			if(mpctx->sh_video && strncmp(filename, "http:", 5) == 0 && mpctx->eof == 1) {
+				//mpctx->eof = 0;
+				//int seek_2_sec = 0;
+				//seek_to_sec = demuxer_get_current_time(mpctx->demuxer);
+				//seek_to_sec = load_restore_point(fileplaying, partitionlabelplaying) - 8;
+				//if(seek_to_sec < 0 || seek_to_sec+120 > demuxer_get_time_length(mpctx->demuxer))
+					//seek_to_sec = 0; //enable eof here?
+				
+				//This workaround allows videos to reconnect after idling for too long.
+				//But it also might cause the video to skip forward by some 20 secs.
+				
+				if(http_hack) {
+					seek_2_sec = demuxer_get_time_length(mpctx->demuxer);
+					http_hack = 0;
+				}
+				if(seek_2_sec > demuxer_get_current_time(mpctx->demuxer) && !http_block) {
+					mpctx->eof = 0;
+					//mpctx->stream->eof = 0;
+					wiiSeek(2, 0); // spams too much so it moves too far.
+					//wiiSeek(-2, 0);
+					//++find_prob;
+					//wiiSeek((int)demuxer_get_current_time(mpctx->demuxer), 2);
+				} else
+					mpctx->eof = 1;
+				
+				//if(seek_2_sec < 0 || seek_2_sec+120 > demuxer_get_time_length(mpctx->demuxer))
+					//mpctx->eof = 1; //enable eof here?
+				//Here's another more convoluted way,
+				//use a variable once per video to record the total time of video.
+				//reset it after video is eof.
+			}
+
             /* Looping. */
             if (mpctx->eof == 1 && mpctx->loop_times >= 0) {
                 mp_msg(MSGT_CPLAYER, MSGL_V, "loop_times = %d, eof = %d\n", mpctx->loop_times, mpctx->eof);
@@ -4645,6 +4729,18 @@ playing_file=false;
 new_load = true; // hack for avi seek
 thp_vid=false;
 monospaced=0; // Go back to original font
+static vu32* const _vigReg = (vu32*)0xCC002030;
+if(*_vigReg == 0x100101AE)
+	*_vigReg = 0x110701AE; //0x1001(30fps) go back to 480i60
+else if(*_vigReg == 0x10010001)
+	*_vigReg = 0x120E0001; //0x1001(30fps) go back to 480p60
+halve_fps=true;
+http_hack = 1;
+// This way it only affects the video when it ends
+// and avoids a flicker when loading a new file.
+if(vmode->fbWidth == 720)
+  SetMplTiledOff();
+
 //if (controlledbygui == 0) // If using 576p it causes the TV to display info each time a video has ended.
   //   VIDEO_SetBlack(TRUE);
 DisableVideoImg();
@@ -4952,8 +5048,42 @@ void PauseAndGotoGUI()
 {
 	SetLastDVDMotorTime();
 
+	//Set FPS back if altered
+	if(!halve_fps) {
+		static vu32* const _vigReg = (vu32*)0xCC002030;
+		if(*_vigReg == 0x100101AE)
+			*_vigReg = 0x110701AE; //0x1001(30fps) go back to 480i60
+		else if(*_vigReg == 0x10010001)
+			*_vigReg = 0x120E0001; //0x1001(30fps) go back to 480p60
+		halve_fps = true;
+	/*	if(*_vigReg == 0x1001) {
+			*_vigReg = 0x120E;
+			halve_fps = true;
+		}*/
+	}
+#if 1
+	//vmode->fbWidth = 640;
+	//VIDEO_Configure(vmode);
+	//VIDEO_Flush();
+	// 720x480 tile rendering
+	/*
+		GX_SetScissor(0,0,720,vmode->efbHeight);
+		GX_SetScissorBoxOffset(0, 0);
+		//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
+		GX_SetDispCopySrc(0, 0, 640, vmode->efbHeight);
+		GX_SetDispCopyDst(vmode->fbWidth,vmode->xfbHeight);
+		//GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+		*/
+		//if(wiiTiledAuto)
+		//	wiiTiledRender = false;
+		SetMplTiledOff();
+#endif
+
 	// Reset video loop mode, which is now ON during video or OFF if in GUI
 	mpctx->loop_times = -1;
+	
+	//HTTP hack needs to be off in GUI mode
+	http_block = true;
 
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->pause(); // pause audio, keep data if possible
@@ -4991,6 +5121,9 @@ void PauseAndGotoGUI()
 		StartDVDMotor();
 	else if(strncmp(filename, "usb", 3) == 0 || (dvd_device && strncmp(dvd_device, "usb", 3) == 0))
 		WakeupUSB();
+
+	//HTTP hack restore
+	http_block = false;
 
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->resume(); // resume audio
@@ -5118,6 +5251,22 @@ void wiiLoadFile(char *_filename, char *_partitionlabel)
 		free(filename);
 	filename = strdup(_filename);
 	
+}
+
+void wiiSetTiledVar()
+{
+	wiiTiledRender = true;
+}
+
+void wiiSetTiledAuto()
+{
+	wiiTiledAuto = true;
+}
+
+void wiiSetTiledOFF()
+{
+	wiiTiledRender = false;
+	wiiTiledAuto = false;
 }
 
 void wiiDash()
@@ -5309,12 +5458,84 @@ void wiiGetDroppedFrames(char * buf)
 		//return;
 // find_prob
 	sprintf(buf, "Dropped Frames: %2d",
+	//sprintf(buf, "AV:%.2f, MP:%2.2f, D:%.1f",
 		drop_frame_cnt);
+	//	find_prob, mpctx->delay, -audio_delay - 30);
+
+        //static vu16* const _vigReg = (vu16*)0xCC002030;
+		//sprintf(buf, "0x%X", *_vigReg);
 
     //mpctx->demuxer->file_format
 	//sprintf(buf, "%9.16f",
 		//mpctx->sh_video->fps);
 }
+/*
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+
+void retrieve_album_art(const char *path, const char *album_art_file) {
+    int i, ret = 0;
+
+	//avformat_network_init();
+    av_register_all();
+
+    if (!filename) {
+        printf("Path is NULL\n");
+        return;
+    }
+
+	//attached_pic
+	
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
+	//warning mixed decl
+
+    printf("Opening %s\n", path);
+
+    // open the specified path
+    if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
+        printf("avformat_open_input() failed: %s", filename);
+        goto fail;
+    }
+
+    // read the format headers
+    if (pFormatCtx->iformat->read_header(pFormatCtx) < 0) {
+        printf("could not read the format header\n");
+        goto fail;
+    }
+
+    // find the first attached picture, if available
+    for (i = 0; i < pFormatCtx->nb_streams; i++)
+        if (pFormatCtx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) {
+            AVPacket pkt = pFormatCtx->streams[i]->attached_pic;
+            FILE* album_art = fopen(album_art_file, "wb");
+            ret = fwrite(pkt.data, pkt.size, 1, album_art);
+            fclose(album_art);
+            av_free_packet(&pkt);
+            break;
+        }
+
+    if (ret) {
+        printf("Wrote album art to %s\n", album_art_file);
+    }
+
+    fail:
+        av_free(pFormatCtx);
+        // this line crashes for some reason...
+        //avformat_free_context(pFormatCtx);
+} */
+/*
+int main() {
+    avformat_network_init();
+    av_register_all();
+
+    const char *path = "some url";
+    const char *album_art_file = "some path";
+
+    retrieve_album_art(path, album_art_file);
+
+    return 0;
+}
+*/
 
 void wiiGetMemory(char * buf)
 {
@@ -5555,6 +5776,21 @@ void wiiSetVolume(int vol)
 		return;
 
 	mixer_setvolume(&mpctx->mixer, vol, vol);
+	
+#if 0
+	// Wii U volume using audio filter
+	static vu16* const _vWii = (vu16*)0xD8005A0;
+	//if (*_vWii == 0xCAFE) {
+	if (*_vWii != 0xCAFE) { //for dolphin testing
+	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
+	cmd->id=MP_CMD_AF_SWITCH;
+	cmd->name=strdup("af_switch");
+	mp_input_queue_cmd(cmd);
+	char wiiu[16];
+	sprintf(wiiu, "volume=%d", vol<1?-99:vol/5); //control is very off
+	cmd->args[0].v.s = strdup(wiiu);
+	}
+#endif
 }
 
 void wiiSetProperty(int command, float value)

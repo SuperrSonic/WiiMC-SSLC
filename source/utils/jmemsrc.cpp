@@ -351,8 +351,8 @@ static u8 * RawTo4x4RGBA(u8 *src, u32 width, u32 height, u32 rowsize, int * dstW
 
 	int padWidth = width;
 	int padHeight = height;
-	if(padWidth%4) padWidth += (4-padWidth%4);
-	if(padHeight%4) padHeight += (4-padHeight%4);
+	if(padWidth%4) padWidth += (0-padWidth%4);
+	if(padHeight%4) padHeight += (0-padHeight%4);
 
 	int len = (padWidth * padHeight) << 2;
 	if(len%32) len += (32-len%32);
@@ -431,9 +431,28 @@ u8 * DecodeJPEG(const u8 *src, u32 len, int *width, int *height, u8 *dstPtr)
 	scale2 = (float)MAX_TEX_HEIGHT / cinfo.output_height;
 	if(scale2 < scale)
 		scale = scale2;
+	scale = 1; // this prevents above making 185x covers scale to 480x
 	// guarantee that one of width or height ends up at max allowed value
 	output_width = scale * cinfo.output_width;
 	output_height = scale * cinfo.output_height;
+	
+	// hack for 185, this scales images that were 185 to 188
+	// otherwise they get padded with alpha, causing the edges to get marked.
+	if(output_width == 185)
+		output_width = 188;
+#if 0
+	// This code resamples the image to avoid
+	// the added alpha padding from creating
+	// an artifact on the edges, causes blurry image.
+	int padWidth = output_width;
+	int padHeight = output_height;
+	if(padWidth%4) padWidth += (4-padWidth%4);
+	if(padHeight%4) padHeight += (4-padHeight%4);
+	if(padWidth != output_width)
+		output_width = padWidth;
+	if(padHeight != output_height)
+		output_height = padHeight;
+#endif
 
 	stuffer.stride = output_width * cinfo.output_components;
 

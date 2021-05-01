@@ -416,11 +416,30 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
 		xRatio = (int)((width<<16)/newWidth)+1;
 		yRatio = (int)((height<<16)/newHeight)+1;
 	}
+	
+	//185->188 no filter
+	/*if(width == 185 && height == 185)
+	{
+		float ratio = (float)width/(float)height;
+		
+		if(ratio > (float)188/(float)188)
+		{
+			newWidth = 188;
+			newHeight = 188/ratio;
+		}
+		else
+		{
+			newWidth = 188*ratio;
+			newHeight = 188;
+		}
+		xRatio = (int)((width<<16)/newWidth)+1;
+		yRatio = (int)((height<<16)/newHeight)+1;
+	}*/
 
 	int padWidth = newWidth;
 	int padHeight = newHeight;
-	if(padWidth%4) padWidth += (4-padWidth%4);
-	if(padHeight%4) padHeight += (4-padHeight%4);
+	if(padWidth%4) padWidth += (0-padWidth%4); //clipped avoids issues with padding
+	if(padHeight%4) padHeight += (0-padHeight%4);
 
 	int len = (padWidth * padHeight) << 2;
 	if(len%32) len += (32-len%32);
@@ -594,7 +613,7 @@ int PNGU_EncodeFromRGB (IMGCTX ctx, u32 width, u32 height, void *buffer, u32 str
 	png_uint_32 rowbytes;
 	u32 y;
 
-	// Erase from the context any readed info
+	// Erase from the context any read info
 	pngu_free_info (ctx);
 	ctx->propRead = 0;
 

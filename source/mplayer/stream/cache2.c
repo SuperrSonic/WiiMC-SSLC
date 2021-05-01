@@ -290,7 +290,7 @@ static int cache_fill(cache_vars_t *s)
 				printf("retry read (%f): %i -> %s \n",cache_fill_status,s->stream->error,fileplaying);
 				
 				if(s->stream->error>3 && strncmp(fileplaying,"smb",3)==0)//only reset network in samba, maybe we can check internet streams later, samba can reconnect
-					CheckMplayerNetwork();	
+					CheckMplayerNetwork();
 		  }
   	    }
 	}
