@@ -22,10 +22,10 @@ GuiFileBrowser::GuiFileBrowser(int w, int s)
 	focus = 0; // allow focus
 
 	trigA = new GuiTrigger;
-	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
+	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 
 	trigHeldA = new GuiTrigger;
-	trigHeldA->SetHeldTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
+	trigHeldA->SetHeldTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 
 	bgBrowseEntry = new GuiImageData(bg_entry_png);
 	bgBrowseEntryOver = new GuiImageData(bg_entry_over_png);
@@ -220,13 +220,11 @@ void GuiFileBrowser::MakeEntry(int i)
 
 	fileListBg[i] = new GuiImage(bgBrowseEntry);
 	fileListBg[i]->SetTile(width/16);
-	//fileListBg[i]->SetPosition(-45, 0);
-	fileListBg[i]->SetPosition(-52, 0);
+	fileListBg[i]->SetPosition(screenwidth > 640 ? -46 : -52, 0);
 
 	fileListBgOver[i] = new GuiImage(bgBrowseEntryOver);
 	fileListBgOver[i]->SetTile(width/16);
-	//fileListBgOver[i]->SetPosition(-45, -2);
-	fileListBgOver[i]->SetPosition(-52, -2);
+	fileListBgOver[i]->SetPosition(screenwidth > 640 ? -46 : -52, -2);
 
 	fileListIcon[i] = new GuiImage;
 	fileListIcon[i]->SetPosition(0, -2);

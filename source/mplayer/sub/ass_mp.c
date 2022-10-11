@@ -84,13 +84,14 @@ static void init_style(ASS_Style *style, const char *name, double playres)
 	style->BorderStyle = 1;
 	style->Alignment = 2;
 #ifdef GEKKO
-	style->Outline = 1;
+	style->Outline = 1.7f;
+	style->Shadow = 0;
 #else
 	style->Outline = 2;
 #endif
 	style->MarginL = 10;
 	style->MarginR = 10;
-	style->MarginV = 20;
+	style->MarginV = 30;
 	style->ScaleX = 1.;
 	style->ScaleY = 1.;
 }
@@ -349,11 +350,14 @@ ASS_Library* ass_init(void) {
 }
 
 int ass_force_reload = 0; // flag set if global ass-related settings were changed
+//extern int use_nocorrect;
 
 ASS_Image* ass_mp_render_frame(ASS_Renderer *priv, ASS_Track* track, long long now, int* detect_change) {
 	if (ass_force_reload) {
 #ifdef GEKKO
 		adjust_font_scale(track);
+		// test correct_pts
+		//++use_nocorrect;
 #endif
 		ass_set_margins(priv, ass_top_margin, ass_bottom_margin, 0, 0);
 		ass_set_use_margins(priv, ass_use_margins);

@@ -117,6 +117,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (MSMPEG4V1, msmpeg4v1);
     REGISTER_ENCDEC  (MSMPEG4V2, msmpeg4v2);
     REGISTER_ENCDEC  (MSMPEG4V3, msmpeg4v3);
+	REGISTER_DECODER (OPUS, opus);
     REGISTER_ENCDEC  (PNG, png);
     REGISTER_ENCDEC  (PRORES, prores);
     REGISTER_ENCODER (PRORES_ANATOLIY, prores_anatoliy);
@@ -231,6 +232,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (PCM_S8, pcm_s8);
     REGISTER_DECODER (PCM_S8_PLANAR, pcm_s8_planar);
     REGISTER_ENCDEC  (PCM_S16BE, pcm_s16be);
+    REGISTER_DECODER (PCM_S16BE_PLANAR, pcm_s16be_planar);
     REGISTER_ENCDEC  (PCM_S16LE, pcm_s16le);
     REGISTER_DECODER (PCM_S16LE_PLANAR, pcm_s16le_planar);
     REGISTER_ENCDEC  (PCM_S24BE, pcm_s24be);
@@ -305,6 +307,7 @@ void avcodec_register_all(void)
     REGISTER_ENCDEC  (LIBOPENCORE_AMRNB, libopencore_amrnb);
     REGISTER_DECODER (LIBOPENCORE_AMRWB, libopencore_amrwb);
     REGISTER_ENCDEC  (LIBOPENJPEG, libopenjpeg);
+	REGISTER_DECODER (LIBOPUS, libopus);
     REGISTER_ENCDEC  (LIBSCHROEDINGER, libschroedinger);
     REGISTER_ENCDEC  (LIBSPEEX, libspeex);
     REGISTER_DECODER (LIBSTAGEFRIGHT_H264, libstagefright_h264);
@@ -347,6 +350,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER  (MPEG4VIDEO, mpeg4video);
     REGISTER_PARSER  (MPEGAUDIO, mpegaudio);
     REGISTER_PARSER  (MPEGVIDEO, mpegvideo);
+	REGISTER_PARSER  (OPUS,      opus);
     REGISTER_PARSER  (PNG, png);
     REGISTER_PARSER  (PNM, pnm);
     REGISTER_PARSER  (RV30, rv30);

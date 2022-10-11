@@ -1354,7 +1354,7 @@ void reorder_channel_nch(void *buf,
             src_layout >= AF_CHANNEL_LAYOUT_SOURCE_NUM ||
             dest_layout >= AF_CHANNEL_LAYOUT_SOURCE_NUM ||
             src_layout == dest_layout)
-        return;
+
     if (chnum == 6)
         reorder_channel(buf, channel_layout_mapping_6ch[src_layout],
                         channel_layout_mapping_6ch[dest_layout],

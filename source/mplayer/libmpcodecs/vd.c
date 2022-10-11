@@ -175,6 +175,8 @@ int mpcodecs_config_vo(sh_video_t *sh, int w, int h,
         // user wants postprocess but no pp filter yet:
         sh->vfilter = vf = vf_open_filter(vf, "pp", NULL);
     }
+	//char *vf_arg[] = { "fd", NULL };
+       // sh->vfilter = vf = vf_open_filter(vf, "pp", vf_arg);
     // check if libvo and codec has common outfmt (no conversion):
   csp_again:
 

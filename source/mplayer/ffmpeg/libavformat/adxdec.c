@@ -31,9 +31,24 @@
 #define BLOCK_SIZE    18
 #define BLOCK_SAMPLES 32
 
+//static int chans = 2;
+
 typedef struct ADXDemuxerContext {
     int header_size;
 } ADXDemuxerContext;
+
+static int adx_probe(AVProbeData *p)
+{
+    int offset;
+    if (AV_RB16(p->buf) != 0x8000)
+        return 0;
+    offset = AV_RB16(&p->buf[2]);
+    if (   offset < 8
+        || offset > p->buf_size - 4
+        || memcmp(p->buf + offset - 2, "(c)CRI", 6))
+        return 0;
+    return AVPROBE_SCORE_MAX * 3 / 4;
+}
 
 static int adx_read_packet(AVFormatContext *s, AVPacket *pkt)
 {
@@ -42,22 +57,28 @@ static int adx_read_packet(AVFormatContext *s, AVPacket *pkt)
     int ret, size;
 
     size = BLOCK_SIZE * avctx->channels;
+	
+	//for read_seek
+	//chans = avctx->channels;
 
     pkt->pos = avio_tell(s->pb);
     pkt->stream_index = 0;
 
-    ret = av_get_packet(s->pb, pkt, size);
-    if (ret != size) {
-        av_free_packet(pkt);
-        return ret < 0 ? ret : AVERROR(EIO);
+    ret = av_get_packet(s->pb, pkt, size * 128);
+    if (ret < 0)
+        return ret;
+    if ((ret % size) && ret >= size) {
+        size = ret - (ret % size);
+        av_shrink_packet(pkt, size);
+        pkt->flags &= ~AV_PKT_FLAG_CORRUPT;
+    } else if (ret < size) {
+        return AVERROR(EIO);
+    } else {
+        size = ret;
     }
-    if (AV_RB16(pkt->data) & 0x8000) {
-        av_free_packet(pkt);
-        return AVERROR_EOF;
-    }
-    pkt->size     = size;
-    pkt->duration = 1;
-    pkt->pts      = (pkt->pos - c->header_size) / size;
+	
+    pkt->duration = size / (BLOCK_SIZE * avctx->channels);
+    pkt->pts      = (pkt->pos - c->header_size) / (BLOCK_SIZE * avctx->channels);
 
     return 0;
 }
@@ -95,6 +116,7 @@ static int adx_read_header(AVFormatContext *s)
 
     st->codec->codec_type  = AVMEDIA_TYPE_AUDIO;
     st->codec->codec_id    = s->iformat->raw_codec_id;
+	st->codec->bit_rate    = avctx->sample_rate * avctx->channels * BLOCK_SIZE * 8LL / BLOCK_SAMPLES;
 
     avpriv_set_pts_info(st, 64, BLOCK_SAMPLES, avctx->sample_rate);
 
@@ -104,6 +126,7 @@ static int adx_read_header(AVFormatContext *s)
 AVInputFormat ff_adx_demuxer = {
     .name           = "adx",
     .long_name      = NULL_IF_CONFIG_SMALL("CRI ADX"),
+	.read_probe     = adx_probe,
     .priv_data_size = sizeof(ADXDemuxerContext),
     .read_header    = adx_read_header,
     .read_packet    = adx_read_packet,

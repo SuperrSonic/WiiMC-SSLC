@@ -677,6 +677,50 @@ AVFrame *avcodec_alloc_frame(void){
     return pic;
 }
 
+int ff_get_buffer(AVCodecContext *avctx, AVFrame *frame, int flags)
+{
+    int ret;
+
+    switch (avctx->codec_type) {
+    case AVMEDIA_TYPE_AUDIO:
+        if (!frame->sample_rate)
+            frame->sample_rate    = avctx->sample_rate;
+        if (frame->format < 0)
+            frame->format         = avctx->sample_fmt;
+        if (!frame->channel_layout) {
+            if (avctx->channel_layout) {
+                 if (av_get_channel_layout_nb_channels(avctx->channel_layout) !=
+                     avctx->channels) {
+                     av_log(avctx, AV_LOG_ERROR, "Inconsistent channel "
+                            "configuration.\n");
+                     return AVERROR(EINVAL);
+                 }
+
+                frame->channel_layout = avctx->channel_layout;
+            } else {
+                if (avctx->channels > 6) {
+                    av_log(avctx, AV_LOG_ERROR, "Too many channels: %d.\n",
+                           avctx->channels);
+                    return AVERROR(ENOSYS);
+                }
+
+                frame->channel_layout = av_get_default_channel_layout(avctx->channels);
+                if (!frame->channel_layout)
+                    frame->channel_layout = (1ULL << avctx->channels) - 1;
+            }
+        }
+        break;
+    default: return AVERROR(EINVAL);
+    }
+   // frame->pkt_pts = avctx->internal->pkt ? avctx->internal->pkt->pts : AV_NOPTS_VALUE;
+   // frame->reordered_opaque = avctx->reordered_opaque;
+
+    //ret = avctx->get_buffer2(avctx, frame, flags);
+	ret = 1;
+
+    return ret;
+}
+
 #define MAKE_ACCESSORS(str, name, type, field) \
     type av_##name##_get_##field(const str *s) { return s->field; } \
     void av_##name##_set_##field(str *s, type v) { s->field = v; }
@@ -2005,6 +2049,7 @@ int av_get_exact_bits_per_sample(enum CodecID codec_id)
     case CODEC_ID_PCM_ZORK:
         return 8;
     case CODEC_ID_PCM_S16BE:
+	case CODEC_ID_PCM_S16BE_PLANAR:
     case CODEC_ID_PCM_S16LE:
     case CODEC_ID_PCM_S16LE_PLANAR:
     case CODEC_ID_PCM_U16BE:
@@ -2157,7 +2202,7 @@ int av_get_audio_frame_duration(AVCodecContext *avctx, int frame_bytes)
 			case CODEC_ID_ADPCM_THP:
 			case CODEC_ID_ADPCM_THP_LE:
                 if (avctx->extradata)
-                    return frame_bytes * 14 / (8 * ch);
+                    return frame_bytes * 14LL / (8 * ch);
                 break;
             case CODEC_ID_ADPCM_XA:
                 return (frame_bytes / 128) * 224 / ch;

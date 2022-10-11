@@ -260,6 +260,9 @@ case CODEC_ID_PCM_S24DAUD:
 case CODEC_ID_PCM_ZORK:
     { extern AVCodec ff_pcm_zork_decoder;
       return ff_pcm_zork_decoder.name; }
+case CODEC_ID_PCM_S16BE_PLANAR:
+    { extern AVCodec ff_pcm_s16be_planar_decoder;
+      return ff_pcm_s16be_planar_decoder.name; }
 case CODEC_ID_PCM_S16LE_PLANAR:
     { extern AVCodec ff_pcm_s16le_planar_decoder;
       return ff_pcm_s16le_planar_decoder.name; }
@@ -404,6 +407,13 @@ case CODEC_ID_DTS:
 case CODEC_ID_VORBIS:
     { extern AVCodec ff_vorbis_decoder;
       return ff_vorbis_decoder.name; }
+/* case CODEC_ID_OPUS:
+    { extern AVCodec ff_opus_decoder;
+      return ff_opus_decoder.name; } */
+	  /*
+case CODEC_ID_OPUS:
+    { extern AVCodec ff_libopus_decoder;
+      return ff_libopus_decoder.name; } */
 case CODEC_ID_DVAUDIO:
     return "dvaudio";
 case CODEC_ID_WMAV1:

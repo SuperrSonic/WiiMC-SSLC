@@ -19,19 +19,38 @@ enum {
 enum {
 	ART_NONE = 0,
 	ART_TOP,
-	ART_SIDE
+	ART_SIDE,
+	ART_FULL,
+	ART_FULL_ALT
 };
 
 enum {
-	//LANG_JAPANESE = 0,
-	LANG_ENGLISH = 0,
-	//LANG_GERMAN,
-	//LANG_FRENCH,
+	YGG_NONE = 0, // no site art
+	YGG_TUNEIN, // site thumbs as backup
+	YGG_THUMB, // just thumbs
+	YGG_THUMB_LARGE, // just thumbs larger, usually missing
+	YGG_HI
+};
+
+
+enum {
+	ANISON_TUNEIN_ONLY = 0,
+	ANISON_TUNEIN_ANISON = 1, // 200
+	ANISON_POSTER = 150, //150
+	ANISON_JUST_ANISON = 200, //200
+	ANISON_POSTER_HI = 300 //300
+};
+
+enum {
+	LANG_JAPANESE = 0,
+	LANG_ENGLISH,
+	LANG_GERMAN,
+	LANG_FRENCH,
 	LANG_SPANISH,
-	/*LANG_ITALIAN,
+	LANG_ITALIAN,
 	LANG_DUTCH,
 	LANG_SIMP_CHINESE,
-	LANG_TRAD_CHINESE,*/
+	LANG_TRAD_CHINESE,
 	LANG_KOREAN,
 	/*LANG_ROMANIAN,
 	LANG_ESTONIAN,
@@ -70,7 +89,7 @@ typedef struct _lang {
 } LANG;
 
 //#define LANGUAGE_SIZE 139
-#define LANGUAGE_SIZE 5
+#define LANGUAGE_SIZE 7
 #define CODEPAGE_SIZE 28
 #define MAX_SHARES 9
 
@@ -119,6 +138,9 @@ struct SWiiSettings {
 	int		debug;
 	int 	artwork;
 	char 	artworkFolder[MAXPATHLEN];
+	int 	bannerLimit;
+	char 	bannerFolder[MAXPATHLEN];
+	int 	jpegQuality;
 	int 	night;
 	int		screenDim;
 	int 	doubleStrike;
@@ -130,6 +152,7 @@ struct SWiiSettings {
 	char* 	descTxt;
 	int 	force576p;
 	int 	tiledRender;
+	char 	theme[10];
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount
@@ -155,13 +178,18 @@ struct SWiiSettings {
 	// Music
 	int 	playOrder; // PLAY_SINGLE, PLAY_CONTINUOUS, PLAY_SHUFFLE, PLAY_LOOP, PLAY_THROUGH
 	int 	screensaverArt;
+	int 	nativeLoops; //adx/brstm/ogg
 	char	musicFolder[MAXPATHLEN];
 	// DVD
 	int		dvdMenu;
 	int		dvdDisabled;
+	int 	dvdSyncType;
 	// Online Media
 	int 	onlineCacheFill;
 	char	onlinemediaFolder[MAXPATHLEN];
+	int 	yggdrasilQuality;
+	int 	anisonfmQuality;
+	int 	onlineBanners;
 	// Network
 	SMBSettings smbConf[MAX_SHARES];
 	FTPSettings ftpConf[MAX_SHARES];
@@ -198,8 +226,8 @@ const char validVideoExtensions[][7] =
 
 const char validAudioExtensions[][6] = 
 {
-	"aac", "ac3", "adx", "aif", "aiff", "amr", "ape", "apl", "asf", "bfstm", "brstm",
-	"flac", "m4a", "m4b", "m4p", "mka", "mp2", "mp3", "mpc", "oga", "ogg", "ra", "ram", "rm",
+	"aac", "ac3", "adx", "aif", "aiff", "amr", "ape", "apl", "asf", "bcstm", "bfstm", "brstm",
+	"flac", "m4a", "m4b", "m4p", "mka", "mp2", "mp3", "mpc", "oga", "ogg", "opus", "ra", "ram", "rm",
 	"shn", "wav", "wma", "wv", ""
 };
 

@@ -46,7 +46,7 @@ extern "C" {
 #define TCP_BLOCK_RECV_TIMEOUT 	15000 // 15 secs to receive
 #define TCP_BLOCK_SEND_TIMEOUT 	15000 // 15 secs to send
 #define TCP_BLOCK_SIZE 			2048
-#define HTTP_TIMEOUT 			360000 // 1 hour // 35 secs to get an http response
+#define HTTP_TIMEOUT 			35000 // 35 secs to get an http response
 #define IOS_O_NONBLOCK			0x04
 
 static int _httoi(const char *value)

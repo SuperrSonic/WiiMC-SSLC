@@ -117,6 +117,11 @@ static void cache_flush(cache_vars_t *s)
   s->min_filepos=s->max_filepos=s->read_filepos; // drop cache content :(
 }
 
+extern int getMESS;
+extern int getWeird;
+extern int waitReload;
+extern int cntReconnect;
+
 static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
 {
   int total=0;
@@ -124,6 +129,16 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
   while(size>0 ){
     int pos,newb,len;
 
+	if(getMESS != 0) { //this loop is significant but not all there is to the bug
+		//getWeird = size; //2048
+		return 0;
+	}
+	if(getWeird > 80) { //assume no longer playing audio
+		getWeird = 0;
+		getMESS = 1; //forces 3 loops to exit, allowing mplayer to still work
+	}
+	++getWeird;
+	
   //printf("CACHE2_READ: 0x%X <= 0x%X <= 0x%X  \n",s->min_filepos,s->read_filepos,s->max_filepos);
 
     if(s->read_filepos>=s->max_filepos || s->read_filepos<s->min_filepos){
@@ -167,6 +182,10 @@ static int cache_read(cache_vars_t *s, unsigned char *buf, int size)
     total+=len;
 
   }
+  
+  //reset
+  getWeird = 0;
+  
 #ifndef GEKKO
   cache_fill_status=(s->max_filepos-s->read_filepos)/(s->buffer_size / 100);
 #endif
@@ -447,8 +466,19 @@ void cache_uninit(stream_t *s) {
   {
     cache_do_control(s, -2, NULL);
     stop_cache_thread = 1;
-    while(!CacheThreadSuspended())
+    while(!CacheThreadSuspended()) {
   	  usleep(50);
+	  if(getMESS != 0) { //significant loop
+		//if(getWeird == 8)
+			//getWeird = 9;
+		getMESS = 0;
+		waitReload = 1; //this flag allows a reload after some time has passed to reconnect stream
+		++cntReconnect;
+		//s->eof = 1; //does not make a diff
+		return;
+		//break; //frequent dsi crash
+	  }
+	}
   }
   s->cache_pid = 0;
   cachearg = NULL;
@@ -543,8 +573,13 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
     stream->cache_pid = _beginthread( ThreadProc, NULL, 256 * 1024, s );
 #elif defined(GEKKO)
 	stop_cache_thread = 1;
-	while(!CacheThreadSuspended())
+	while(!CacheThreadSuspended()) {
 		usleep(50);
+
+		//if(getMESS != 0) { //this doesn't hit, but let's assume it's useful for edgecases
+		//	return -1;
+		//}
+	}
 	cachearg = s;
 	stop_cache_thread = 0;
 	ResumeCacheThread();
@@ -572,8 +607,13 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
 	    (int64_t)s->max_filepos-s->read_filepos
 	);
 
+	//if(getMESS != 0) {
+		//getWeird = 8;
+		//return -1; //it's unlikely but let's assume in case of edgecases
+	//}
+	
 #ifdef GEKKO
-	if(s->stream->type == STREAMTYPE_STREAM)
+	if(s->stream->type == STREAMTYPE_STREAM && cntReconnect == 0)
 		ShowProgress("Buffering...", (int)(100.0*(float)(s->max_filepos)/(float)(min)), 100);
 #endif
 	if(s->eof) break; // file is smaller than prefill size
@@ -614,7 +654,8 @@ static void ThreadProc( void *s ){
 #ifndef GEKKO
   } while (cache_execute_control(s));
 #else
-  } while (cache_execute_control(s) && !stop_cache_thread);
+  //} while (cache_execute_control(s) && !stop_cache_thread && getMESS == 0); //not this, but let's assume due to edgecases
+  } while (cache_execute_control(s) && !stop_cache_thread); //not this
 #endif  
 #if defined(__MINGW32__) || defined(__OS2__)
   _endthread();
@@ -733,8 +774,11 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
     default:
       return STREAM_UNSUPPORTED;
   }
-  while (s->control != -1)
+  while (s->control != -1) {
 	usec_sleep(CONTROL_SLEEP_TIME);
+	if(getMESS != 0) //significant loop
+		return 0;
+  }
 
   if (s->control_res != STREAM_OK)
     return s->control_res;
@@ -768,6 +812,8 @@ int cache_do_control(stream_t *stream, int cmd, void *arg) {
   return s->control_res;
 }
 
+//extern int getINFO;
+
 int stream_read(stream_t *s,char* mem,int total)
 {
   int len=total;
@@ -775,6 +821,14 @@ int stream_read(stream_t *s,char* mem,int total)
   while(len>0)
   {
     int x;
+	
+	//One bread ahead of the bread
+/*	if(getINFO == 2) {
+		getINFO = 0;
+		return 0;
+	}*/
+	//if(getMESS != 0) //don't care, let's assume there's an edgecase that still fails rarely...
+		//return 0;
 
     if(s->buf_len-s->buf_pos==0)
     {

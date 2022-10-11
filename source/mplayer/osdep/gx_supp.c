@@ -69,10 +69,12 @@ extern unsigned int *xfb[2];
 extern bool flip_pending;
 //extern int delay_amount;
 extern bool wiiTiledRender;
+extern unsigned guiDelay;
 
 static int hor_pos=0, vert_pos=0;
 static float hor_zoom = 1.0f, vert_zoom = 1.0f;
 static int video_diffx, video_diffy, video_haspect, video_vaspect;
+double sub_dar = 0; // for subtitles
 int mplayerwidth = 640;
 int mplayerheight = 480;
 
@@ -161,7 +163,7 @@ void GX_SetScreenPos(int _hor_pos, int _vert_pos, float _hor_zoom, float _vert_z
 	vert_pos = _vert_pos;
 #if 1
 	if(wiiTiledRender)
-		hor_zoom = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? _hor_zoom+.003f : _hor_zoom-.015f;
+		hor_zoom = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? _hor_zoom+.003f : _hor_zoom;
 	else
 		hor_zoom = _hor_zoom;
 #endif
@@ -489,9 +491,17 @@ void GX_ConfigTextureYUV(u16 width, u16 height, u16 chroma_width, u16 chroma_hei
 #include "osdep/timer.h"
 
 bool goBackto = false;
+extern int sync_interlace;
+extern timerFadeBlack; // not an actual fade, just delay drawing mplayer to avoid 1 frame flicker.
 
 inline void DrawMPlayer()
 {
+	//PauseAndGotoGUI();
+	if(timerFadeBlack) {
+		--timerFadeBlack;
+		return;
+	}
+	
 	DCFlushRange(Yltexture, Yltexsize);
 	if (wr>0) DCFlushRange(Yrtexture, Yrtexsize);
 	DCFlushRange(Utexture, UVtexsize);
@@ -506,7 +516,24 @@ inline void DrawMPlayer()
 
 	u32 level = 0;
 	_CPU_ISR_Disable(level);
-	if (flip_pending)
+	//if(flip_pending && !sync_interlace)
+		//VIDEO_WaitVSync();
+/*	if(!CONF_GetProgressiveScan() && vmode->xfbHeight > 240) {
+		//Plays 480i DVDs correctly but breaks everything else.
+		do VIDEO_WaitVSync();
+		while (!VIDEO_GetNextField());
+	}
+	else if(flip_pending)
+		VIDEO_WaitVSync(); */
+	if(sync_interlace == 1 && vmode->fbWidth > 640) {
+		do VIDEO_WaitVSync();
+		while (!VIDEO_GetNextField());
+	}
+	else if(sync_interlace == 2 && vmode->fbWidth > 640) {
+		do VIDEO_WaitVSync();
+		while (VIDEO_GetNextField());
+	}
+	else if(flip_pending)
 		VIDEO_WaitVSync();
 	_CPU_ISR_Restore(level);
 
@@ -541,6 +568,13 @@ inline void DrawMPlayer()
 	}
 	else if(drawMode != 0)
 	{
+		if(guiDelay != 0) {
+			// fixes seekbar info remaining after a new video.
+			DrawMPlayerGui();
+			DrawMPlayerGui();
+			--guiDelay;
+		}
+		
 		// reconfigure GX for MPlayer
 		Mtx44 p;
 		draw_initYUV();
@@ -584,15 +618,19 @@ else {
 	// Switch to tile rendering
 	SetMplTiled();
 	
-	int half_ht = vmode->efbHeight / 2;
+	//int half_ht = vmode->efbHeight / 2;
+	int half_ht = vmode->efbHeight; // don't do height for now
 	int half_wh = vmode->fbWidth / 2;
 
 	bool pad_wh = (half_wh / 8) % 2;
 	int corr_wh = half_wh + (8 * pad_wh);
+	
+	// don't do height
+	int y = 0;
 
 	//whichfb ^= 1;
-	for (int y = 0; y < 2; y++)
-	{
+	//for (int y = 0; y < 2; y++)
+	//{
 		for (int x = 0; x < 2; x++)
 		{
 			int hor_offset = (half_wh - (8 * pad_wh)) * x;
@@ -611,11 +649,11 @@ else {
 		if(copyScreen == 1)
 		{
 			if(controlledbygui != 2) {
-				vmode->fbWidth = 640;
-				VIDEO_Configure(vmode);
-				VIDEO_Flush();
+			//	vmode->fbWidth = 640;
+			//	VIDEO_Configure(vmode);
+			//	VIDEO_Flush();
 				SetMplTiledOff();
-				GX_CopyDisp(xfb[whichfb], GX_TRUE);
+			//	GX_CopyDisp(xfb[whichfb], GX_TRUE);
 				//TakeScreenshot();
 				goBackto = true;
 				break;
@@ -636,6 +674,16 @@ else {
 		else if(drawMode != 0)
 		{
 			//SetMplTiled();
+			
+			// Fixes gui bar from not displaying
+			// the left chunk on the first frame.
+			if(guiDelay != 0) {
+				DrawMPlayerGui();
+				DrawMPlayerGui();
+				--guiDelay;
+			}
+			
+			//DrawMPlayerGui(); //fixes left chunk seek bar from remaining after loading a new video.
 			// reconfigure GX for MPlayer
 			Mtx44 p;
 			draw_initYUV();
@@ -649,7 +697,7 @@ else {
 			u32 xfb_offset = (((vmode->fbWidth * VI_DISPLAY_PIX_SZ) * (vmode->xfbHeight / 2)) * y) + ((half_wh * VI_DISPLAY_PIX_SZ) * x);
 			GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
 		}
-	}
+//	}
 #endif
 	}
 	if(!wiiTiledRender)
@@ -700,6 +748,8 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	video_diffy = (h - height)/2.0;
 	video_haspect = haspect;
 	video_vaspect = vaspect;
+	// for subtitles
+	sub_dar = (double)video_haspect / (double)video_vaspect;
 
 	GX_UpdateScaling();
 

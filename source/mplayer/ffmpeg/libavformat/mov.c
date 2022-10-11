@@ -168,6 +168,68 @@ static int mov_read_mac_string(MOVContext *c, AVIOContext *pb, int len,
     return p - dst;
 }
 
+#include "../../utils/mem2_manager.h"
+//extern int wiim_inf;
+extern int embedded_pic;
+extern u8 *pos_pic;
+
+static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
+{
+//	return 0; //memleak is here!
+    AVPacket pkt;
+    AVStream *st;
+    MOVStreamContext *sc;
+    enum CodecID id;
+    int ret;
+
+    switch (type) {
+    //case 0xd:  id = CODEC_ID_MJPEG; break; //triggers video playback
+    case 0xd:  id = CODEC_ID_PNG; break;
+    case 0xe:  id = CODEC_ID_PNG;   break;
+    case 0x1b: id = CODEC_ID_BMP;   break;
+    default:
+        av_log(c->fc, AV_LOG_WARNING, "Unknown cover type: 0x%x.\n", type);
+        avio_skip(pb, len);
+        return 0;
+    }
+
+    st = avformat_new_stream(c->fc, NULL);
+    if (!st)
+        return AVERROR(ENOMEM);
+    sc = av_mallocz(sizeof(*sc));
+    if (!sc)
+        return AVERROR(ENOMEM);
+    st->priv_data = sc;
+
+    ret = av_get_packet(pb, &pkt, len);
+    if (ret < 0)
+        return ret;
+
+/*    st->disposition              |= AV_DISPOSITION_ATTACHED_PIC;
+
+    st->attached_pic              = pkt;
+    st->attached_pic.stream_index = st->index;
+    st->attached_pic.flags       |= AV_PKT_FLAG_KEY;
+
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
+    st->codec->codec_id   = id;
+*/
+	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
+	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+	avio_seek(pb, -len, SEEK_CUR);
+	
+	//If the len is higher than the allocated buffer fix it
+	if(len > 1.5*1024*1024)
+		len = 1.5*1024*1024;
+	
+	avio_read(pb, pos_pic, len);
+	//avio_seek(pb, +len, SEEK_CUR);
+	embedded_pic = 1;
+
+	//wiim_inf = 2;
+    return 0;
+}
+
 static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 {
 #ifdef MOV_EXPORT_ALL_METADATA
@@ -175,8 +237,8 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 #endif
     char str[1024], key2[16], language[4] = {0};
     const char *key = NULL;
-    uint16_t str_size, langcode = 0;
-    uint32_t data_type = 0;
+    uint16_t langcode = 0;
+    uint32_t data_type = 0, str_size;
     int (*parse)(MOVContext*, AVIOContext*, unsigned, const char*) = NULL;
 
     switch (atom.type) {
@@ -192,7 +254,7 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     case MKTAG(0xa9,'c','m','t'):
     case MKTAG(0xa9,'i','n','f'): key = "comment";   break;
     case MKTAG(0xa9,'a','l','b'): key = "album";     break;
-    case MKTAG(0xa9,'d','a','y'): key = "date";      break;
+    case MKTAG(0xa9,'d','a','y'): key = "year";      break; // date should be year
     case MKTAG(0xa9,'g','e','n'): key = "genre";     break;
     case MKTAG( 'g','n','r','e'): key = "genre";
         parse = mov_metadata_gnre; break;
@@ -228,6 +290,16 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
             avio_rb32(pb); // unknown
             str_size = data_size - 16;
             atom.size -= 16;
+			
+			//Cover stuff
+			if (atom.type == MKTAG('c', 'o', 'v', 'r')) {
+                int ret = mov_read_covr(c, pb, data_type, str_size);
+                if (ret < 0) {
+                    av_log(c->fc, AV_LOG_ERROR, "Error parsing cover art.\n");
+                    return ret;
+                }
+				//return ret; // fixes double read
+            }
         } else return 0;
     } else if (atom.size > 4 && key && !c->itunes_metadata) {
         str_size = avio_rb16(pb); // string length
@@ -257,8 +329,12 @@ static int mov_read_udta_string(MOVContext *c, AVIOContext *pb, MOVAtom atom)
         if (data_type == 3 || (data_type == 0 && (langcode < 0x400 || langcode == 0x7fff))) { // MAC Encoded
             mov_read_mac_string(c, pb, str_size, str, sizeof(str));
         } else {
-            avio_read(pb, str, str_size);
+            int ret = avio_read(pb, str, str_size);
             str[str_size] = 0;
+			// 2014
+		//	if(ret != str_size) {
+         //       av_freep(&str);
+			//}
         }
         av_dict_set(&c->fc->metadata, key, str, 0);
         if (*language && strcmp(language, "und")) {
@@ -1664,6 +1740,9 @@ static int mov_read_stss(MOVContext *c, AVIOContext *pb, MOVAtom atom)
     }
     if (entries >= UINT_MAX / sizeof(int))
         return AVERROR_INVALIDDATA;
+	// 2014 change test
+	av_freep(&sc->keyframes);
+
     sc->keyframes = av_malloc(entries * sizeof(int));
     if (!sc->keyframes)
         return AVERROR(ENOMEM);
@@ -1823,6 +1902,9 @@ static int mov_read_ctts(MOVContext *c, AVIOContext *pb, MOVAtom atom)
 
     av_dlog(c->fc, "track[%i].ctts.entries = %i\n", c->fc->nb_streams-1, entries);
 
+	// 2015 change test
+	av_freep(&sc->ctts_data);
+	
     if (!entries)
         return 0;
     if (entries >= UINT_MAX / sizeof(*sc->ctts_data))

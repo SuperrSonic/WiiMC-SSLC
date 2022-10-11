@@ -32,6 +32,7 @@ typedef struct _bentry
 	char *display; // name for browser display
 	char *xml; // name for xml data
 	char *image;
+	char *tunein;
 	char *year;
 	char *desc;
 	int icon; // icon to display

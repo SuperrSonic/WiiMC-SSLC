@@ -47,6 +47,7 @@
 #include "../filelist.h"
 #include "../input.h"
 #include "../menu.h"
+#include "../utils/3ds.h"
 
 //#define gui_malloc malloc
 //#define gui_free free
@@ -208,22 +209,22 @@ class GuiTrigger
 		//!\param ch Controller channel number
 		//!\param wiibtns Wii controller trigger button(s) - classic controller buttons are considered separately
 		//!\param gcbtns GameCube controller trigger button(s)
-		void SetSimpleTrigger(s32 ch, u32 wiibtns, u16 gcbtns);
+		void SetSimpleTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns);
 		//!Sets a held trigger. Requires: element is selected, and trigger button is pressed
 		//!\param ch Controller channel number
 		//!\param wiibtns Wii controller trigger button(s) - classic controller buttons are considered separately
 		//!\param gcbtns GameCube controller trigger button(s)
-		void SetHeldTrigger(s32 ch, u32 wiibtns, u16 gcbtns);
+		void SetHeldTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns);
 		//!Sets a button-only trigger. Requires: Trigger button is pressed
 		//!\param ch Controller channel number
 		//!\param wiibtns Wii controller trigger button(s) - classic controller buttons are considered separately
 		//!\param gcbtns GameCube controller trigger button(s)
-		void SetButtonOnlyTrigger(s32 ch, u32 wiibtns, u16 gcbtns);
+		void SetButtonOnlyTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns);
 		//!Sets a button-only trigger. Requires: trigger button is pressed and parent window of element is in focus
 		//!\param ch Controller channel number
 		//!\param wiibtns Wii controller trigger button(s) - classic controller buttons are considered separately
 		//!\param gcbtns GameCube controller trigger button(s)
-		void SetButtonOnlyInFocusTrigger(s32 ch, u32 wiibtns, u16 gcbtns);
+		void SetButtonOnlyInFocusTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns);
 		//!Get X or Y value from Wii Joystick (classic, nunchuk) input
 		//!\param stick Controller stick (left = 0, right = 1)
 		//!\param axis Controller stick axis (x-axis = 0, y-axis = 1)
@@ -251,6 +252,7 @@ class GuiTrigger
 		bool Down();
 
 		WPADData wpaddata; //!< Wii controller trigger data
+		ctr_state_t cpad; //!< 3DS controller trigger data
 		PADData pad; //!< GameCube controller trigger data
 		WPADData * wpad; //!< Wii controller trigger
 		s32 chan; //!< Trigger controller channel (0-3, -1 for all)

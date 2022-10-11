@@ -125,7 +125,12 @@ void reinit_audio()
 */	
 }
 
+//adjust for 240p being slower video?
+//freq = 48091, 32060
+//freq = 47908, 31939
+
 //bool once_rate = true;
+extern bool use32kHz;
 
 static int init(int rate, int channels, int format, int flags)
 {
@@ -136,7 +141,8 @@ static int init(int rate, int channels, int format, int flags)
 	 else quality = AI_SAMPLERATE_32KHZ;
 	 once_rate = false;
     }*/
-	ao_data.samplerate = (quality==AI_SAMPLERATE_48KHZ) ? 48000 : 32000;
+	//ao_data.samplerate = (quality==AI_SAMPLERATE_48KHZ) ? 48000 : 32000;
+	ao_data.samplerate = use32kHz ? 32000 : 48000;
 	ao_data.channels = clamp(channels, 2, 6);
 	ao_data.format = AF_FORMAT_S16_NE;
 	ao_data.bps = ao_data.channels * ao_data.samplerate * sizeof(s16);

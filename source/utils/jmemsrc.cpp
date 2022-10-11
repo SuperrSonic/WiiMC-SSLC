@@ -25,6 +25,7 @@
 
 #include "video.h"
 #include "mem2_manager.h"
+#include "settings.h"
 
 //only texture in mem2, internal memory managed by gcc
 #define jpg_malloc malloc
@@ -407,6 +408,8 @@ static void got_row(void *data, unsigned char *row, int len)
 	st->dest += st->stride;
 }
 
+extern bool bannerSSactive;
+
 u8 * DecodeJPEG(const u8 *src, u32 len, int *width, int *height, u8 *dstPtr)
 {
 	struct jpeg_decompress_struct cinfo;
@@ -440,6 +443,24 @@ u8 * DecodeJPEG(const u8 *src, u32 len, int *width, int *height, u8 *dstPtr)
 	// otherwise they get padded with alpha, causing the edges to get marked.
 	if(output_width == 185)
 		output_width = 188;
+	else if(WiiSettings.jpegQuality && output_width > 188 && output_width != 768 && output_height != 480 && !bannerSSactive) {
+		//For slow smooth art setting
+		float ar = (float)output_height / (float)output_width;
+		if(WiiSettings.screensaverArt >= ART_FULL && output_width > 448) {
+			output_width = 448;
+			output_height = output_width * ar;
+		} else if(WiiSettings.screensaverArt != ART_FULL && output_width > 188) {
+			output_width = 188;
+			output_height = output_width * ar;
+		}
+	}
+	//else if(output_width > 800 || output_height > 800) { // for embedded art
+	else if(output_width + output_height > 1599) { // for embedded art
+		float ar = (float)output_height / (float)output_width;
+		output_width = WiiSettings.screensaverArt >= ART_FULL ? 448 : 188;
+		output_height = output_width * ar;
+	//	printf("give inf: %d,,", output_height);
+	}
 #if 0
 	// This code resamples the image to avoid
 	// the added alpha padding from creating

@@ -253,6 +253,18 @@ static av_cold int pcm_decode_init(AVCodecContext *avctx)
         dst += size / 8;                                                \
     }
 
+#define DECODE_PLANAR(size, endian, src, dst, n, shift, offset)         \
+    {                                                                   \
+        int av_unused n2;                                               \
+        n /= avctx->channels;                                           \
+        for (c = 0; c < avctx->channels; c++) {                         \
+            samples = s->frame.data[c];                          \
+            n2 = n;                                                     \
+            DECODE(size, endian, src, samples, n2, 0, 0)                \
+        }                                                               \
+    }
+
+
 static int pcm_decode_frame(AVCodecContext *avctx, void *data,
                             int *got_frame_ptr, AVPacket *avpkt)
 {
@@ -337,19 +349,28 @@ static int pcm_decode_frame(AVCodecContext *avctx, void *data,
             samples += 2;
         }
         break;
-    case CODEC_ID_PCM_S16LE_PLANAR:
+	case CODEC_ID_PCM_S16BE_PLANAR:
+        DECODE_PLANAR(16, be16, src, samples, n, 0, 0);
+        break;
+	case CODEC_ID_PCM_S16LE_PLANAR:
+        DECODE_PLANAR(16, le16, src, samples, n, 0, 0);
+        break;
+   // case CODEC_ID_PCM_S16BE_PLANAR:
+   /* case CODEC_ID_PCM_S16LE_PLANAR:
     {
-        int i;
+       // int i;
         n /= avctx->channels;
         for (c = 0; c < avctx->channels; c++) {
             samples = s->frame.data[c];
-            for (i = n; i > 0; i--) {
-                AV_WN16A(samples, bytestream_get_le16(&src));
-                samples += 2;
-            }
+            //for (i = n; i > 0; i--) {
+              //  AV_WN16A(samples, bytestream_get_le16(&src));
+              //  samples += 2;
+			//  samples = frame->extended_data[c];
+            bytestream_get_buffer(&src, samples, n * sample_size);
+           // }
         }
         break;
-    }
+    }*/
     case CODEC_ID_PCM_U16LE:
         DECODE(16, le16, src, samples, n, 0, 0x8000)
         break;
@@ -526,6 +547,7 @@ PCM_DECODER(CODEC_ID_PCM_LXF,          AV_SAMPLE_FMT_S32P,pcm_lxf,          "PCM
 PCM_CODEC  (CODEC_ID_PCM_MULAW,        AV_SAMPLE_FMT_S16, pcm_mulaw,        "PCM mu-law / G.711 mu-law");
 PCM_CODEC  (CODEC_ID_PCM_S8,           AV_SAMPLE_FMT_U8,  pcm_s8,           "PCM signed 8-bit");
 PCM_CODEC  (CODEC_ID_PCM_S16BE,        AV_SAMPLE_FMT_S16, pcm_s16be,        "PCM signed 16-bit big-endian");
+PCM_DECODER(CODEC_ID_PCM_S16BE_PLANAR, AV_SAMPLE_FMT_S16P,pcm_s16be_planar, "PCM signed 16-bit big-endian planar");
 PCM_CODEC  (CODEC_ID_PCM_S16LE,        AV_SAMPLE_FMT_S16, pcm_s16le,        "PCM signed 16-bit little-endian");
 PCM_DECODER(CODEC_ID_PCM_S16LE_PLANAR, AV_SAMPLE_FMT_S16P,pcm_s16le_planar, "PCM 16-bit little-endian planar");
 PCM_CODEC  (CODEC_ID_PCM_S24BE,        AV_SAMPLE_FMT_S32, pcm_s24be,        "PCM signed 24-bit big-endian");

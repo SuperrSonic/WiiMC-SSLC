@@ -113,6 +113,8 @@ typedef struct {
     uint64_t pixel_width;
     uint64_t pixel_height;
     EbmlBin color_space;
+    uint64_t interlaced;
+    uint64_t field_order;
     uint64_t stereo_mode;
 } MatroskaTrackVideo;
 
@@ -320,7 +322,8 @@ static EbmlSyntax matroska_track_video[] = {
     { MATROSKA_ID_VIDEOPIXELCROPL,    EBML_NONE },
     { MATROSKA_ID_VIDEOPIXELCROPR,    EBML_NONE },
     { MATROSKA_ID_VIDEODISPLAYUNIT,   EBML_NONE },
-    { MATROSKA_ID_VIDEOFLAGINTERLACED,EBML_NONE },
+    { MATROSKA_ID_VIDEOFLAGINTERLACED,EBML_UINT, 0, offsetof(MatroskaTrackVideo,interlaced) },
+	{ MATROSKA_ID_VIDEOFIELDORDER,    EBML_UINT, 0, offsetof(MatroskaTrackVideo,field_order) },
     { MATROSKA_ID_VIDEOASPECTRATIO,   EBML_NONE },
     { 0 }
 };
@@ -1400,6 +1403,7 @@ static void matroska_metadata_creation_time(AVDictionary **metadata, int64_t dat
 }
 
 //extern double find_prob;
+extern int sync_interlace;
 
 static int matroska_read_header(AVFormatContext *s)
 {
@@ -1703,6 +1707,14 @@ static int matroska_read_header(AVFormatContext *s)
             st->codec->codec_tag  = fourcc;
             st->codec->width  = track->video.pixel_width;
             st->codec->height = track->video.pixel_height;
+			
+			if (track->video.interlaced == MATROSKA_VIDEO_INTERLACE_FLAG_INTERLACED) {
+				sync_interlace = 1;
+				if(track->video.field_order > 1)
+					sync_interlace = 2;
+                //st->codecpar->field_order = mkv_field_order(track->video.field_order);
+			}
+			
             av_reduce(&st->sample_aspect_ratio.num,
                       &st->sample_aspect_ratio.den,
                       st->codec->height * track->video.display_width,

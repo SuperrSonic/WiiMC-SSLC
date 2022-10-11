@@ -38,7 +38,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
 	shift = 0;
 	caps = 0;
 	selectable = true;
-	focus = 0; // allow focus
+	focus = 1; // allow focus
 	alignmentHor = ALIGN_CENTRE;
 	alignmentVert = ALIGN_MIDDLE;
 	strncpy(kbtextstr, t, max);
@@ -123,7 +123,7 @@ GuiKeyboard::GuiKeyboard(char * t, u32 max)
 	//keySoundOver = new GuiSound(button_over_pcm, button_over_pcm_size, SOUND_PCM);
 	//keySoundClick = new GuiSound(button_click_pcm, button_click_pcm_size, SOUND_PCM);
 	trigA = new GuiTrigger;
-	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
+	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 
 	keyBackImg = new GuiImage(keyMedium);
 	keyBackOverImg = new GuiImage(keyMediumOver);
@@ -316,6 +316,13 @@ void GuiKeyboard::Update(GuiTrigger * t)
 			kbText->SetText(kbtextstr);
 		}
 		keySpace->SetState(STATE_SELECTED, t->chan);
+		
+		//don't reset pos
+		if(focus)
+		{
+			int selected = this->GetSelected();
+			_elements.at(selected)->SetState(STATE_SELECTED);
+		}
 	}
 	else if(keyBack->GetState() == STATE_CLICKED)
 	{
@@ -325,6 +332,13 @@ void GuiKeyboard::Update(GuiTrigger * t)
 			kbText->SetText(GetDisplayText(kbtextstr));
 		}
 		keyBack->SetState(STATE_SELECTED, t->chan);
+		
+		//don't reset pos
+		if(focus)
+		{
+			int selected = this->GetSelected();
+			_elements.at(selected)->SetState(STATE_SELECTED);
+		}
 	}
 	else if(keyShift->GetState() == STATE_CLICKED)
 	{
@@ -374,6 +388,13 @@ void GuiKeyboard::Update(GuiTrigger * t)
 					}
 					kbText->SetText(GetDisplayText(kbtextstr));
 					keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
+
+					//don't reset pos
+					if(focus)
+					{
+						int selected = this->GetSelected();
+						_elements.at(selected)->SetState(STATE_SELECTED);
+					}
 
 					if(shift)
 					{

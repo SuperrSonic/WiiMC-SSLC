@@ -16,6 +16,8 @@ static u64 prev[4];
 static u64 now[4];
 static u32 delay[4];
 
+static u8 stickTimer = 0;
+
 /**
  * Constructor for the GuiTrigger class.
  */
@@ -24,6 +26,7 @@ GuiTrigger::GuiTrigger()
 	chan = -1;
 	memset(&wpaddata, 0, sizeof(WPADData));
 	memset(&pad, 0, sizeof(PADData));
+	memset(&cpad, 0, sizeof(ctr_state_t));
 	wpad = &wpaddata;
 }
 
@@ -77,12 +80,13 @@ void GuiTrigger::operator delete[](void *p)
  * - Element is selected
  * - Trigger button is pressed
  */
-void GuiTrigger::SetSimpleTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
+void GuiTrigger::SetSimpleTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns)
 {
 	type = TRIGGER_SIMPLE;
 	chan = ch;
 	wpaddata.btns_d = wiibtns;
 	pad.btns_d = gcbtns;
+	cpad.data.down = ctrbtns;
 }
 
 /**
@@ -90,24 +94,26 @@ void GuiTrigger::SetSimpleTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
  * - Element is selected
  * - Trigger button is pressed and held
  */
-void GuiTrigger::SetHeldTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
+void GuiTrigger::SetHeldTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns)
 {
 	type = TRIGGER_HELD;
 	chan = ch;
 	wpaddata.btns_h = wiibtns;
 	pad.btns_h = gcbtns;
+	cpad.data.held = ctrbtns;
 }
 
 /**
  * Sets a button trigger. Requires:
  * - Trigger button is pressed
  */
-void GuiTrigger::SetButtonOnlyTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
+void GuiTrigger::SetButtonOnlyTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns)
 {
 	type = TRIGGER_BUTTON_ONLY;
 	chan = ch;
 	wpaddata.btns_d = wiibtns;
 	pad.btns_d = gcbtns;
+	cpad.data.down = ctrbtns;
 }
 
 /**
@@ -115,12 +121,13 @@ void GuiTrigger::SetButtonOnlyTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
  * - Trigger button is pressed
  * - Parent window is in focus
  */
-void GuiTrigger::SetButtonOnlyInFocusTrigger(s32 ch, u32 wiibtns, u16 gcbtns)
+void GuiTrigger::SetButtonOnlyInFocusTrigger(s32 ch, u32 wiibtns, u16 gcbtns, uint32_t ctrbtns)
 {
 	type = TRIGGER_BUTTON_ONLY_IN_FOCUS;
 	chan = ch;
 	wpaddata.btns_d = wiibtns;
 	pad.btns_d = gcbtns;
+	cpad.data.down = ctrbtns;
 }
 
 /****************************************************************************
@@ -197,11 +204,13 @@ bool GuiTrigger::Left()
 
 	if((wpad->btns_d | wpad->btns_h) & (wiibtn | WPAD_CLASSIC_BUTTON_LEFT)
 			|| (pad.btns_d | pad.btns_h) & PAD_BUTTON_LEFT
+			|| (cpad.data.down | cpad.data.held) & CTR_BUTTON_LEFT
+			|| (cpad.data.down | cpad.data.held) & CTR_STICK_LEFT
 			|| pad.stickX < -PADCAL
 			|| WPAD_StickX(0) < -PADCAL)
 	{
 		if(wpad->btns_d & (wiibtn | WPAD_CLASSIC_BUTTON_LEFT)
-			|| pad.btns_d & PAD_BUTTON_LEFT)
+			|| pad.btns_d & PAD_BUTTON_LEFT || cpad.data.down & CTR_BUTTON_LEFT || cpad.data.down & CTR_STICK_LEFT)
 		{
 			prev[chan] = gettime();
 			delay[chan] = SCROLL_DELAY_INITIAL; // reset scroll delay
@@ -230,11 +239,13 @@ bool GuiTrigger::Right()
 
 	if((wpad->btns_d | wpad->btns_h) & (wiibtn | WPAD_CLASSIC_BUTTON_RIGHT)
 			|| (pad.btns_d | pad.btns_h) & PAD_BUTTON_RIGHT
+			|| (cpad.data.down | cpad.data.held) & CTR_BUTTON_RIGHT
+			|| (cpad.data.down | cpad.data.held) & CTR_STICK_RIGHT
 			|| pad.stickX > PADCAL
 			|| WPAD_StickX(0) > PADCAL)
 	{
 		if(wpad->btns_d & (wiibtn | WPAD_CLASSIC_BUTTON_RIGHT)
-			|| pad.btns_d & PAD_BUTTON_RIGHT)
+			|| pad.btns_d & PAD_BUTTON_RIGHT || cpad.data.down & CTR_BUTTON_RIGHT || cpad.data.down & CTR_STICK_RIGHT)
 		{
 			prev[chan] = gettime();
 			delay[chan] = SCROLL_DELAY_INITIAL; // reset scroll delay
@@ -261,13 +272,22 @@ bool GuiTrigger::Up()
 {
 	u32 wiibtn = WPAD_BUTTON_UP;
 
+	++stickTimer;
+	if(pad.stickY > PADCAL && stickTimer > 50) {
+		pad.btns_d = PAD_BUTTON_UP;
+		stickTimer = 0;
+	} else if(WPAD_StickY(0) > PADCAL && stickTimer > 50) {
+		pad.btns_d = PAD_BUTTON_UP;
+		stickTimer = 0;
+	}
+
 	if((wpad->btns_d | wpad->btns_h) & (wiibtn | WPAD_CLASSIC_BUTTON_UP)
 			|| (pad.btns_d | pad.btns_h) & PAD_BUTTON_UP
-			|| pad.stickY > PADCAL
-			|| WPAD_StickY(0) > PADCAL)
+			|| (cpad.data.down | cpad.data.held) & CTR_BUTTON_UP
+			|| (cpad.data.down | cpad.data.held) & CTR_STICK_UP)
 	{
 		if(wpad->btns_d & (wiibtn | WPAD_CLASSIC_BUTTON_UP)
-			|| pad.btns_d & PAD_BUTTON_UP)
+			|| pad.btns_d & PAD_BUTTON_UP || cpad.data.down & CTR_BUTTON_UP || cpad.data.down & CTR_STICK_UP)
 		{
 			prev[chan] = gettime();
 			delay[chan] = SCROLL_DELAY_INITIAL; // reset scroll delay
@@ -294,13 +314,22 @@ bool GuiTrigger::Down()
 {
 	u32 wiibtn = WPAD_BUTTON_DOWN;
 
+	++stickTimer;
+	if(stickTimer > 50 && pad.stickY < -PADCAL) {
+		pad.btns_d = PAD_BUTTON_DOWN;
+		stickTimer = 0;
+	} else if(WPAD_StickY(0) < -PADCAL && stickTimer > 50) {
+		pad.btns_d = PAD_BUTTON_DOWN;
+		stickTimer = 0;
+	}
+
 	if((wpad->btns_d | wpad->btns_h) & (wiibtn | WPAD_CLASSIC_BUTTON_DOWN)
 			|| (pad.btns_d | pad.btns_h) & PAD_BUTTON_DOWN
-			|| pad.stickY < -PADCAL
-			|| WPAD_StickY(0) < -PADCAL)
+			|| (cpad.data.down | cpad.data.held) & CTR_BUTTON_DOWN
+			|| (cpad.data.down | cpad.data.held) & CTR_STICK_DOWN)
 	{
 		if(wpad->btns_d & (wiibtn | WPAD_CLASSIC_BUTTON_DOWN)
-			|| pad.btns_d & PAD_BUTTON_DOWN)
+			|| pad.btns_d & PAD_BUTTON_DOWN || cpad.data.down & CTR_BUTTON_DOWN || cpad.data.down & CTR_STICK_DOWN)
 		{
 			prev[chan] = gettime();
 			delay[chan] = SCROLL_DELAY_INITIAL; // reset scroll delay

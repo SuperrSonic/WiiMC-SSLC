@@ -24,12 +24,14 @@
 
 #include <stdlib.h>
 #include "libavutil/avstring.h"
+#include "libavutil/base64.h"
 #include "libavutil/bswap.h"
 #include "libavutil/dict.h"
 #include "libavcodec/get_bits.h"
 #include "libavcodec/bytestream.h"
 #include "libavcodec/vorbis_parser.h"
 #include "avformat.h"
+#include "flac_picture.h"
 #include "internal.h"
 #include "oggdec.h"
 #include "vorbiscomment.h"
@@ -68,6 +70,19 @@ static int ogm_chapter(AVFormatContext *as, uint8_t *key, uint8_t *val)
     return 1;
 }
 
+#include "../../utils/mem2_manager.h"
+extern u8 *pos_pic;
+extern int embedded_pic;
+//extern int wiim_inf;
+
+extern char* ogg_title;
+extern char* ogg_artist;
+extern char* ogg_album;
+extern char* ogg_year;
+extern char* ogg_loopstart;
+
+//int hereItero = 0;
+
 int
 ff_vorbis_comment(AVFormatContext * as, AVDictionary **m, const uint8_t *buf, int size)
 {
@@ -75,6 +90,13 @@ ff_vorbis_comment(AVFormatContext * as, AVDictionary **m, const uint8_t *buf, in
     const uint8_t *end = buf + size;
     unsigned n, j;
     int s;
+
+	// Reset metadata
+	ogg_title = NULL;
+	ogg_artist = NULL;
+	ogg_album = NULL;
+	ogg_year = NULL;
+	ogg_loopstart = NULL;
 
     if (size < 8) /* must have vendor_length and user_comment_list_length */
         return -1;
@@ -128,10 +150,86 @@ ff_vorbis_comment(AVFormatContext * as, AVDictionary **m, const uint8_t *buf, in
             memcpy(ct, v, vl);
             ct[vl] = 0;
 
-            if (!ogm_chapter(as, tt, ct))
-                av_dict_set(m, tt, ct,
-                                   AV_DICT_DONT_STRDUP_KEY |
-                                   AV_DICT_DONT_STRDUP_VAL);
+			/* The format in which the pictures are stored is the FLAC format.
+             * Xiph says: "The binary FLAC picture structure is base64 encoded
+             * and placed within a VorbisComment with the tag name
+             * 'METADATA_BLOCK_PICTURE'. This is the preferred and
+             * recommended way of embedding cover art within VorbisComments."
+             */
+            if (!strcmp(tt, "METADATA_BLOCK_PICTURE")) {
+#if 1
+                int ret;
+                char *pict = av_malloc(vl);
+
+                if (!pict) {
+                    av_log(as, AV_LOG_WARNING, "out-of-memory error. Skipping cover art block.\n");
+					av_freep(&tt);
+					av_freep(&ct);
+                    continue;
+                }
+                if ((ret = av_base64_decode(pict, ct, vl)) > 0) {
+#if 1
+                //if (ret > 0) {
+                    //ret = ff_flac_parse_picture(as, pict, ret);
+
+					int len, len_desc, len_pic;
+					AVIOContext *pb = NULL;
+					pb = avio_alloc_context(pict, ret, 0, NULL, NULL, NULL, NULL);
+					if (!pb) {
+						av_freep(&tt);
+						av_freep(&ct);
+						continue;
+					}
+					avio_rb32(pb); // image type, don't care
+					len = avio_rb32(pb); // length of mimetype
+					if(len != 0)
+						avio_skip(pb, len);
+					len_desc = avio_rb32(pb);
+					if(len_desc != 0)
+						avio_skip(pb, len_desc);
+					avio_rb32(pb); //width
+					avio_rb32(pb); //height
+					avio_skip(pb, 8); // blank
+					len_pic = avio_rb32(pb); //pic size
+
+					pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+					
+					//if the length is higher memleak will occur, or crash
+					if(len_pic > 1.5*1024*1024)
+						len_pic = 1.5*1024*1024;
+					
+					memcpy(pos_pic, pict+32+len+len_desc, len_pic);
+					embedded_pic = 1;
+					//wiim_inf = len;
+#endif
+				}
+                av_freep(&tt);
+                av_freep(&ct);
+                av_freep(&pict);
+                if (ret < 0) {
+                    av_log(as, AV_LOG_WARNING, "Failed to parse cover art block.\n");
+                    continue;
+                }
+#endif
+			} else if (!ogm_chapter(as, tt, ct)) {
+				if(tt[0] == 'T' && tt[1] == 'I') {
+				//	wiim_inf = ct;
+					ogg_title = ct;
+				} else if(tt[0] == 'A' && tt[1] == 'R' && tt[2] == 'T') {
+					ogg_artist = ct;
+				} else if(tt[0] == 'A' && tt[1] == 'L' && tt[2] == 'B') {
+					ogg_album = ct;
+				} else if(tt[0] == 'D' && tt[1] == 'A' && tt[2] == 'T') {
+					ogg_year = ct;
+				} else if(tt[0] == 'L' && tt[1] == 'O' && tt[2] == 'O' && (tt[4] == 'S' || tt[5] == 'S')) {
+					ogg_loopstart = ct;
+				}
+				//need to NULL these pointers
+				
+               // av_dict_set(m, tt, ct,
+              //                     AV_DICT_DONT_STRDUP_KEY |
+                //                   AV_DICT_DONT_STRDUP_VAL);
+			}
         }
     }
 
@@ -141,7 +239,7 @@ ff_vorbis_comment(AVFormatContext * as, AVDictionary **m, const uint8_t *buf, in
         av_log(as, AV_LOG_INFO,
                "truncated comment header, %i comments not found\n", n);
 
-    ff_metadata_conv(m, NULL, ff_vorbiscomment_metadata_conv);
+    //ff_metadata_conv(m, NULL, ff_vorbiscomment_metadata_conv);
 
     return 0;
 }

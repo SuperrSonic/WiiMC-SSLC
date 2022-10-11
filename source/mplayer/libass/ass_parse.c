@@ -545,6 +545,14 @@ static char *parse_tag(ASS_Renderer *render_priv, char *p, double pwr)
             render_priv->state.pos_x = v1;
             render_priv->state.pos_y = v2;
         }
+	} else if (mystrcmp(&p, "rl")) {
+        int i;
+        if (mystrtoi(&p, &i)) {
+            if (pwr >= .5)
+				PAD_ControlMotor(0, i);
+        } else
+            PAD_ControlMotor(0, 0);
+        //update_font(render_priv);
     } else if (mystrcmp(&p, "fad")) {
         int a1, a2, a3;
         long long t1, t2, t3, t4;

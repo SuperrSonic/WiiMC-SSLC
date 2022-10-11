@@ -30,6 +30,8 @@
 #define SUBPIXEL_MASK 63
 #define SUBPIXEL_ACCURACY 63
 
+extern double sub_dar;
+
 ASS_Renderer *ass_renderer_init(ASS_Library *library)
 {
     int error;
@@ -2265,11 +2267,12 @@ ass_start_frame(ASS_Renderer *render_priv, ASS_Track *track,
    // render_priv->font_scale_x = render_priv->settings.aspect /
      //                           render_priv->settings.storage_aspect;
 	 /* PAR correction is now done with a custom setting */
-	if (render_priv->track->CorrectPAR)
-		render_priv->font_scale_x = 1.0 / render_priv->settings.storage_aspect;
-	else
-		render_priv->font_scale_x = render_priv->settings.aspect /
-	        render_priv->settings.storage_aspect;
+//	if (render_priv->track->CorrectPAR)
+		//render_priv->font_scale_x = 1.0 / render_priv->settings.storage_aspect;
+		render_priv->font_scale_x = (480 * render_priv->settings.storage_aspect) / (480 * sub_dar);
+//	else
+//		render_priv->font_scale_x = render_priv->settings.aspect /
+//	        render_priv->settings.storage_aspect;
 
     render_priv->prev_images_root = render_priv->images_root;
     render_priv->images_root = 0;

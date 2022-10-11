@@ -353,6 +353,46 @@ static unsigned int id3v2_tag_size(uint8_t maj_ver, stream_t *s) {
   return header_footer_size + size;
 }
 
+#include "../../utils/mem2_manager.h"
+u8 *pos_pic = NULL;
+extern int embedded_pic;
+//extern int wiim_inf;
+//extern bool thumbLoad;
+/*
+wchar_t* charToWChar(char* cArray, int len) {
+    char wideChar[2];
+    wchar_t wideCharW;
+    wchar_t *wArray = (wchar_t *) malloc(sizeof(wchar_t) * len / 2);
+    int counter = 0;
+
+    for (int j = 2; j < len; j+=2){
+        wideChar[1] = cArray[j]; wideChar[0] = cArray[j + 1];
+
+        wideCharW = (uint16_t)((uint8_t)wideChar[1] << 8 | (uint8_t)wideChar[0]);
+        wArray[counter] = wideCharW;
+        counter++;
+    }
+    wArray[counter] = '\0';
+    return wArray;
+} */
+//From asfheader.c
+static char* get_ucs2strII(const uint16_t* inbuf, uint16_t inlen)
+{
+  char* outbuf = calloc(inlen, 2);
+  char* q;
+  int i;
+
+  if (!outbuf) {
+    return NULL;
+  }
+  q = outbuf;
+  for (i = 0; i < inlen / 2; i++) {
+    uint8_t tmp;
+    PUT_UTF8(AV_RL16(&inbuf[i]), tmp, *q++ = tmp;)
+  }
+  return outbuf;
+}
+
 static int demux_audio_open(demuxer_t* demuxer) {
   stream_t *s;
   sh_audio_t* sh_audio;
@@ -364,6 +404,9 @@ static int demux_audio_open(demuxer_t* demuxer) {
   da_priv_t* priv;
   double duration;
   int found_WAVE = 0;
+  int found_ID3 = 0;
+  unsigned int loop_limit = 32;
+  bool skip_id3v1 = false;
 
   s = demuxer->stream;
 
@@ -387,7 +430,17 @@ static int demux_audio_open(demuxer_t* demuxer) {
       // empty the buffer
 	step = 4;
     } else if( hdr[0] == 'I' && hdr[1] == 'D' && hdr[2] == '3' && hdr[3] >= 2 && hdr[3] != 0xff) {
+
+	  //ID3v2.4, v2.3, v2.2
+	  if(hdr[3] == 4)
+		 found_ID3 = 2;
+      else if(hdr[3] > 2)
+         found_ID3 = 1;
+	  else if(hdr[3] == 2)
+		 found_ID3 = -1;
+
       unsigned int len = id3v2_tag_size(hdr[3], s);
+	  loop_limit = len;
       if(len > 0)
         stream_skip(s,len-10);
       step = 4;
@@ -403,6 +456,8 @@ static int demux_audio_open(demuxer_t* demuxer) {
         break;
       }
     } else if( hdr[0] == 'f' && hdr[1] == 'L' && hdr[2] == 'a' && hdr[3] == 'C' ) {
+      found_ID3 = 1;
+	  loop_limit = id3v2_tag_size(3, s); // Works
       frmt = fLaC;
       if (!mp3_hdrs || mp3_hdrs->cons_hdrs < 3)
         break;
@@ -444,8 +499,9 @@ static int demux_audio_open(demuxer_t* demuxer) {
     mp3_found = NULL;
     if(demuxer->movi_end && (s->flags & MP_STREAM_SEEK) == MP_STREAM_SEEK) {
       if(demuxer->movi_end >= 128) {
-#if 1
-        stream_seek(s,demuxer->movi_end-188);
+#if 0
+	//Parial support for Enhanced ID3v1, used for getting longer text easily.
+      stream_seek(s,demuxer->movi_end-188); //switch to 227?
       stream_read(s,hdr,4);
       if(!memcmp(hdr,"TAG+",4)) { // Works but is not up to spec.
 	char buf[61];
@@ -475,9 +531,330 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	//demux_info_add(demuxer,"Genre",genres[g]);
       }
 #endif
+#if 1
+//wiim_inf = 2;
+
+		uint8_t cur_bytes[4];
+		uint8_t cur_b_desc[1];
+		uint8_t apic_size[4];
+		uint8_t apic_mime[4];
+		uint8_t apic_desc[1]; //determine if there's a desc.
+		u8 apic_datstep = 0;
+		int val_apic_size = 0;
+		int j = 0;
+		if(found_ID3 > 0) {
+#if 1
+			//If a title, artist, or album is found, skip checking for ID3v1
+			//title
+			for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TIT2",4)) {
+				//encoding byte, 00 is ascii, 01 is u16
+				stream_seek(s, i+10);
+				
+				if(stream_read_char(s) == 0) {
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-1];
+				stream_seek(s, i+11);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Title",buf);
+				skip_id3v1 = true;
+				break;
+				}
+				else { //utf-16 string
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-2];
+				stream_seek(s, i+13);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				//buf[2] = '\0'; // first 0xFEXX
+				
+				//convert buf to utf8
+				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
+				memcpy(b, buf, sizeof(buf));
+			/*	for(int j=0;j < sizeof(buf);++j) {
+					if(buf[j] == 0)
+						buf[j] = buf[j+1];
+				} */
+				//wchar_t wc = charToWChar(buf, sizeof(buf));
+			//	wcstombs(buf, charToWChar(buf, sizeof(buf)), sizeof(buf));
+
+				//wcstombs(buf, wc, sizeof(buf));
+	//			ConvertUTF16toUTF8 (
+//	b[0], b[sizeof(buf)],
+//	buf[0], buf[sizeof(buf)], 0);
+				
+				demux_info_add(demuxer,"Title",get_ucs2strII(b, sizeof(buf)));
+				free(b);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+		}
+		//artist
+		for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TPE1",4)) {
+				//encoding byte, 00 is ascii, 01 is u16
+				stream_seek(s, i+10);
+				
+				if(stream_read_char(s) == 0) {
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-1];
+				stream_seek(s, i+11);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Artist",buf);
+				skip_id3v1 = true;
+				break;
+				}
+				else {
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-2];
+				stream_seek(s, i+13);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
+				memcpy(b, buf, sizeof(buf));
+				
+				demux_info_add(demuxer,"Artist",get_ucs2strII(b, sizeof(buf)));
+				free(b);
+				skip_id3v1 = true;
+				break;
+			}
+			}
+		}
+		//album
+		for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TALB",4)) {
+				//encoding byte, 00 is ascii, 01 is u16
+				stream_seek(s, i+10);
+				if(stream_read_char(s) == 0) {
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-1];
+				stream_seek(s, i+11);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Album",buf);
+				skip_id3v1 = true;
+				break;
+				}
+				else {
+					uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-2];
+				stream_seek(s, i+13);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
+				memcpy(b, buf, sizeof(buf));
+				demux_info_add(demuxer,"Album",get_ucs2strII(b, sizeof(buf)));
+				free(b);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+		}
+		//year, TDRC should only be read in v2.4
+		for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if((found_ID3 == 2 && !memcmp(cur_bytes,"TDRC",4)) || (found_ID3 == 1 && !memcmp(cur_bytes,"TYER",4))) {
+				//encoding byte, 00 is ascii, 01 is u16
+				stream_seek(s, i+10);
+				if(stream_read_char(s) == 0) {
+				uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-1];
+				stream_seek(s, i+11);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Year",buf);
+				break;
+				}
+				else {
+					uint8_t size_of_TIT2[4];
+				stream_seek(s, i+4);
+				stream_read(s, size_of_TIT2, 4);
+				char buf[(size_of_TIT2[0] << 24) + (size_of_TIT2[1] << 16) + (size_of_TIT2[2] << 8) + size_of_TIT2[3]-2];
+				stream_seek(s, i+13);
+				stream_read(s,buf,sizeof(buf));
+				buf[sizeof(buf)] = '\0';
+				uint16_t* b = (uint16_t*) malloc(sizeof(buf) * sizeof(uint16_t));
+				memcpy(b, buf, sizeof(buf));
+				demux_info_add(demuxer,"Year",get_ucs2strII(b, sizeof(buf)));
+				free(b);
+				break;
+				}
+			}
+		}
+#endif
+
+		for(int i=32; i < loop_limit; i++) { // start at pos 32 should speed up search
+			stream_seek(s, i);
+			stream_read(s, cur_bytes, 4);
+			if(cur_bytes[0] == 'A' && cur_bytes[1] == 'P' && cur_bytes[2] == 'I' && cur_bytes[3] == 'C') {
+				stream_seek(s, i+4); // Get apic size
+				stream_read(s,apic_size,4);
+				//Goto pic
+				val_apic_size = (apic_size[0] << 24) + (apic_size[1] << 16) + (apic_size[2] << 8) + apic_size[3];
+				if(val_apic_size > 1.5*1024*1024)
+					val_apic_size = 1.5*1024*1024;
+					//break;
+			//	wiim_inf = val_apic_size; // For debug
+				stream_seek(s, i+17); // Get mime - jpeg, jpg, png
+				stream_read(s, apic_mime, 4);
+				if(apic_mime[3] == 'g') // jpeg mimetype
+					apic_datstep = 24;
+				else
+					apic_datstep = 23; // jpg/png mimetype
+				
+				//handle description
+				stream_seek(s, apic_datstep == 24 ? i+23 : i+22); // Get desc if NULL
+				stream_read(s, apic_desc, 1);
+				if(apic_desc[0] != '\0') {
+					for(j=0;j<0xFF;j++) {
+						stream_seek(s, apic_datstep == 24 ? i+23+j : i+22+j);
+						stream_read(s, cur_b_desc, 1);
+						if(cur_b_desc[0] == '\0')
+							break;
+					}
+				}
+				//wiim_inf = apic_datstep+j;
+				
+				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+				stream_seek(s, i+apic_datstep+j); // Get pic data
+				stream_read(s, pos_pic, val_apic_size);
+				//enable cover art in gui
+			//	thumbLoad = true; // enable in audio callback to create a delay
+				embedded_pic = 1;
+				break;
+			}
+		}
+		} else if(found_ID3 == -1) {
+			//original version, rare.
+			//title
+			for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TT2",3)) {
+				uint8_t size_of_TIT2[1];
+				stream_seek(s, i+5);
+				stream_read(s, size_of_TIT2, 1);
+				char buf[size_of_TIT2[0]];
+				stream_seek(s, i+7);
+				stream_read(s,buf,sizeof(buf));
+			//	buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Title",buf);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+			//artist
+			for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TP1",3)) {
+				uint8_t size_of_TIT2[1];
+				stream_seek(s, i+5);
+				stream_read(s, size_of_TIT2, 1);
+				char buf[size_of_TIT2[0]];
+				stream_seek(s, i+7);
+				stream_read(s,buf,sizeof(buf));
+			//	buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Artist",buf);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+			//album
+			for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TAL",3)) {
+				uint8_t size_of_TIT2[1];
+				stream_seek(s, i+5);
+				stream_read(s, size_of_TIT2, 1);
+				char buf[size_of_TIT2[0]];
+				stream_seek(s, i+7);
+				stream_read(s,buf,sizeof(buf));
+			//	buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Album",buf);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+			//year
+			for(int i=4; i < loop_limit; i++) {
+				stream_seek(s, i);
+				stream_read(s, cur_bytes, 4);
+			if(!memcmp(cur_bytes,"TYE",3)) {
+				uint8_t size_of_TIT2[1];
+				stream_seek(s, i+5);
+				stream_read(s, size_of_TIT2, 1);
+				char buf[size_of_TIT2[0]];
+				stream_seek(s, i+7);
+				stream_read(s,buf,sizeof(buf));
+			//	buf[sizeof(buf)] = '\0';
+				demux_info_add(demuxer,"Year",buf);
+				skip_id3v1 = true;
+				break;
+				}
+			}
+			//pic
+			for(int i=32; i < loop_limit; i++) { // start at pos 32 should speed up search
+			stream_seek(s, i);
+			stream_read(s, cur_bytes, 4);
+			if(cur_bytes[0] == '\0' && cur_bytes[1] == 'P' && cur_bytes[2] == 'I' && cur_bytes[3] == 'C') {
+				stream_seek(s, i+4); // Get apic size
+				stream_read(s,apic_size,4);
+				//Goto pic
+				val_apic_size = (apic_size[0] << 24) + (apic_size[1] << 16) + (apic_size[2] << 8) + apic_size[3];
+				if(val_apic_size > 1.5*1024*1024)
+					val_apic_size = 1.5*1024*1024;
+				stream_seek(s, i+8); // Get mime - jpeg, jpg, png
+				stream_read(s, apic_mime, 4);
+				if(apic_mime[2] == 'G') // JPG/PNG mimetype
+					apic_datstep = 0xD;
+				else
+					apic_datstep = 0xE; // JPEG mimetype, not sure if it exists.
+				
+				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+				stream_seek(s, i+apic_datstep); // Get pic data
+				stream_read(s, pos_pic, val_apic_size);
+				embedded_pic = 1;
+				break;
+			}
+			}
+			
+		}
+
+		//works, now to automate
+	//	pos_pic = (u8 *)mem2_memalign(32, 200*1024, MEM2_OTHER);
+	//	stream_seek(s, 0x7F);
+	//	stream_read(s,pos_pic,0xBFB0);
+#endif
+
 	  stream_seek(s,demuxer->movi_end-128);
       stream_read(s,hdr,3);
-	  if(!memcmp(hdr,"TAG",3)) {
+	  if(!memcmp(hdr,"TAG",3) && !skip_id3v1) {
 	char buf[31];
 	uint8_t g;
           demuxer->movi_end -= 128;
@@ -646,6 +1023,58 @@ static int demux_audio_open(demuxer_t* demuxer) {
 	      sh_audio->i_bps = 64 * 1024;
 	    sh_audio->needs_parsing = 1;
 	    get_flac_metadata (demuxer);
+		
+		uint8_t cur_bytes[4];
+		uint8_t apic_size[4];
+		uint8_t apic_mime[4];
+		uint8_t apic_desc[4];
+		//u8 apic_datstep = 0;
+		int len_mimetype = 0;
+		int len_desc = 0;
+		int val_apic_size = 0;
+		if(found_ID3) {
+		for(int i=32;i < loop_limit;i++) { // start at pos 32 should speed up search
+			stream_seek(s, i);
+			stream_read(s, cur_bytes, 4);
+			if(cur_bytes[0] == 'a' && cur_bytes[1] == 'g' && cur_bytes[2] == 'e' && cur_bytes[3] == '/') {
+			/*	stream_seek(s, i+4); // Get mime - jpeg, jpg, png
+				stream_read(s, apic_mime, 4);
+				if(apic_mime[3] == 'g') { // jpeg mimetype
+					apic_datstep = 0x20;
+					stream_seek(s, i+0x1C); // Get apic size
+					stream_read(s,apic_size,4);
+				} else {
+					apic_datstep = 0x1F; // jpg/png mimetype
+					stream_seek(s, i+0x1B); // Get apic size
+					stream_read(s,apic_size,4);
+				}*/
+				stream_seek(s, (i-0xA)+4); //mimetype length
+				stream_read(s, apic_mime, 4);
+				len_mimetype = (apic_mime[0] << 24) + (apic_mime[1] << 16) + (apic_mime[2] << 8) + apic_mime[3];
+				
+				stream_seek(s, (i-0xA)+8+len_mimetype); //desc length
+				stream_read(s, apic_desc, 4);
+				len_desc = (apic_desc[0] << 24) + (apic_desc[1] << 16) + (apic_desc[2] << 8) + apic_desc[3];
+				
+				stream_seek(s, (i-0xA)+8+len_mimetype+len_desc+4+4+4+4+4);
+				stream_read(s, apic_size, 4);
+				
+				//Goto pic
+				val_apic_size = (apic_size[0] << 24) + (apic_size[1] << 16) + (apic_size[2] << 8) + apic_size[3];
+				if(val_apic_size > 1.5*1024*1024)
+					break;
+				//wiim_inf = val_apic_size; // For debug
+				
+				pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+				stream_seek(s, (i-0xA)+8+len_mimetype+len_desc+24); // Get pic data
+				stream_read(s, pos_pic, val_apic_size);
+				//enable cover art in gui
+				embedded_pic = 1;
+				break;
+			}
+		}
+		}
+		
 	    break;
   }
 
@@ -735,7 +1164,8 @@ static int demux_audio_fill_buffer(demuxer_t *demux, demux_stream_t *ds) {
     l = 65535;
     dp = new_demux_packet(l);
     l = stream_read(s,dp->buffer,l);
-    priv->next_pts = MP_NOPTS_VALUE;
+    //priv->next_pts = MP_NOPTS_VALUE;
+    priv->next_pts += l/(double)sh_audio->i_bps;
     break;
   }
   default:

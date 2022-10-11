@@ -7,9 +7,6 @@ msgstr "Video"
 msgid "Music"
 msgstr "Música"
 
-msgid "Pictures"
-msgstr "Imágenes"
-
 msgid "Online Media"
 msgstr "Medios online"
 
@@ -30,9 +27,6 @@ msgstr "Cancelar"
 
 msgid "Information"
 msgstr "Información"
-
-msgid "Credits"
-msgstr "Créditos"
 
 msgid "Play"
 msgstr "Reproducir"
@@ -61,11 +55,17 @@ msgstr "Directo"
 msgid "Screensaver Art"
 msgstr "Carátulas en el salvapantallas"
 
+msgid "Internal Loops"
+msgstr "Loop interno"
+
 msgid "Top"
 msgstr "Arriba"
 
 msgid "Side"
 msgstr "Al lado"
+
+msgid "Full"
+msgstr "Completo"
 
 msgid "Playlist"
 msgstr "Lista de reprodución"
@@ -133,21 +133,6 @@ msgstr "DVD Video"
 msgid "Go back"
 msgstr "Atras"
 
-msgid "Update Available"
-msgstr "Actualización disponible"
-
-msgid "An update is available!"
-msgstr "¡Una actualización disponible!"
-
-msgid "Update now"
-msgstr "Actualizar ahora"
-
-msgid "Update later"
-msgstr "Actualizar más tarde"
-
-msgid "Online media file not found."
-msgstr "Archivo no encontrado"
-
 msgid "Unrecognized DVD format!"
 msgstr "¡Formato de DVD desconocido!"
 
@@ -168,9 +153,6 @@ msgstr "Opciones - Video"
 
 msgid "Settings - Music"
 msgstr "Opciones - Música"
-
-msgid "Settings - Pictures"
-msgstr "Opciones - Imágenes"
 
 msgid "Settings - Online Media"
 msgstr "Opciones - Medios online"
@@ -194,7 +176,7 @@ msgid "Exit Action"
 msgstr "Acción al salir"
 
 msgid "Wii Remote Rumble"
-msgstr "Vibración del mando"
+msgstr "Vibración"
 
 msgid "Hide"
 msgstr "Ocultar"
@@ -206,7 +188,7 @@ msgid "Auto"
 msgstr "Auto"
 
 msgid "Return to Wii Menu"
-msgstr "Volver al Menu Wii"
+msgstr "Volver al Menú Wii"
 
 msgid "Power Off Wii"
 msgstr "Apagar Wii"
@@ -325,6 +307,9 @@ msgstr "Reiniciar"
 msgid "Online Media Folder"
 msgstr "Carpeta medios online"
 
+msgid "Banner Screensaver"
+msgstr "Screensaver Online"
+
 msgid "Add SMB Share"
 msgstr "Conexión al PC"
 
@@ -332,7 +317,13 @@ msgid "Add FTP Site"
 msgstr "Conexión FTP"
 
 msgid "DVD Menu"
-msgstr "Menu DVD"
+msgstr "Menú DVD"
+
+msgid "DVD Sync Type"
+msgstr "Método de scan"
+
+msgid "Mixed"
+msgstr "Mixto"
 
 msgid "Skip to Main Title"
 msgstr "Ir al título principal"
@@ -505,6 +496,9 @@ msgstr "Opciones - Subtítulos"
 msgid "Visibility"
 msgstr "Visibilidad"
 
+msgid "Monospaced"
+msgstr "Monoespaciada"
+
 msgid "Delay"
 msgstr "Retrasar"
 
@@ -523,9 +517,6 @@ msgstr "¡Imposible cambiar idioma. Memoria insuficiente!"
 msgid "Font Required"
 msgstr "Fuente requerida"
 
-msgid "Unable to save font file!"
-msgstr "¡Imposible guardar fuente!"
-
 msgid "Out of Memory"
 msgstr "Fuera de memoria"
 
@@ -538,8 +529,17 @@ msgstr "Este directorio contiene más entradas del máximo permitido. No todas s
 msgid "This playlist contains more entries than the maximum allowed. Not all entries will be visible."
 msgstr "Esta lista de reproducción contiene más entradas del máximo permitido. No todas serán visibles."
 
-msgid "Color"
-msgstr "Color"
+msgid "White"
+msgstr "Blanco"
+
+msgid "Black"
+msgstr "Negro"
+
+msgid "Yellow"
+msgstr "Amarillo"
+
+msgid "Red"
+msgstr "Rojo"
 
 msgid "Size"
 msgstr "Tamaño"
@@ -601,6 +601,15 @@ msgstr "Carátulas y portadas"
 msgid "Art Folder"
 msgstr "Carpeta de carátulas y portadas"
 
+msgid "Screensaver Banner Limiter"
+msgstr "Límite de banners"
+
+msgid "Banner Folder"
+msgstr "Carpeta de banners"
+
+msgid "JPEG Resample"
+msgstr "JPEG suave"
+
 msgid "Night Filter"
 msgstr "Filtro nocturno"
 
@@ -613,8 +622,8 @@ msgstr "Modo "Double-Strike""
 msgid "Force 576p"
 msgstr "Modo 576p"
 
-msgid "Enhanced Definition"
-msgstr "Definición Aumentada"
+msgid "Enhanced Resolution"
+msgstr "Definición mejorada"
 
 msgid "Error opening font file!"
 msgstr "Error abriendo la fuente del archivo!"

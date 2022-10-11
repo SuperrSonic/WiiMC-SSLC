@@ -70,6 +70,7 @@ static int init(sh_audio_t * sh_audio)
             sh_audio->sample_format = AF_FORMAT_U8;
         break;
     case 0x736F7774: // 'twos'
+	//brstm: big-endian PCM16
         sh_audio->sample_format = AF_FORMAT_S16_BE;
         // intended fall-through
     case 0x74776F73: // 'sowt'

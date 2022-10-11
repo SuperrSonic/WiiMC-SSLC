@@ -43,13 +43,17 @@ u32 FrameTimer = 0;
 bool drawGui = false;
 bool pal = false;
 bool pal60 = false;
+static bool want576i = false;
 u8 night = 22;
 bool fade_boot = false;
 bool fade_not = false;
 
 bool delayrender = true; //fixes bottom screen garbage when loaded by channel.
-
+//bool menu_black = false;
+bool tiledBlack = false;
+unsigned timerBlack = 12;
 extern bool wiiTiledRender;
+extern bool ssIsActive;
 
 /****************************************************************************
  * TakeScreenshot
@@ -59,16 +63,6 @@ extern bool wiiTiledRender;
 
 void TakeScreenshot()
 {
-	// Change video mode as fast as soon as possible
-	// otherwise a frame of oversized EFB will pop up.
-/*	if(WiiSettings.tiledRender) {
-	//	VIDEO_SetBlack(TRUE);
-		vmode->fbWidth = 640;
-		VIDEO_Configure(vmode);
-		VIDEO_Flush();
-		//VIDEO_SetBlack(FALSE);
-	}*/
-	
 	GX_SetTexCopySrc(0, 0, vmode->fbWidth, vmode->efbHeight);
 	GX_SetTexCopyDst(vmode->fbWidth, vmode->efbHeight, GX_TF_RGBA8, GX_FALSE);
 	DCInvalidateRange(videoScreenshot, vmode->fbWidth * vmode->efbHeight * 4);
@@ -184,6 +178,16 @@ void fadeout_copyfilter()
  ***************************************************************************/
 void Menu_Render()
 {
+	//This fixes some noticeable garbage flicker when a video ends.
+	if(tiledBlack) {
+		VIDEO_SetBlack(TRUE);
+		--timerBlack;
+		if(!AutobootExit && timerBlack == 0)
+			VIDEO_SetBlack(FALSE);
+		if(timerBlack == 0)
+			tiledBlack = false;
+	}
+	
 	//whichfb ^= 1; // flip framebuffer
 	GX_SetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 	GX_SetColorUpdate(GX_TRUE);
@@ -232,8 +236,12 @@ void Menu_DrawImg(f32 xpos, f32 ypos, u16 width, u16 height, u8 data[],
 
 	GXTexObj texObj;
 
+	//u8 mipmap = GX_FALSE;
+	//if(width == 600 && height == 600)
+	//	mipmap = GX_TRUE;
+	
 	GX_InitTexObj(&texObj, data, width, height, format, GX_CLAMP, GX_CLAMP, GX_FALSE);
-	//GX_InitTexObjFilterMode(&texObj, GX_LINEAR, GX_NEAR);
+	//GX_InitTexObjFilterMode(&texObj, GX_NEAR, GX_NEAR);
 	GX_LoadTexObj(&texObj, GX_TEXMAP0);
 	GX_InvalidateTexAll();
 
@@ -312,7 +320,7 @@ extern bool point_on;
 int DrawMPlayerGui()
 {
 	UpdatePads();
-	if(safe_gc) { // GC controller reads 1 input as 4 inputs when using tiled rendering
+	if(safe_gc) { // GC controller reads 1 input as 2 inputs when using tiled rendering
 		MPlayerInput();
 		return 0;
 	} else if (!wiiTiledRender)
@@ -567,46 +575,69 @@ void SetMplTiled()
 	GX_Flush();
 	
 	// Clear framebuffers
-	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
-	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+//	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+//	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
     VIDEO_Configure(vmode);
     VIDEO_Flush();
-    VIDEO_WaitVSync();
+    //VIDEO_WaitVSync();
 }
 
 void SetMplTiledOff()
 {
-	if(!WiiSettings.tiledRender || !wiiTiledRender)
+	if(!WiiSettings.tiledRender || !wiiTiledRender || ssIsActive)
 		return;
 	
-//	VIDEO_SetBlack(TRUE);
-	//GX_SetScissor(0,0,720,vmode->efbHeight);
+	// needed, this fixes tearing when calling the menu.
+	int i = 0;
+	do {
+		VIDEO_WaitVSync();
+		VIDEO_ClearFrameBuffer (vmode, xfb[i], COLOR_BLACK);
+		i++;
+	} while(i < 2);
+	
+//	for(int i=0;i < 2;++i) {
+//		VIDEO_ClearFrameBuffer (vmode, xfb[i], COLOR_BLACK);
+//	}
+	//VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
+	//VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
+	//usleep(500);
+
+	timerBlack = 12; //12 is good, lower might be too annoying.
+	tiledBlack = true;
+	// VIDEO_SetBlack causes refresh message when in 576p
+	// it also causes 0 fps when changing music in ss
+	VIDEO_SetBlack(TRUE);
+
 	GX_SetScissorBoxOffset(0, 0);
+	//GX_SetScissor(0,0,720,vmode->efbHeight);
 	//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
 	//GX_SetDispCopySrc(0, 0, 640, vmode->efbHeight);
 	//GX_SetDispCopyDst(vmode->fbWidth,vmode->xfbHeight);
-	
-//	vmode->viWidth = VI_MAX_WIDTH_NTSC;
+
 	if(WiiSettings.viWidth)
-		SetVIscale();
+		//SetVIscale();
+		vmode->viWidth = VI_MAX_WIDTH_NTSC;
+	else if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+		vmode->viWidth = 711;
 	else
-		SetVIscaleback();
+		vmode->viWidth = 704;
+		//SetVIscaleback();
 	vmode->fbWidth = 640;
 	HOffset();
-	
+
 	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
-	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
-	//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
+	//GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
+	
 	GX_Flush();
 
-	// When loading audio-only this triggers a one frame flicker
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
@@ -614,8 +645,9 @@ void SetMplTiledOff()
 
     VIDEO_Configure(vmode);
     VIDEO_Flush();
-    VIDEO_WaitVSync();
-//	VIDEO_SetBlack(FALSE);
+	
+    //VIDEO_WaitVSync();
+	//VIDEO_SetBlack(FALSE);
 }
 #endif
 
@@ -631,14 +663,17 @@ InitVideo ()
 	//static vu32* const _vigReg = (vu32*)0xCC002030;
 	//*_vigReg = 0x1001; //0x1001(30fps), 0x120E(60fps)
 
-	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale) // 50Hz
+	if (vmode == &TVPal576IntDfScale || vmode == &TVPal576ProgScale) { // 50Hz
 		pal = true;
-	else if (CONF_GetVideo() == CONF_VIDEO_PAL) // 60Hz
+		if(vmode == &TVPal576IntDfScale)
+			want576i = true;
+	} else if (CONF_GetVideo() == CONF_VIDEO_PAL) // 60Hz
 		pal60 = true;
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 		vmode->viWidth = 711;
-		screenwidth = 768;
+		//screenwidth = 768;
+		screenwidth = 854;
 	}
 
 	HOffset();
@@ -663,13 +698,15 @@ InitVideo2 ()
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
 	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
 	//xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
-	vmode->fbWidth = 640;
-	vmode->xfbHeight = 480; //do I have to do this?
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
 	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
 	//VIDEO_ClearFrameBuffer (vmode, xfb[2], COLOR_BLACK);
+	// It's immportant to clear the fb before going back to 640x480
+	// otherwise changing to 720x480 will show some green lines on the first frame.
+	vmode->fbWidth = 640;
+	vmode->xfbHeight = want576i ? 576 : 480;
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
 	VIDEO_Flush ();
@@ -704,14 +741,12 @@ InitVideo2 ()
 	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
 	GX_SetFieldMode(GX_DISABLE,((vmode->viHeight==2*vmode->xfbHeight)?GX_ENABLE:GX_DISABLE));
 
-	
 	VIDEO_SetPreRetraceCallback(vblank_cb);
 
 	GX_SetDrawDoneCallback(Draw_VIDEO);
 	GX_Flush();
 
 	videoScreenshot = (u8 *) mem2_malloc(vmode->fbWidth * vmode->efbHeight * 4, MEM2_VIDEO);
-	//videoScreenshot = (u8 *) mem2_malloc(720 * vmode->efbHeight * 4, MEM2_VIDEO);
 }
 
 }

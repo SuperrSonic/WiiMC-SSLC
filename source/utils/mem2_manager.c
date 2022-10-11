@@ -366,6 +366,7 @@ u32 mem2_size(const int i)
 }
 
 //extern int debug_mem;
+extern int debug_space;
 
 #ifdef DEBUG_MEM2_LEVEL
 static void PrintAreaInfo(int index)
@@ -379,6 +380,7 @@ static void PrintAreaInfo(int index)
 	printf("Area: %i. free blocks: %u  free size: %u  used blocks: %u  used_size: %u\n",index, 
 			info.free_blocks,info.free_size,info.used_blocks,info.used_size);
 	//debug_mem = info.free_size,info.used_blocks;
+	debug_space = info.free_size;
 }
 #endif
 

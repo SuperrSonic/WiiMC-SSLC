@@ -61,6 +61,7 @@ static void Reset(BROWSER *info)
 		mem2_free(i->year, MEM2_BROWSER);
 		mem2_free(i->desc, MEM2_BROWSER);
 		mem2_free(i->image, MEM2_BROWSER);
+		mem2_free(i->tunein, MEM2_BROWSER);
 		n=i->next;
 		mem2_free(i, MEM2_BROWSER);
 		i=n;
@@ -184,6 +185,7 @@ bool DeleteEntry(BROWSER *info, BROWSERENTRY *entry)
 			mem2_free(i->year, MEM2_BROWSER);
 			mem2_free(i->desc, MEM2_BROWSER);
 			mem2_free(i->image, MEM2_BROWSER);
+			mem2_free(i->tunein, MEM2_BROWSER);
 			mem2_free(i, MEM2_BROWSER);
 				
 			return true;

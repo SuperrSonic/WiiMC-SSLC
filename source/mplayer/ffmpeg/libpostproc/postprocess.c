@@ -670,10 +670,12 @@ static inline void postProcess(const uint8_t src[], int srcStride, uint8_t dst[]
 /* -pp Command line Help
 */
 #if LIBPOSTPROC_VERSION_INT < (52<<16)
-const char *const pp_help=
+//const char *const pp_help=
 #else
-const char pp_help[] =
+//const char pp_help[] =
 #endif
+
+#if 0
 "Available postprocessing filters:\n"
 "Filters                        Options\n"
 "short  long name       short   long option     Description\n"
@@ -716,7 +718,7 @@ const char pp_help[] =
 "tn:64:128:256\n"
 "\n"
 ;
-
+#endif
 pp_mode *pp_get_mode_by_name_and_quality(const char *name, int quality)
 {
     char temp[GET_MODE_BUFFER_SIZE];
@@ -725,7 +727,7 @@ pp_mode *pp_get_mode_by_name_and_quality(const char *name, int quality)
     static const char optionDelimiters[] = ":";
     struct PPMode *ppMode;
     char *filterToken;
-
+#if 0
     if (!strcmp(name, "help")) {
         const char *p;
         for (p = pp_help; strchr(p, '\n'); p = strchr(p, '\n') + 1) {
@@ -734,7 +736,7 @@ pp_mode *pp_get_mode_by_name_and_quality(const char *name, int quality)
         }
         return NULL;
     }
-
+#endif
     ppMode= av_malloc(sizeof(PPMode));
 
     ppMode->lumMode= 0;

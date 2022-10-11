@@ -30,6 +30,7 @@
 #include "avformat.h"
 #include "internal.h"
 #include "avio_internal.h"
+#include "id3v2.h"
 #include "riff.h"
 #include "asf.h"
 #include "asfcrypt.h"
@@ -130,6 +131,7 @@ static void print_guid(const ff_asf_guid *g)
     else PRINT_IF_GUID(g, ff_asf_ext_stream_embed_stream_header);
     else PRINT_IF_GUID(g, ff_asf_ext_stream_audio_stream);
     else PRINT_IF_GUID(g, ff_asf_metadata_header);
+	else PRINT_IF_GUID(g, ff_asf_metadata_library_header);
     else PRINT_IF_GUID(g, ff_asf_marker_header);
     else PRINT_IF_GUID(g, stream_bitrate_guid);
     else PRINT_IF_GUID(g, ff_asf_language_guid);
@@ -163,6 +165,155 @@ static int get_value(AVIOContext *pb, int type){
     }
 }
 
+#include "../../utils/mem2_manager.h"
+extern u8 *pos_pic;
+extern int embedded_pic;
+//extern int wiim_inf;
+int wm_picture_type2 = 0;
+
+/* MSDN claims that this should be "compatible with the ID3 frame, APIC",
+ * but in reality this is only loosely similar */
+static int asf_read_picture(AVFormatContext *s, int len)
+{
+    AVPacket pkt = { 0 };
+    const CodecMime *mime = ff_id3v2_mime_tags;
+    enum  CodecID      id = CODEC_ID_NONE;
+    char mimetype[64];
+    uint8_t  *desc = NULL;
+    ASFStream *ast = NULL;
+    AVStream   *st = NULL;
+    int ret, type, picsize, desc_len;
+
+    /* type + picsize + mime + desc */
+    if (len < 1 + 4 + 2 + 2) {
+        av_log(s, AV_LOG_ERROR, "Invalid attached picture size: %d.\n", len);
+        return AVERROR_INVALIDDATA;
+    }
+
+	//check for pos with seek then cur pos.
+/*
+	char cur_bytes[4] = { 0 };
+	int i = 0;
+	avio_seek(s->pb, 0x20, SEEK_SET);
+	for(i=0;i<len;i++) {
+		avio_seek(s->pb, i, SEEK_CUR);
+		avio_read(s->pb, cur_bytes, 4);
+		if(cur_bytes[0] == 'M' && cur_bytes[1] == 0x0 && cur_bytes[2] == 0x2F) {
+			avio_rb32(s->pb);
+			avio_rb32(s->pb);
+			avio_rb32(s->pb);
+			avio_rb32(s->pb);
+			
+			pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
+			avio_seek(s->pb, 0x1D, SEEK_CUR);
+			avio_read(s->pb, pos_pic, len);
+			//embedded_pic = 1;
+			break;
+		}
+			
+	} */
+	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
+			//avio_seek(s->pb, -len, SEEK_CUR);
+		//	avio_read(s->pb, pos_pic, len);
+			//embedded_pic = 1;
+		//	return 0;
+
+	/* if the file size is big the position of wd/picture different. */
+	if(wm_picture_type2) {
+		avio_seek(s->pb, -len, SEEK_CUR);
+		wm_picture_type2 = 0;
+	}
+
+    /* picture type */
+    type = avio_r8(s->pb);
+    len--;
+    if (type >= FF_ARRAY_ELEMS(ff_id3v2_picture_types) || type < 0) {
+        av_log(s, AV_LOG_WARNING, "Unknown attached picture type: %d.\n", type);
+        type = 0;
+    }
+
+    /* picture data size */
+    picsize = avio_rl32(s->pb);
+    len -= 4;
+
+    /* picture MIME type */
+    len -= avio_get_str16le(s->pb, len, mimetype, sizeof(mimetype));
+    while (mime->id != CODEC_ID_NONE) {
+        if (!strncmp(mime->str, mimetype, sizeof(mimetype))) {
+            id = mime->id;
+            break;
+        }
+        mime++;
+    }
+	//fails here
+//wiim_inf = type;
+    if (id == CODEC_ID_NONE) {
+        av_log(s, AV_LOG_ERROR, "Unknown attached picture mimetype: %s.\n",
+               mimetype);
+        return 0;
+    }
+
+    if (picsize >= len) {
+        av_log(s, AV_LOG_ERROR, "Invalid attached picture data size: %d >= %d.\n",
+               picsize, len);
+        return AVERROR_INVALIDDATA;
+    }
+
+    /* picture description */
+    desc_len = (len - picsize) * 2 + 1;
+    desc     = av_malloc(desc_len);
+    if (!desc)
+        return AVERROR(ENOMEM);
+    len -= avio_get_str16le(s->pb, len - picsize, desc, desc_len);
+
+    ret = av_get_packet(s->pb, &pkt, picsize);
+    if (ret < 0)
+        goto fail;
+
+    st = avformat_new_stream(s, NULL);
+    ast = av_mallocz(sizeof(*ast));
+    if (!st || !ast) {
+        ret = AVERROR(ENOMEM);
+        goto fail;
+    }
+	// memleak
+/*    st->priv_data = ast;
+
+    st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
+    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
+    st->codec->codec_id   = id;
+
+    st->attached_pic      = pkt;
+    st->attached_pic.stream_index = st->index;
+    st->attached_pic.flags |= AV_PKT_FLAG_KEY;
+*/
+	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
+	avio_seek(s->pb, -picsize, SEEK_CUR);
+	
+	//limit length to avoid crash
+	if(picsize > 1.5*1024*1024)
+		picsize = 1.5*1024*1024;
+	
+	avio_read(s->pb, pos_pic, picsize);
+	embedded_pic = 1;
+//	wiim_inf = 23;
+
+    if (*desc)
+        av_dict_set(&st->metadata, "title", desc, AV_DICT_DONT_STRDUP_VAL);
+    else
+        av_freep(&desc);
+
+    av_dict_set(&st->metadata, "comment", ff_id3v2_picture_types[type], 0);
+
+    return 0;
+
+fail:
+    av_freep(&ast);
+    av_freep(&desc);
+    av_free_packet(&pkt);
+    return ret;
+}
+
 static void get_tag(AVFormatContext *s, const char *key, int type, int len)
 {
     char *value;
@@ -183,6 +334,12 @@ static void get_tag(AVFormatContext *s, const char *key, int type, int len)
     } else if (type > 1 && type <= 5) {  // boolean or DWORD or QWORD or WORD
         uint64_t num = get_value(s->pb, type);
         snprintf(value, len, "%"PRIu64, num);
+	} else if (type == 1 && !strcmp(key, "WM/Picture")) { // handle cover art
+        asf_read_picture(s, len);
+        goto finish;
+	} else if (type == 6) { // (don't) handle GUID
+        av_log(s, AV_LOG_DEBUG, "Unsupported GUID value in tag %s.\n", key);
+        goto finish;
     } else {
         av_log(s, AV_LOG_DEBUG, "Unsupported value type %d in tag %s.\n", type, key);
         goto finish;
@@ -527,6 +684,13 @@ static int asf_read_metadata(AVFormatContext *s, int64_t size)
         //av_log(s, AV_LOG_ERROR, "%d %d %d %d %d <%s>\n", i, stream_num, name_len, value_type, value_len, name);
         value_num= avio_rl16(pb);//we should use get_value() here but it does not work 2 is le16 here but le32 elsewhere
         avio_skip(pb, value_len - 2);
+		
+		if (!strcmp(name, "WM/Picture")) {
+			//so far so good
+			wm_picture_type2 = 1;
+			asf_read_picture(s, value_len);
+			//wiim_inf = value_len;
+		}
 
         if(stream_num<128){
             if     (!strcmp(name, "AspectRatioX")) asf->dar[stream_num].num= value_num;
@@ -618,6 +782,8 @@ static int asf_read_header(AVFormatContext *s)
         } else if (!ff_guidcmp(&g, &ff_asf_extended_content_header)) {
             asf_read_ext_content_desc(s, gsize);
         } else if (!ff_guidcmp(&g, &ff_asf_metadata_header)) {
+            asf_read_metadata(s, gsize);
+		} else if (!ff_guidcmp(&g, &ff_asf_metadata_library_header)) {
             asf_read_metadata(s, gsize);
         } else if (!ff_guidcmp(&g, &ff_asf_ext_stream_header)) {
             asf_read_ext_stream_properties(s, gsize);

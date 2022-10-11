@@ -26,6 +26,7 @@
 #include "pcm.h"
 #include "aiff.h"
 #include "isom.h"
+#include "id3v2.h"
 
 #define AIFF                    0
 #define AIFF_C_VERSION1         0xA2805140
@@ -144,9 +145,6 @@ static unsigned int get_aiff_header(AVFormatContext *s, int size,
         case CODEC_ID_GSM:
             codec->block_align = 33;
             break;
-        case CODEC_ID_QCELP:
-            codec->block_align = 35;
-            break;
         default:
             aiff->block_duration = 1;
             break;
@@ -188,13 +186,14 @@ static int aiff_probe(AVProbeData *p)
 /* aiff input */
 static int aiff_read_header(AVFormatContext *s)
 {
-    int size, filesize;
-    int64_t offset = 0;
+    int ret, size, filesize;
+    int64_t offset = 0, position;
     uint32_t tag;
     unsigned version = AIFF_C_VERSION1;
     AVIOContext *pb = s->pb;
     AVStream * st;
     AIFFInputContext *aiff = s->priv_data;
+	ID3v2ExtraMeta *id3v2_extra_meta = NULL;
 
     /* check FORM header */
     filesize = get_tag(pb, &tag);
@@ -231,6 +230,19 @@ static int aiff_read_header(AVFormatContext *s)
             if (offset > 0) // COMM is after SSND
                 goto got_sound;
             break;
+		case MKTAG('I', 'D', '3', ' '):
+			//wiim_inf = 8;
+			position = avio_tell(pb);
+            ff_id3v2_read(s, ID3v2_DEFAULT_MAGIC, &id3v2_extra_meta);
+			if (id3v2_extra_meta)
+                if (ret = ff_id3v2_parse_apic(s, &id3v2_extra_meta) < 0) {
+                    ff_id3v2_free_extra_meta(&id3v2_extra_meta);
+                    return ret;
+                }
+            ff_id3v2_free_extra_meta(&id3v2_extra_meta);
+			if (position + size > avio_tell(pb))
+                avio_skip(pb, position + size - avio_tell(pb));
+            break;
         case MKTAG('F', 'V', 'E', 'R'):     /* Version chunk */
             version = avio_rb32(pb);
             break;
@@ -251,7 +263,8 @@ static int aiff_read_header(AVFormatContext *s)
             offset = avio_rb32(pb);      /* Offset of sound data */
             avio_rb32(pb);               /* BlockSize... don't care */
             offset += avio_tell(pb);    /* Compute absolute data offset */
-            if (st->codec->block_align)    /* Assume COMM already parsed */
+            //if (st->codec->block_align)    /* Assume COMM already parsed */
+            if (st->codec->block_align && !pb->seekable)    /* Assume COMM already parsed */
                 goto got_sound;
             if (!pb->seekable) {
                 av_log(s, AV_LOG_ERROR, "file is not seekable\n");
@@ -313,10 +326,17 @@ static int aiff_read_packet(AVFormatContext *s,
         return AVERROR_EOF;
 
     /* Now for that packet */
-    if (st->codec->block_align >= 33) // GSM, QCLP, IMA4
+    //if (st->codec->block_align >= 33) // GSM, QCLP, IMA4
+    switch (st->codec->codec_id) {
+     case CODEC_ID_ADPCM_IMA_QT:
+     case CODEC_ID_GSM:
+     case CODEC_ID_QDM2:
+     case CODEC_ID_QCELP:
         size = st->codec->block_align;
-    else
+     break;
+	default:
         size = (MAX_SIZE / st->codec->block_align) * st->codec->block_align;
+	}
     size = FFMIN(max_size, size);
     res = av_get_packet(s->pb, pkt, size);
     if (res < 0)

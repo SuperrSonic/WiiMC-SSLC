@@ -838,7 +838,8 @@ static void UnmountPartitions(int device)
 void UnmountAllDevices()
 {
 	UnmountPartitions(DEVICE_SD);
-	UnmountPartitions(DEVICE_USB);
+	if(appPath[0] == 'u') // avoid unmounting usb, if sd is used.
+		UnmountPartitions(DEVICE_USB);
 }
 
 /****************************************************************************
@@ -1647,7 +1648,9 @@ void FindDirectory()
 
 void FindFile()
 {
-	if(loadedFile[0] == 0 || browser.dir[0] == 0 || (menuCurrent != MENU_BROWSE_VIDEOS && menuCurrent != MENU_BROWSE_MUSIC && menuCurrent != MENU_BROWSE_ONLINEMEDIA))
+	// browser.dir[0] == 0 is causing a glitch preventing the selector to update correctly,
+	// only affects online media section. So, I'm adding an exception here.
+	if(loadedFile[0] == 0 || (browser.dir[0] == 0 && menuCurrent != MENU_BROWSE_ONLINEMEDIA) || (menuCurrent != MENU_BROWSE_VIDEOS && menuCurrent != MENU_BROWSE_MUSIC && menuCurrent != MENU_BROWSE_ONLINEMEDIA))
 	{
 		findLoadedFile = 0;
 		return;
@@ -1677,6 +1680,8 @@ void FindFile()
 
 		if(!selectLoadedFile) // only move to the file when first returning from the video
 			return;
+		//else if(selectLoadedFile && findLoadedFile != 3 && menuCurrent == MENU_BROWSE_ONLINEMEDIA)
+			//return;
 
 		int pagesize = 11;
 
@@ -1984,6 +1989,7 @@ typedef struct
 	char url[MAXPATHLEN + 1];
 	char thumb[MAXJOLIET + 1];
 	char xml[MAXJOLIET + 1];
+	char tunein[MAXJOLIET + 1];
 	char processor[MAXPATHLEN + 1];
 } PLXENTRY;
 
@@ -2103,6 +2109,10 @@ static int ParsePLXPlaylist()
 			{
 				snprintf(newEntry.xml, MAXJOLIET, "%s", value);
 			}
+			else if(strncmp(attribute, "tunein", 3) == 0)
+			{
+				snprintf(newEntry.tunein, MAXJOLIET, "%s", value);
+			}
 			else if(strncmp(attribute, "processor", 9) == 0)
 			{
 				snprintf(newEntry.processor, MAXPATHLEN, "%s", value);
@@ -2219,6 +2229,18 @@ static int ParsePLXPlaylist()
 		{
 			f_entry->xml = mem2_strdup(list[i].xml, MEM2_BROWSER);
 			if(!f_entry->xml) // no mem
+			{
+				DeleteEntryFiles(f_entry);
+				free(list);
+				mem2_free(buffer, MEM2_OTHER);
+				return -1;
+			}
+		}
+		
+		if(list[i].tunein)
+		{
+			f_entry->tunein = mem2_strdup(list[i].tunein, MEM2_BROWSER);
+			if(!f_entry->tunein) // no mem
 			{
 				DeleteEntryFiles(f_entry);
 				free(list);
@@ -2560,6 +2582,16 @@ int ParseOnlineMedia()
 			{
 			f_entry->image = mem2_strdup(om_entry->image, MEM2_BROWSER);
 				if(f_entry->image == NULL) //no mem
+				{
+					DeleteEntryFiles(f_entry);
+					break;
+				}
+			}
+			// For dynamic artwork from tunein
+			if(om_entry->tunein)
+			{
+			f_entry->tunein = mem2_strdup(om_entry->tunein, MEM2_BROWSER);
+				if(f_entry->tunein == NULL) //no mem
 				{
 					DeleteEntryFiles(f_entry);
 					break;

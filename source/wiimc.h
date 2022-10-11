@@ -12,7 +12,7 @@
 #include "network.h"
 
 #define APPNAME			"WiiMC"
-#define APPVERSION		"1.3.8"
+#define APPVERSION		"2.0.0"
 #define APPFOLDER		"wiimc"
 
 enum {
@@ -118,7 +118,9 @@ void wiiForceBold();
 void wiiUseAltFont();
 void wiiMainFont();
 void wiiTHP();
+void wiiSFD();
 void wiiSetLoopOn();
+void wiiSpecialLoops(int val);
 void nightfade_cb();
 void nofade_cb();
 void fadein_copyfilter();

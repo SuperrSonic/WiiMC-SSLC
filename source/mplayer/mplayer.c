@@ -147,12 +147,12 @@
 
 // debug_30fps if debug is used 30fps videos will only correct pts every 2 minutes for ~6 seconds.
 // purpose originally was to improve smoothness, but now it's helpful to find a bug that happens to
-// cause a/v desync randomly. Likely related to device mounting/reading.
+// cause a/v desync randomly. *This is hopefully fixed in the latest code, by using bits of nocorrect-pts.
 bool debug_30fps;
 
 int http_hack = 1;
-int seek_2_sec = 0;
-bool http_block = true;
+double seek_2_sec = 0;
+bool http_block = false;
 
 bool delay_load = true;
 
@@ -193,6 +193,7 @@ int pause_gui=0;
 int wii_error = 0;
 static int pause_low_cache=0;
 static bool thp_vid = false;
+unsigned timerFadeBlack = 0; // not an actual fade.
 
 char fileplaying[MAXPATHLEN];
 static char *partitionlabel=NULL;
@@ -248,10 +249,14 @@ static int total_frame_cnt;
 static int drop_frame_cnt; // total number of dropped frames
 int benchmark;
 
-float find_prob;
+//int find_prob;
 bool wiiTiledRender;
 bool wiiTiledAuto;
+extern int mplayerwidth;
 //int ext_lang = 0;
+extern int sync_interlace;
+
+extern int use_lavf;
 
 // options:
 #define DEFAULT_STARTUP_DECODE_RETRY 4
@@ -283,6 +288,10 @@ static double seek_to_sec;
 static off_t seek_to_byte;
 static off_t step_sec;
 static int loop_seek;
+//ADX/BRSTM/OGGVORBIS LOOP INFO
+double loop_st_point = 0;
+double loop_ed_point = 0;
+static int loop_tm = 0;
 
 static m_time_size_t end_at = { .type = END_AT_NONE, .pos = 0 };
 
@@ -351,6 +360,12 @@ static int softsleep;
 
 double force_fps;
 //double first_fps;
+char styleChanges[128] = {0};
+char shadowStyle[56] = {0};
+char boxStyle[32] = {0};
+char boldStyle[8] = {0};
+
+unsigned guiDelay = 1;
 
 static int force_srate;
 static int audio_output_format = AF_FORMAT_UNKNOWN;
@@ -1418,6 +1433,14 @@ static void stream_dump_progress_end(void)
  * @param sh_audio describes the requested input format of the chain.
  * @param ao_data describes the requested output format of the chain.
  */
+
+//extern int wiim_inf;
+/* static double audioSampleRate = 60.0 / 1.001;
+static double audioSampleRateDS = 90.0 / 1.50436;
+float AudioCalculateRatio(float inputSampleRate, float desiredFPS, float desiredSampleRate) {
+	return desiredSampleRate * 729000000 / (12162162 * desiredFPS * inputSampleRate);
+}
+*/
 static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
 {
     int new_srate;
@@ -1446,6 +1469,21 @@ static int build_afilter_chain(sh_audio_t *sh_audio, ao_data_t *ao_data)
             playback_speed = (float)new_srate / (float)sh_audio->samplerate;
         }
     }
+	//Works but the rate is not correct, it still stutters rarely.
+	//double up_rate;
+	//up_rate = ((float)60.0 / 1.001) / ((float)90.0 / 1.50436);
+	//up_rate = ((float)90.0 / 1.50436) / ((float)60.0 / 1.001);
+//	if(vmode->xfbHeight < 480)
+		//ao_data->samplerate = 48000 * up_rate; //48091
+//		ao_data->samplerate = 48001; //48091
+//	else
+//		ao_data->samplerate = 48000;
+/*	if(vmode->xfbHeight < 480)
+		ao_data->samplerate = 48091; //try 47909
+	else
+		ao_data->samplerate = 48000; */
+	//wiim_inf = ao_data->samplerate;
+
     result = init_audio_filters(sh_audio, new_srate,
                                 &ao_data->samplerate, &ao_data->channels, &ao_data->format);
     mpctx->mixer.afilter = sh_audio->afilter;
@@ -1895,6 +1933,13 @@ static void wiiSeek(int sec, int mode)
 	mp_input_queue_cmd(cmd);
 }
 
+unsigned waitLag = 0;
+//rumble
+//bool timerRumbleEnable = false;
+//bool rumbleRandEnable = false;
+//unsigned timerRumble = 0;
+extern bool useDumbRP;
+
 static int check_framedrop(double frame_time)
 {
     // check for frame-drop:
@@ -1904,24 +1949,33 @@ static int check_framedrop(double frame_time)
         float delay = playback_speed * mpctx->audio_out->get_delay();
         float d     = delay - mpctx->delay;
         ++total_frame_cnt;
-		if (seek_to_sec && new_load && total_frame_cnt > 1 && mpctx->demuxer->file_format == 3) {
-			VIDEO_SetBlack(TRUE);
+		if (seek_to_sec && new_load && total_frame_cnt > 1 && useDumbRP) {
+			// Dumb Restore Points
+		//	VIDEO_SetBlack(TRUE);
             wiiSeek(seek_to_sec, 0);
             //end_at.pos += seek_to_sec;
 			new_load = false;
 			//VIDEO_SetBlack(FALSE);
-        } else if (seek_to_sec && !new_load && total_frame_cnt > 8 && mpctx->demuxer->file_format == 3)
-			VIDEO_SetBlack(FALSE);
+        } //else if (seek_to_sec && !new_load && total_frame_cnt > 8 && mpctx->demuxer->file_format == 3)
+			//VIDEO_SetBlack(FALSE);
         // we should avoid dropping too many frames in sequence unless we
         // are too late. and we allow 100ms A-V delay here:
-        if (d < -dropped_frames * frame_time - 0.100 &&
+		if(waitLag != 0)
+			--waitLag;
+        if (waitLag == 0 && d < -dropped_frames * frame_time - 0.100 &&
             mpctx->osd_function != OSD_PAUSE) {
             ++drop_frame_cnt;
             ++dropped_frames;
-		/*	if(dropped_frames > 3) {
-				wiiSeek(1, 0);
+			//Freeze frame style of framedrop
+#if 0
+			if(dropped_frames > 0 && timerFadeBlack == 0) {
+			//	wiiSeek(1, 0);
+				timerFadeBlack = 30; //skip, not fade
 				dropped_frames = 0;
-			}*/
+				waitLag = 40;
+				return 0;
+			}
+#endif
             return frame_dropping;
         } else
             dropped_frames = 0;
@@ -2726,6 +2780,8 @@ err_out:
     return 0;
 }
 
+//int use_nocorrect;
+
 static double update_video(int *blit_frame)
 {
     sh_video_t *const sh_video = mpctx->sh_video;
@@ -2737,13 +2793,15 @@ static double update_video(int *blit_frame)
 	//My solution is to use correct-pts but enable the code below.
 	//This fixes the jitters and I get no more video freezes.
 	//PROBLEM: Variable FPS plays at 60fps, need exception.
-    if (correct_pts) {
+    //if (correct_pts && use_nocorrect > 0) {
+	//if (!correct_pts && use_nocorrect < 1) {
+    if (!correct_pts || sh_video->fps < 59.0f) {
         unsigned char *start = NULL;
         void *decoded_frame  = NULL;
         int drop_frame       = 0;
         int in_size;
         int full_frame;
-
+//find_prob = 0; // = no fps drops, when using subs
         do {
         	int flush;
         	current_module = "video_read_frame";
@@ -2806,6 +2864,7 @@ static double update_video(int *blit_frame)
         *blit_frame    = (decoded_frame && filter_video(sh_video, decoded_frame,
                                                         sh_video->pts));
     } else {
+		//find_prob = 1;
         int res = generate_video_frame(sh_video, mpctx->d_video);
         if (!res)
             return -1;
@@ -3182,12 +3241,31 @@ m_config_set_option(mconfig,"sub-fuzziness","1");
 m_config_set_option(mconfig,"subfont-autoscale","0"); // 3=movie diagonal (default)
 m_config_set_option(mconfig,"subfont-osd-scale","1");
 m_config_set_option(mconfig,"subfont-text-scale","1");
+
+//use ffmpeg to demux, fixes audio not playing in SFD videos
+//m_config_set_option(mconfig,"demuxer","lavf=1");
+
+//45000/1504.36p
+//double valDD = (90.0 / 1.50436) / 2;
+//freq = 48091, 32060
+//freq = 47908, 31939
+//char valString[8] = {0};
+//sprintf(valString, "%f", valDD);
+//m_config_set_option(mconfig,"fps",valString);
+//m_config_set_option(mconfig,"ofps","30");
+
 //m_config_set_option(mconfig,"mc",".02");
-//m_config_set_option(mconfig,"loop","0");
+//m_config_set_option(mconfig,"loop","2");
 //m_config_set_option(mconfig,"autosync","30"); // autosync seems to have no effect
 //m_config_set_option(mconfig,"use-filedir-conf","1"); // Doesn't actually work because .conf not supported
 //m_config_set_option(mconfig,"fps","29.9699993133544");
+//m_config_set_option(mconfig,"ofps","59.94");
+//m_config_set_option(mconfig,"fps","59.94");
 //m_config_set_option(mconfig,"nocorrect-pts","1"); // Check fps drops when playing subs. Seems to work but buggy.
+//m_config_set_option(mconfig,"vf","field"); // lo-quality deinterlacing.
+//m_config_set_option(mconfig,"vf","tfields=1"); // fast bob deinterlacing 1, doesn't double fps by itself
+//m_config_set_option(mconfig,"vf","yadif=1"); // bob deinterlacing 2. not fullspeed
+//m_config_set_option(mconfig,"vf","pp=fd"); // deint, slow and not available
 #ifdef CONFIG_ASS
 m_config_set_option(mconfig,"ass","1");
 m_config_set_option(mconfig,"ass-font-scale","2.5");
@@ -3195,6 +3273,8 @@ m_config_set_option(mconfig,"ass-font-scale","2.5");
 //m_config_set_option(mconfig,"ass-hinting","0");
 #endif
 SetMPlayerSettings();
+sprintf(styleChanges,"%s,%s,%s", boldStyle, boxStyle, shadowStyle);
+m_config_set_option(mconfig,"ass-force-style", styleChanges);
 
 orig_stream_cache_min_percent=stream_cache_min_percent;
 orig_stream_cache_seek_min_percent=stream_cache_seek_min_percent;
@@ -3913,7 +3993,7 @@ stream_cache_min_percent=0.2;
                  strcmp(att->type, "application/x-font") == 0))
                 ass_add_font(ass_library, att->name, att->data, att->data_size); */
 			  if (alt_font && att->name && att->type && att->data && att->data_size &&
-			      (strcmp(att->type, "application/x-trueype-font") == 0 ||
+			      (strcmp(att->type, "application/x-truetype-font") == 0 ||
 				   strcmp(att->type, "application/x-font")))
 				     monospaced = 1;
         }
@@ -4092,6 +4172,8 @@ stream_cache_min_percent=0.2;
   if(wiiTiledAuto && mpctx->sh_video) {
    if(mpctx->sh_video->disp_w > 670)
      wiiTiledRender = true;
+   //else if(mplayerwidth > 640 && mpctx->sh_video->aspect < 1.6f)
+     //wiiTiledRender = true;
    else if(mpctx->sh_video)
      wiiTiledRender = false;
   }
@@ -4282,7 +4364,8 @@ if (mpctx->sh_video)
 	}
 #endif
 
-        if (seek_to_sec && mpctx->demuxer->file_format != 3) {
+        // Restore Points
+        if (seek_to_sec && !useDumbRP) {
             seek(mpctx, seek_to_sec, SEEK_ABSOLUTE);
             end_at.pos += seek_to_sec;
         }
@@ -4589,6 +4672,11 @@ total_time_usage_start=GetTimer();
 			if (thp_vid)
 				mpctx->loop_times = -1;
 
+			if(wiiTiledAuto && mpctx->sh_video) {
+				if(mplayerwidth > 640 && mpctx->sh_video->aspect < 1.6f)
+					wiiTiledRender = true;
+			}
+
 			if(mpctx->sh_video && strncmp(filename, "http:", 5) == 0 && mpctx->eof == 1) {
 				//mpctx->eof = 0;
 				//int seek_2_sec = 0;
@@ -4604,15 +4692,19 @@ total_time_usage_start=GetTimer();
 					seek_2_sec = demuxer_get_time_length(mpctx->demuxer);
 					http_hack = 0;
 				}
-				if(seek_2_sec > demuxer_get_current_time(mpctx->demuxer) && !http_block) {
+				if((demuxer_get_current_time(mpctx->demuxer)+5) < seek_2_sec && !http_block) {
+					wiiSeek(demuxer_get_current_time(mpctx->demuxer)+5, 2);
+					wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
+					
+				//	wiiSeek(4, 0);
 					mpctx->eof = 0;
 					//mpctx->stream->eof = 0;
-					wiiSeek(2, 0); // spams too much so it moves too far.
-					//wiiSeek(-2, 0);
+				//	wiiSeek(4, 0); // spams too much so it moves too far.
+			//		wiiSeek(demuxer_get_current_time(mpctx->demuxer), 2);
 					//++find_prob;
 					//wiiSeek((int)demuxer_get_current_time(mpctx->demuxer), 2);
-				} else
-					mpctx->eof = 1;
+				} //else
+					//mpctx->eof = 1; // this prevents it from working half the time.
 				
 				//if(seek_2_sec < 0 || seek_2_sec+120 > demuxer_get_time_length(mpctx->demuxer))
 					//mpctx->eof = 1; //enable eof here?
@@ -4620,11 +4712,54 @@ total_time_usage_start=GetTimer();
 				//use a variable once per video to record the total time of video.
 				//reset it after video is eof.
 			}
-
+			
+			//helps play more audio that gets cutoff by eof
+			if(mpctx->eof == 1)
+				//usleep(465000);
+				usleep(550000);
+			
+			int loop_mode = 0; //1=end point supported
+			if(loop_ed_point != 0) {
+				double pts = playing_audio_pts(mpctx->sh_audio, mpctx->d_audio, mpctx->audio_out);
+				int pts_secs = pts;
+				pts_secs %= 60;
+				if(pts > loop_ed_point)
+					mpctx->eof = 1;
+				loop_mode = 1;
+			}
+			
             /* Looping. */
-            if (mpctx->eof == 1 && mpctx->loop_times >= 0) {
+            if ((mpctx->eof == 1 && mpctx->loop_times >= 0) || (mpctx->eof == 1 && loop_tm > 0 &&
+														(loop_st_point != 0 || loop_ed_point != 0))) {
                 mp_msg(MSGT_CPLAYER, MSGL_V, "loop_times = %d, eof = %d\n", mpctx->loop_times, mpctx->eof);
 
+				//try to read loop_start
+				//char loopInfo[8] = {0};
+				//strcpy(loopInfo, get_demuxer_info("loop_start"));
+		//		if(get_demuxer_info("loop_start") != NULL)
+				/*if(loop_st_point != 0)
+					seek_to_sec = loop_st_point;
+				loop_st_point = 0;
+				*/
+				if(loop_tm > 0)
+					--loop_tm;
+				
+				if(loop_mode == 1 && loop_ed_point != 0) {
+					seek_to_sec = loop_st_point;
+					if(loop_tm == 0) //don't end on the endpoint
+						loop_ed_point = 0;
+				//	loop_ed_point = 0;
+					loop_mode = 0;
+					if(loop_tm < 1)
+						loop_st_point = 0;
+				} else if(loop_st_point != 0) {
+					seek_to_sec = loop_st_point;
+					if(loop_tm < 1)
+						loop_st_point = 0;
+					loop_mode = 0;
+				}
+				
+				
                 if (mpctx->loop_times > 1)
                     mpctx->loop_times--;
                 else if (mpctx->loop_times == 1)
@@ -4632,9 +4767,12 @@ total_time_usage_start=GetTimer();
                 play_n_frames = play_n_frames_mf;
                 mpctx->eof    = 0;
                 abs_seek_pos  = SEEK_ABSOLUTE;
-                rel_seek_secs = seek_to_sec;
+                rel_seek_secs = seek_to_sec; //atoi(loopInfo);//seek_to_sec;
                 loop_seek     = 1;
             }
+			//if(mpctx->eof == 1)
+			//	sleep(1);
+			//mpctx->eof = 0;
 
             if (rel_seek_secs || abs_seek_pos) {
                 if (seek(mpctx, rel_seek_secs, abs_seek_pos) >= 0) {
@@ -4728,6 +4866,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 playing_file=false;
 new_load = true; // hack for avi seek
 thp_vid=false;
+loop_ed_point = 0; //for ADX loops
 monospaced=0; // Go back to original font
 static vu32* const _vigReg = (vu32*)0xCC002030;
 if(*_vigReg == 0x100101AE)
@@ -4736,6 +4875,10 @@ else if(*_vigReg == 0x10010001)
 	*_vigReg = 0x120E0001; //0x1001(30fps) go back to 480p60
 halve_fps=true;
 http_hack = 1;
+sync_interlace = 0;
+guiDelay = 1;
+//use_nocorrect = 0;
+http_block = false;
 // This way it only affects the video when it ends
 // and avoids a flicker when loading a new file.
 if(vmode->fbWidth == 720)
@@ -5044,6 +5187,8 @@ static float timing_sleep(float time_frame)
 	return time_frame;
 }
 
+//extern bool tiledBlack;
+
 void PauseAndGotoGUI()
 {
 	SetLastDVDMotorTime();
@@ -5084,6 +5229,9 @@ void PauseAndGotoGUI()
 	
 	//HTTP hack needs to be off in GUI mode
 	http_block = true;
+	
+	//avoid issues with tiled rendering
+	guiDelay = 1;
 
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->pause(); // pause audio, keep data if possible
@@ -5108,6 +5256,11 @@ void PauseAndGotoGUI()
 	if (controlledbygui == 2)
 		return;
 
+	//TODO: Resuming video randomly displays a black screen for one frame.
+	//fade in to mitigate 1 frame flicker (not currently a fade.)
+	timerFadeBlack = 12;
+	//tiledBlack = true;
+
 	stop_cache_thread = 0;
 	ResumeCacheThread();
 
@@ -5124,6 +5277,7 @@ void PauseAndGotoGUI()
 
 	//HTTP hack restore
 	http_block = false;
+	VIDEO_SetBlack(FALSE);
 
 	if (mpctx->audio_out && mpctx->sh_audio)
 		mpctx->audio_out->resume(); // resume audio
@@ -5272,11 +5426,20 @@ void wiiSetTiledOFF()
 void wiiDash()
 {
 	m_config_set_option(mconfig,"lavdopts","skiploopfilter=all"); // H264 deblock skip; all, bidir, nonref, nonkey
+	//m_config_set_option(mconfig,"lavdopts","skiploopfilter=all:fast=1"); // test fast=1
 }
 
 void wiiElse()
 {
 	m_config_set_option(mconfig,"lavdopts","skiploopfilter=default");
+}
+
+void wiiSFD()
+{
+	if(use_lavf)
+		m_config_set_option(mconfig,"demuxer","lavf");
+	else
+		m_config_set_option(mconfig,"demuxer","lavf=0");
 }
 
 void wiiDup()
@@ -5299,21 +5462,22 @@ void wiiAssOff()
 
 void wiiRemoveShadows()
 {
-	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
-	m_config_set_option(mconfig,"ass-force-style","Outline=1.7");
-	m_config_set_option(mconfig,"ass-force-style","ScaledBorderAndShadow=no");
+	//force style, for it to work must be used once.
+	//m_config_set_option(mconfig,"ass-force-style","ScaledBorderAndShadow=no,Shadow=0,Outline=1.7");
+	//sprintf(shadowStyle, "%s", "ScaledBorderAndShadow=no,Shadow=0,Outline=1.7");
+	sprintf(shadowStyle, "%s", "ScaledBorderAndShadow=no,Shadow=0");
 }
 
 void wiiBoxShadows()
 {
-	m_config_set_option(mconfig,"ass-force-style","Shadow=0");
-	m_config_set_option(mconfig,"ass-force-style","Outline=0");
-	m_config_set_option(mconfig,"ass-force-style","BorderStyle=3");
+	//m_config_set_option(mconfig,"ass-force-style","BorderStyle=3,Outline=0,Shadow=0");
+	sprintf(boxStyle, "%s", "BorderStyle=3,Outline=0,Shadow=0");
 }
 
 void wiiForceBold()
 {
-	m_config_set_option(mconfig,"ass-force-style","Bold=1");
+	//m_config_set_option(mconfig,"ass-force-style","Bold=1");
+	sprintf(boldStyle, "%s", "Bold=1");
 }
 
 void wiiUseAltFont()
@@ -5324,6 +5488,11 @@ void wiiUseAltFont()
 void wiiMainFont()
 {
 	alt_font = 0;
+}
+
+void wiiSpecialLoops(int val)
+{
+	loop_tm = val;
 }
 
 void wiiGotoGui()
@@ -5459,6 +5628,7 @@ void wiiGetDroppedFrames(char * buf)
 // find_prob
 	sprintf(buf, "Dropped Frames: %2d",
 	//sprintf(buf, "AV:%.2f, MP:%2.2f, D:%.1f",
+		//find_prob);
 		drop_frame_cnt);
 	//	find_prob, mpctx->delay, -audio_delay - 30);
 
@@ -5469,73 +5639,6 @@ void wiiGetDroppedFrames(char * buf)
 	//sprintf(buf, "%9.16f",
 		//mpctx->sh_video->fps);
 }
-/*
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-
-void retrieve_album_art(const char *path, const char *album_art_file) {
-    int i, ret = 0;
-
-	//avformat_network_init();
-    av_register_all();
-
-    if (!filename) {
-        printf("Path is NULL\n");
-        return;
-    }
-
-	//attached_pic
-	
-    AVFormatContext *pFormatCtx = avformat_alloc_context();
-	//warning mixed decl
-
-    printf("Opening %s\n", path);
-
-    // open the specified path
-    if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0) {
-        printf("avformat_open_input() failed: %s", filename);
-        goto fail;
-    }
-
-    // read the format headers
-    if (pFormatCtx->iformat->read_header(pFormatCtx) < 0) {
-        printf("could not read the format header\n");
-        goto fail;
-    }
-
-    // find the first attached picture, if available
-    for (i = 0; i < pFormatCtx->nb_streams; i++)
-        if (pFormatCtx->streams[i]->disposition & AV_DISPOSITION_ATTACHED_PIC) {
-            AVPacket pkt = pFormatCtx->streams[i]->attached_pic;
-            FILE* album_art = fopen(album_art_file, "wb");
-            ret = fwrite(pkt.data, pkt.size, 1, album_art);
-            fclose(album_art);
-            av_free_packet(&pkt);
-            break;
-        }
-
-    if (ret) {
-        printf("Wrote album art to %s\n", album_art_file);
-    }
-
-    fail:
-        av_free(pFormatCtx);
-        // this line crashes for some reason...
-        //avformat_free_context(pFormatCtx);
-} */
-/*
-int main() {
-    avformat_network_init();
-    av_register_all();
-
-    const char *path = "some url";
-    const char *album_art_file = "some path";
-
-    retrieve_album_art(path, album_art_file);
-
-    return 0;
-}
-*/
 
 void wiiGetMemory(char * buf)
 {
@@ -5589,23 +5692,43 @@ bool wiiAudioOnly()
 	return true;
 }
 
+char* ogg_title = NULL;
+char* ogg_artist = NULL;
+char* ogg_album = NULL;
+char* ogg_year = NULL;
+//char* ogg_loopstart = NULL;
+
 char * wiiGetMetaTitle()
 {
+	if(mpctx->sh_audio->format == 22127) { // OGG VORBIS
+		//loop_st_point = atoi(ogg_loopstart) / mpctx->sh_audio->samplerate;
+		return ogg_title;
+	}
+
 	return get_metadata(META_INFO_TITLE);
 }
 
 char * wiiGetMetaArtist()
 {
+	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
+		return ogg_artist;
+
 	return get_metadata(META_INFO_ARTIST);
 }
 
 char * wiiGetMetaAlbum()
 {
+	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
+		return ogg_album;
+
 	return get_metadata(META_INFO_ALBUM);
 }
 
 char * wiiGetMetaYear()
 {
+	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
+		return ogg_year;
+
 	return get_metadata(META_INFO_YEAR);
 }
 
@@ -5777,17 +5900,42 @@ void wiiSetVolume(int vol)
 
 	mixer_setvolume(&mpctx->mixer, vol, vol);
 	
-#if 0
+#if 1
+//	printf("howMany: %d,,", vol);
+
 	// Wii U volume using audio filter
-	static vu16* const _vWii = (vu16*)0xD8005A0;
-	//if (*_vWii == 0xCAFE) {
-	if (*_vWii != 0xCAFE) { //for dolphin testing
+	static vu16* const _vWii = (vu16*)0xCD8005A0;
+	if (*_vWii == 0xCAFE) {
+	//if (*_vWii != 0xCAFE) { //for dolphin testing
 	mp_cmd_t * cmd = calloc( 1,sizeof( *cmd ) );
 	cmd->id=MP_CMD_AF_SWITCH;
 	cmd->name=strdup("af_switch");
 	mp_input_queue_cmd(cmd);
 	char wiiu[16];
-	sprintf(wiiu, "volume=%d", vol<1?-99:vol/5); //control is very off
+	//sprintf(wiiu, "volume=%d", vol<1?-99:vol/5); //control is very off
+	int volAF = 0;
+	if(vol > -1 && vol < 10)
+		volAF = -16;
+	else if(vol > 9 && vol < 20)
+		volAF = -8;
+	else if(vol > 19 && vol < 30)
+		volAF = -6;
+	else if(vol > 29 && vol < 40)
+		volAF = -4;
+	else if(vol > 39 && vol < 50)
+		volAF = -2;
+	else if(vol > 49 && vol < 60)
+		volAF = 0;
+	else if(vol > 59 && vol < 70)
+		volAF = 2;
+	else if(vol > 69 && vol < 80)
+		volAF = 4;
+	else if(vol > 79 && vol < 100)
+		volAF = 8;
+	else if(vol == 100)
+		volAF = 16;
+	
+	sprintf(wiiu, "volume=%d", volAF); //control is not as accurate but works well
 	cmd->args[0].v.s = strdup(wiiu);
 	}
 #endif

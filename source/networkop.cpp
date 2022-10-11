@@ -22,6 +22,9 @@
 #include "utils/http.h"
 #include "utils/gettext.h"
 #include "libwiigui/gui.h"
+#include "utils/3ds.h"
+
+extern bool want3DS;
 
 void ShowAction (const char *msg, UpdateCallback c);
 
@@ -82,6 +85,10 @@ static void * netcb (void *arg)
 
 			if (res == 0)
 			{
+				//3DS Controller
+				if(want3DS)
+					CTRInit();
+				
 				struct in_addr hostip;
 				hostip.s_addr = net_gethostip();
 				
@@ -104,6 +111,7 @@ static void * netcb (void *arg)
 			usleep(100);
 		}
 	}
+	
 	return NULL;
 }
 

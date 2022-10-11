@@ -114,6 +114,10 @@ const ff_asf_guid ff_asf_marker_header = {
         0x01, 0xCD, 0x87, 0xF4, 0x51, 0xA9, 0xCF, 0x11, 0x8E, 0xE6, 0x00, 0xC0, 0x0C, 0x20, 0x53, 0x65
 };
 
+const ff_asf_guid ff_asf_metadata_library_header = {
+    0x94, 0x1c, 0x23, 0x44, 0x98, 0x94, 0xd1, 0x49, 0xa1, 0x41, 0x1d, 0x13, 0x4e, 0x45, 0x70, 0x54
+};
+
 /* I am not a number !!! This GUID is the one found on the PC used to
    generate the stream */
 const ff_asf_guid ff_asf_my_guid = {
@@ -154,6 +158,7 @@ const AVMetadataConv ff_asf_metadata_conv[] = {
     { "WM/TrackNumber"     , "track"       },
     { "WM/MediaStationCallSign", "service_provider" },
     { "WM/MediaStationName", "service_name" },
+    { "WM/Year"            , "year"        },
 //  { "Year"               , "date"        }, TODO: conversion year<->date
     { 0 }
 };

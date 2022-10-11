@@ -317,6 +317,8 @@ static int pngu_decode (IMGCTX ctx, u32 width, u32 height, u32 stripAlpha)
 		if (c != PNGU_OK)
 			return c;
 	}
+	
+	
 
 	// Check if the user has specified the real width and height of the image
 	if ( (ctx->prop.imgWidth != width) || (ctx->prop.imgHeight != height) )
@@ -370,8 +372,20 @@ static int pngu_decode (IMGCTX ctx, u32 width, u32 height, u32 stripAlpha)
 	for (i = 0; i < propImgHeight; ++i)
 		ctx->row_pointers[i] = ctx->img_data + (i * rowbytes);
 
+	
+	//NOTE: If the PNG is corrupted, no IEND value, no CRC
+	// PNGLIB continues to read data until WiiMC runs out of memory and exits.
+	//if(propImgHeight == 700)
+		//return 0;
+	
+	//if(&ctx->png_ptr[(sizeof (png_bytep) * ctx->prop.imgHeight)-8] != 0x49)
+	//	return 0;
+//if(ctx->prop.imgHeight == 700)
+	//printf("SHOME: 0x%X,,", (uint8_t)&ctx->png_ptr[0]);
+	
 	// Transform the image and copy it to our allocated memory
 	png_read_image (ctx->png_ptr, ctx->row_pointers);
+	
 
 	// Free resources
 	pngu_free_info (ctx);
@@ -399,23 +413,67 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
 	int newWidth = width;
 	int newHeight = height;
 
-	if(width > MAX_TEX_WIDTH || height > MAX_TEX_HEIGHT)
+	//if(width > MAX_TEX_WIDTH || height > MAX_TEX_HEIGHT)
+#if 1
+	int resamp = 800;
+	if(width > resamp || height > resamp)
 	{
 		float ratio = (float)width/(float)height;
 		
-		if(ratio > (float)MAX_TEX_WIDTH/(float)MAX_TEX_HEIGHT)
+		if(ratio > (float)resamp/(float)resamp)
 		{
-			newWidth = MAX_TEX_WIDTH;
-			newHeight = MAX_TEX_WIDTH/ratio;
+			newWidth = resamp;
+			newHeight = resamp/ratio;
 		}
 		else
 		{
-			newWidth = MAX_TEX_HEIGHT*ratio;
-			newHeight = MAX_TEX_HEIGHT;
+			newWidth = resamp*ratio;
+			newHeight = resamp;
 		}
 		xRatio = (int)((width<<16)/newWidth)+1;
 		yRatio = (int)((height<<16)/newHeight)+1;
 	}
+#endif
+#if 0
+	int resamp = 448;
+	if(width > resamp || height > resamp)
+	{
+		float ratio = (float)width/(float)height;
+		
+		if(ratio > (float)resamp/(float)resamp)
+		{
+			if((float)width * (float).5 <= resamp) {
+				newWidth = (float)width * (float).5;
+				newHeight = newWidth/ratio;
+			}
+			else if((float)width * (float).25 <= resamp) {
+				newWidth = (float)width * (float).25;
+				newHeight = newWidth/ratio;
+			}
+			else {
+				newWidth = resamp;
+				newHeight = resamp/ratio;
+			}
+		}
+		else
+		{
+			if((float)height * (float).5 <= resamp) {
+				newHeight = (float)height * (float).5;
+				newWidth = newHeight*ratio;
+			}
+			else if((float)height * (float).25 <= resamp) {
+				newHeight = (float)height * (float).25;
+				newWidth = newHeight*ratio;
+			}
+			else {
+				newWidth = resamp*ratio;
+				newHeight = resamp;
+			}
+		}
+		xRatio = (int)((width<<16)/newWidth)+1;
+		yRatio = (int)((height<<16)/newHeight)+1;
+	}
+#endif
 	
 	//185->188 no filter
 	/*if(width == 185 && height == 185)
@@ -447,7 +505,7 @@ static u8 * PNGU_DecodeTo4x4RGBA8 (IMGCTX ctx, u32 width, u32 height, int * dstW
 	if(dstPtr)
 		dst = dstPtr; // use existing allocation
 	else
-		dst = mem2_memalign (32, len, MEM2_GUI); 
+		dst = mem2_memalign (32, len, MEM2_GUI);
 
 	if(!dst)
 		return NULL;

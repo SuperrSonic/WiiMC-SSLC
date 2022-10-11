@@ -67,7 +67,7 @@ GuiKeypad::GuiKeypad(char * t, u32 max)
 	keyMediumOver = new GuiImageData(keyboard_mediumkey_over_png);
 
 	trigA = new GuiTrigger;
-	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
+	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 	
 	keyBackImg = new GuiImage(keyMedium);
 	keyBackOverImg = new GuiImage(keyMediumOver);
@@ -208,6 +208,13 @@ void GuiKeypad::Update(GuiTrigger * t)
 			kpText->SetText(GetDisplayText(kptextstr));
 		}
 		keyBack->SetState(STATE_SELECTED, t->chan);
+		
+		//don't reset pos
+		//if(focus)
+		//{
+			int selected = this->GetSelected();
+			_elements.at(selected)->SetState(STATE_SELECTED);
+		//}
 	}
 
 	for(int i=0; i<4; i++)
@@ -223,8 +230,25 @@ void GuiKeypad::Update(GuiTrigger * t)
 
 					kpText->SetText(GetDisplayText(kptextstr));
 					keyBtn[i][j]->SetState(STATE_SELECTED, t->chan);
+					
+					//don't reset pos
+					//if(focus)
+					//{
+						int selected = this->GetSelected();
+						_elements.at(selected)->SetState(STATE_SELECTED);
+					//}
 				}
 			}
 		}
 	}
+	
+	//dpad/stick movement
+	if(t->Right())
+		this->MoveSelectionHor(1);
+	else if(t->Left())
+		this->MoveSelectionHor(-1);
+	else if(t->Down())
+		this->MoveSelectionVert(1);
+	else if(t->Up())
+		this->MoveSelectionVert(-1);
 }

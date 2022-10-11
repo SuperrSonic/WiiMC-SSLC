@@ -19,8 +19,9 @@
 #include <sdcard/wiisd_io.h>
 #include <time.h>
 
-//#include "utils/mload.h"
-//#include "utils/usb2storage.h"
+#include "utils/ehcmodule_elf.h"
+#include "utils/mload.h"
+#include "utils/usb2storage.h"
 
 #include "utils/FreeTypeGX.h"
 #include "utils/gettext.h"
@@ -45,6 +46,43 @@ extern char MPLAYER_CSSDIR[512];
 #include "mplayer/input/input.h"
 #include "mplayer/osdep/gx_supp.h"
 
+bool want3DS = false;
+bool isReload = false;
+u8 iosVal = 58;
+
+static bool load_ehci_module()
+{
+	data_elf my_data_elf;
+	
+	if (mload_elf(ehcmodule_elf, &my_data_elf) < 0)
+		return false;
+	
+	if (mload_run_thread(my_data_elf.start, my_data_elf.stack, my_data_elf.size_stack, my_data_elf.prio) < 0) {
+	//	usleep(1000);
+		usleep(100);
+		if (mload_run_thread(my_data_elf.start, my_data_elf.stack, my_data_elf.size_stack, 0x47) < 0)
+			return false;
+	}
+	
+	return true;
+}
+/*
+bool load_ehci_module()
+{
+	data_elf elf;
+	memset(&elf, 0, sizeof(data_elf));
+
+	if(mload_elf((void *) ehcmodule_elf, &elf) != 0)
+		return false;
+
+	if(mload_run_thread(elf.start, elf.stack, elf.size_stack, elf.prio) < 0)
+		return false;
+	
+	usleep(5000);
+	return true;
+}
+*/
+
 extern "C" {
 extern void __exception_setreload(int t);
 extern char *network_useragent;
@@ -59,6 +97,9 @@ char loadedDevice[16] = { 0 };
 char loadedFileDisplay[128] = { 0 };
 static bool settingsSet = false;
 bool AutobootExit = false;
+bool isDynamic = false;
+int sync_interlace = 0;
+int use_lavf = 0;
 
 // MPlayer threads
 #define MPLAYER_STACKSIZE (512*1024)
@@ -268,7 +309,7 @@ static void USBGeckoOutput()
  ***************************************************************************/
 bool SupportedIOS(u32 ios)
 {
-	if(ios == 58 || ios == 61 || ios == 202)
+	if(ios == 58 || ios == 61 || ios == 202 || ios == 249)
 		return true;
 
 	return false;
@@ -448,6 +489,17 @@ extern "C" bool FindNextFile(bool load)
 			// THP doesn't support seek, yet the demuxer enables it
 			if(strcasecmp(ext, "thp") == 0)
 				wiiTHP();
+			
+			if(strcasecmp(ext, "sfd") == 0) {
+				use_lavf = 1;
+				wiiSFD();
+			} else if(use_lavf == 1) {
+				use_lavf = 0;
+				wiiSFD();
+			}
+			
+			//if(WiiSettings.nativeLoops > 0)
+				wiiSpecialLoops(WiiSettings.nativeLoops);
 
 			// use part after last / for display name, if it's not already the end of the string
 			if(start != NULL && start[1] != 0)
@@ -653,6 +705,7 @@ void LoadMPlayerFile()
 	settingsSet = false;
 	nowPlayingSet = false;
 	controlledbygui = 2; // signal any previous file to end
+	sync_interlace = 0; // reset interlace-handling flag
 
 	// wait for previous file to end
 	while(controlledbygui == 2)
@@ -664,22 +717,44 @@ void LoadMPlayerFile()
 
 	wiiSetDVDDevice(NULL);
 
-	if(WiiSettings.dvdMenu && strlen(ext) > 0 && 
+	if(strlen(ext) > 0 && 
 		(strcasecmp(ext, "iso") == 0 || strcasecmp(ext, "ifo") == 0))
 	{
+		if(WiiSettings.dvdSyncType == 1)
+			sync_interlace = 1;
+		else if(WiiSettings.dvdSyncType == 2)
+			sync_interlace = 2;
 		if(strcasecmp(ext, "ifo") == 0)
 		{
 			char *end = strrchr(loadedFile, '/');
 			*end = 0; // strip filename
 		}
 		wiiSetDVDDevice(loadedFile);
-		sprintf(loadedFile, "dvdnav://");
+		if(WiiSettings.dvdMenu == 0)
+			sprintf(loadedFile, "dvdnav://");
+		else
+			sprintf(loadedFile, "dvdnav://%d", WiiSettings.dvdMenu);
 		partitionlabel = NULL;
 	}
+/*	else if(strlen(ext) > 0 && (strcasecmp(ext, "iso") == 0 || strcasecmp(ext, "ifo") == 0))
+	{
+		// After title selecting, this code has become useless.
+		if(WiiSettings.dvdSyncType == 1)
+			sync_interlace = 1;
+		else if(WiiSettings.dvdSyncType == 2)
+			sync_interlace = 2;
+		partitionlabel = GetPartitionLabel(loadedFile);
+	} */
 	else
-	{		
-		if (strncmp(loadedFile, "dvd://", 6) == 0 || strncmp(loadedFile, "dvdnav://", 9) == 0)
+	{
+		if (strncmp(loadedFile, "dvd://", 6) == 0 || strncmp(loadedFile, "dvdnav://", 9) == 0) {
+			if(WiiSettings.dvdSyncType == 1)
+				sync_interlace = 1;
+			else if(WiiSettings.dvdSyncType == 2)
+				sync_interlace = 2;
+			
 		    wiiSetDVDDevice(loadedDevice);
+		}
 		partitionlabel = GetPartitionLabel(loadedFile);
 	}
 
@@ -691,6 +766,17 @@ void LoadMPlayerFile()
 	// THP doesn't support seek, yet the demuxer enables it
 	if(strcasecmp(ext, "thp") == 0)
 		wiiTHP();
+	
+	if(strcasecmp(ext, "sfd") == 0) {
+		use_lavf = 1;
+		wiiSFD();
+	} else if(use_lavf == 1) {
+		use_lavf = 0;
+		wiiSFD();
+	}
+	
+	//if(WiiSettings.nativeLoops > 0)
+		wiiSpecialLoops(WiiSettings.nativeLoops);
 
 	// wait for directory parsing to finish (to find subtitles)	
 	while(WiiSettings.subtitleVisibility && !ParseDone())
@@ -876,6 +962,118 @@ void SetMPlayerSettings()
 }
 }
 
+#include <ogc/machine/processor.h>
+#define CheckAHBPROT()	(read32(0x0D800064) == 0xFFFFFFFF)
+#define MEM2_PROT		0x0D8B420A
+#define ES_MODULE_START	((u16 *)0x939F0000)
+#define ES_MODULE_END	(ES_MODULE_START + 0x4000)
+#define ES_HACK_OFFSET	4
+
+void cIOS_access(void)
+{
+	/* I just need this for the screen dimmer. */
+	if (CheckAHBPROT())
+	{
+
+		static const u16 ticket_check[] = {
+			0x685B,			// ldr  r3, [r3, #4] ; Get TMD pointer
+			0x22EC, 0x0052,	// movs r2, 0x1D8	; Set offset of access rights field in TMD
+			0x189B,			// adds r3, r3, r2   ; Add offset to TMD pointer
+			0x681B,			// ldr  r3, [r3]	 ; Load access rights. We'll hack it with full access rights!!!
+			0x4698,			// mov  r8, r3	   ; Store it for the DVD video bitcheck later
+			0x07DB			// lsls r3, r3, 0x1F ; check AHBPROT bit
+		};
+
+		/* Disable MEM 2 protection. */
+		write16(MEM2_PROT, 2);
+
+		for (u16 *patchme = ES_MODULE_START; patchme < ES_MODULE_END; patchme++)
+		{
+			if (!memcmp(patchme, ticket_check, sizeof(ticket_check)))
+			{
+				/* Apply patch */
+				patchme[ES_HACK_OFFSET] = 0x23FF; // li r3, 0xFF ; Set full access rights
+
+				/* Flush cache */
+				DCFlushRange(patchme+ES_HACK_OFFSET, 2);
+				break;
+			}
+		}
+	}
+}
+
+bool use32kHz = false;
+bool useDumbRP = true;
+
+void setOption(char* key, char* valuePointer){
+	bool isString = valuePointer[0] == '"';
+	//char value = 0;
+	
+	if(isString) {
+		char* p = valuePointer++;
+		while(*++p != '"');
+		*p = 0;
+	} //else
+		//value = atoi(valuePointer);
+	
+	unsigned int i = 0;
+	for(i=0; i<5; i++){
+		if(!strcmp("path", key)) {
+			sprintf(loadedFile, valuePointer);
+			AutobootExit = true;
+		} else if(!strcmp("theme", key)) {
+			sprintf(WiiSettings.theme, "%s", valuePointer);
+			if(strcmp(WiiSettings.theme, "dynamic") == 0)
+				isDynamic = true;
+			//printf("give me info: %s", valuePointer);
+		} else if(!strcmp("ios", key)) {
+			isReload = true;
+			iosVal = atoi(valuePointer);
+			//IOS_ReloadIOS(atoi(valuePointer));
+		} else if(!strcmp("32khz", key)) {
+			if(atoi(valuePointer) == 1)
+				use32kHz = true;
+		} else if(!strcmp("dumbRestorePoints", key)) {
+			if(atoi(valuePointer) == 0)
+				useDumbRP = false;
+		} else if(!strcmp("3ds", key)) {
+			if(atoi(valuePointer) == 0)
+				want3DS = true;
+		}
+		//break;
+	}
+}
+
+void handleConfigPair(char* kv){
+	char* vs = kv;
+	while(*vs != ' ' && *vs != '\t' && *vs != ':' && *vs != '=')
+			++vs;
+	*(vs++) = 0;
+	while(*vs == ' ' || *vs == '\t' || *vs == ':' || *vs == '=')
+			++vs;
+
+	setOption(kv, vs);
+}
+
+void handleIOSreload(void)
+{
+	if(!isReload)
+		return;
+	
+	// module loading needed to be outside the arg loop to detect hdd.
+	bool ehci = false;
+	
+	// Regain access, this allows burn-in reduction dimmer to work.
+	cIOS_access();
+	IOS_ReloadIOS(iosVal);
+	
+	if(IOS_GetVersion() == 202) {
+		if(mload_init())
+			ehci = load_ehci_module();
+		USB2Enable(ehci);
+	}
+}
+
 /****************************************************************************
  * Main
  ***************************************************************************/
@@ -906,10 +1104,31 @@ int main(int argc, char *argv[])
 	/*if(__di_check_ahbprot() != 1) */
 
 	//if(argc > 2) {
-		//IOS_ReloadIOS(202);
+//		bool ehci = false;
+//		IOS_ReloadIOS(202);
+		//mload_init();
 		//if(mload_init() >= 0 && load_ehci_module())
+//		if(mload_init())
+//			ehci = load_ehci_module();
 			//USB2Enable(true);
+//		USB2Enable(ehci);
 	//}
+
+	// path sent by the plugin's argument
+	if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))
+	{
+		sprintf(loadedFile, argv[1]);
+		AutobootExit = true;
+		//VIDEO_SetBlack(FALSE);
+	} else {
+		int i;
+		for(i=1; i<argc; ++i){
+			handleConfigPair(argv[i]);
+		}
+	}
+	
+	// My usb drive fails to mount if I use 202, only on Wii boot
+	handleIOSreload();
 
 	DI_Init();
 	WPAD_Init();
@@ -924,8 +1143,8 @@ int main(int argc, char *argv[])
                 (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     
                 (32*1024); // padding	
 	AddMem2Area (size, MEM2_VIDEO); 
-	AddMem2Area (3*1024*1024, MEM2_BROWSER);
-	AddMem2Area (6*1024*1024, MEM2_GUI);
+	AddMem2Area (2*1024*1024, MEM2_BROWSER);
+	AddMem2Area (7.5*1024*1024, MEM2_GUI);
 	AddMem2Area (5*1024*1024, MEM2_OTHER); // vars + ttf
 	AddMem2Area (.125*1024*1024, MEM2_DESC); // desc test
 
@@ -952,14 +1171,6 @@ int main(int argc, char *argv[])
 	LWP_CreateThread(&cthread, mplayercachethread, NULL, cachestack, CACHE_STACKSIZE, 70);
 
 	usleep(200);
-	
-	// path sent by the plugin's argument
-	if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))
-	{
-		sprintf(loadedFile, argv[1]);
-		AutobootExit = true;
-		//VIDEO_SetBlack(FALSE);
-	}
 
 	// create GUI thread
  	while(1)

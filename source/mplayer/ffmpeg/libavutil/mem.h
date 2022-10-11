@@ -133,6 +133,13 @@ void *av_mallocz(size_t size) av_malloc_attrib av_alloc_size(1);
  * @param size
  * @return Pointer to the allocated block, NULL if it cannot be allocated.
  */
+av_alloc_size(1) static inline void *av_mallocz_array(size_t nmemb, size_t size)
+{
+    if (!size || nmemb >= INT_MAX / size)
+        return NULL;
+    return av_mallocz(nmemb * size);
+}
+
 void *av_calloc(size_t nmemb, size_t size) av_malloc_attrib;
 
 /**

@@ -1,23 +1,20 @@
 # WiiMC-SS features:
-- Embedded cover art in MP3, AAC, FLAC, OGG, WMA, and AIFF.
+- Embedded cover art in MP3, MP4 (AAC), FLAC, OGG, WMA, and AIFF.
 - Dynamic cover art updating from Tunein, Yggdrasil Radio, and ANISON.FM.
-- Automatic tiled rendering (true 720x480p) option.
-- Changed widescreen support from 768x480 to 853x480.
+- Tiled rendering (true 720x480p) depending on video size.
 - Perfect sync in 29.97/30 fps videos in 480i/p modes.
 - Sync options for interlaced video. (MKV elements, and DVD Video.)
 - Subtitles always use DAR instead of SAR.
 - GameCube controller support.
-- Enabled ADX decoding.
-- Backported BRSTM demuxing.
-- Optional 240p mode.
-- Exposed the volume normalizer filter.
-- Added ".dash" extension, using this extension will skip the deblock filter.
-- Made the deflicker filter optional.
+- Better handling of game formats ADX and BRSTM.
+- Various options: 240p mode, night filter, volnorm, deflicker.
+- Use the ".dash" extension to skip the deblock filter in H.264 and VP8 files.
 - Added Shuffle, Loop, and Continuous modes for video.
-- Artwork Viewer for videos and music.
-- Night filter mode.
-- Wii Message Board playlog support.
+- Artwork Viewer for videos and music using external files.
+- Wii Message Board playlog support when started from a Channel.
 - Changing themes requires using arguments.
+- Force IOS argument allows using a different usb module with IOS202.
+- Reconnect radio streams after a minute if a fail is detected.
 - Removed photo viewer, BMP, GIF, NTFS, and EXT2 support.
 - Other minor changes and fixes.
 

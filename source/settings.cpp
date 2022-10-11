@@ -69,9 +69,9 @@ LANG languages[LANGUAGE_SIZE] = {
 	/*{ "Estonian", "et", "est" },
 	{ "Finnish", "fi", "fin" },
 	{ "Fiji", "fj", "fij" },
-	{ "Faroese", "fo", "fao" },
+	{ "Faroese", "fo", "fao" }, */
 	{ "Français", "fr", "fre" },
-	{ "Frisian", "fy", "fry" },
+/*	{ "Frisian", "fy", "fry" },
 	{ "Galician", "gl", "glg" },
 	{ "Georgian", "ka", "geo" },
 	{ "Greek", "el", "gre" },
@@ -340,6 +340,9 @@ prepareSettingsData ()
 	createXMLSetting("debug", "Debug", toStr(WiiSettings.debug));
 	createXMLSetting("artwork", "Artwork Viewer", toStr(WiiSettings.artwork));
 	createXMLSetting("artworkFolder", "Artwork folder", WiiSettings.artworkFolder);
+	createXMLSetting("bannerLimit", "Amount of banners to shuffle", toStr(WiiSettings.bannerLimit));
+	createXMLSetting("bannerFolder", "Banner folder", WiiSettings.bannerFolder);
+	createXMLSetting("jpegQuality", "JPEG Resample", toStr(WiiSettings.jpegQuality));
 	createXMLSetting("night", "Night Filter", toStr(WiiSettings.night));
 	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
 	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
@@ -375,15 +378,20 @@ prepareSettingsData ()
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
 	createXMLSetting("screensaverArt", "Display Art on Screensaver", toStr(WiiSettings.screensaverArt));
+	createXMLSetting("nativeLoops", "Number of loops", toStr(WiiSettings.nativeLoops));
 	createXMLSetting("musicFolder", "Music folder", WiiSettings.musicFolder);
 	// DVD
 	createXMLSection("DVD", "DVD Settings");
 	createXMLSetting("dvdMenu", "DVD Menu", toStr(WiiSettings.dvdMenu));
 	createXMLSetting("dvdDisabled", "DVD Disabled", toStr(WiiSettings.dvdDisabled));
+	createXMLSetting("dvdSyncType", "DVD Sync Type", toStr(WiiSettings.dvdSyncType));
 	// Online Media
 	createXMLSection("Online Media", "Online Media Settings");
 	createXMLSetting("onlineCacheFill", "Online Cache Fill %", toStr(WiiSettings.onlineCacheFill));
 	createXMLSetting("onlinemediaFolder", "Online media folder", WiiSettings.onlinemediaFolder);
+	createXMLSetting("yggdrasilQuality", "Yggdrasil Radio artsyle", toStr(WiiSettings.yggdrasilQuality));
+	createXMLSetting("anisonfmQuality", "ANISON.FM artstyle", toStr(WiiSettings.anisonfmQuality));
+	createXMLSetting("onlineBanners", "Online Screensaver", toStr(WiiSettings.onlineBanners));
 	// Network
 	createXMLSection("Network", "Network Settings");
 	for(int i=0; i<MAX_SHARES; i++)
@@ -510,6 +518,7 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
 		const char *addr = mxmlElementGetAttr(next, "addr");
 		const char *image = mxmlElementGetAttr(next, "image");
 		const char *type = mxmlElementGetAttr(next, "type");
+		const char *tunein = mxmlElementGetAttr(next, "tunein");
 
 		if(name && addr) // this is a link
 		{
@@ -542,6 +551,16 @@ static void RecurseOnlineMedia(mxml_node_t * top, char * path)
 			{
 				o_entry->image = mem2_strdup(image, MEM2_BROWSER);
 				if(!o_entry->image) // no mem
+				{
+					DeleteEntryOnlineMedia(o_entry);
+					break;
+				}
+			}
+			
+			if(tunein)
+			{
+				o_entry->tunein = mem2_strdup(tunein, MEM2_BROWSER);
+				if(!o_entry->tunein) // no mem
 				{
 					DeleteEntryOnlineMedia(o_entry);
 					break;
@@ -686,6 +705,16 @@ void LoadThumbsFile(char * filepath)
 void LoadThumbsFileHTTP(char * filepath)
 {
 	int offset = 0;
+	
+	// This case is to reduce the number of http_requests
+	// when using dynamic artwork.
+	if(filepath == NULL) {
+		if (WiiSettings.descTxt && WiiSettings.yearNum) {
+			WiiSettings.descTxt = NULL;
+			WiiSettings.yearNum = NULL;
+		}
+		return;
+	}
 
 	savebuffer = (char *)mem2_malloc(SAVEBUFFERSIZE, MEM2_OTHER);
 
@@ -722,7 +751,7 @@ void DefaultSettings ()
 	memset(&WiiSettings, 0, sizeof(SWiiSettings));
 
 	// Global
-	WiiSettings.language = CONF_GetLanguage() == 4 ? LANG_SPANISH : LANG_ENGLISH;
+	WiiSettings.language = CONF_GetLanguage();
 	WiiSettings.volume = 50;
 	WiiSettings.hideExtensions = 1;
 	WiiSettings.exitAction = EXIT_AUTO;
@@ -734,6 +763,9 @@ void DefaultSettings ()
 	WiiSettings.startArea = MENU_BROWSE_ONLINEMEDIA;
 	WiiSettings.artwork = 0;
 	WiiSettings.artworkFolder[0] = 0;
+	WiiSettings.bannerLimit = 0;
+	WiiSettings.bannerFolder[0] = 0;
+	WiiSettings.jpegQuality = 0;
 	WiiSettings.night = 0;
 	WiiSettings.screenDim = CONF_GetScreenSaverMode();
 	WiiSettings.doubleStrike = 0;
@@ -766,13 +798,18 @@ void DefaultSettings ()
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.screensaverArt = ART_NONE;
+	WiiSettings.nativeLoops = 1;
 	WiiSettings.musicFolder[0] = 0;
 	// DVD
 	WiiSettings.dvdMenu = 1;
 	WiiSettings.dvdDisabled = 0;
+	WiiSettings.dvdSyncType = 0;
 	// Online Media
 	WiiSettings.onlineCacheFill = 20;
 	WiiSettings.onlinemediaFolder[0] = 0;
+	WiiSettings.yggdrasilQuality = YGG_TUNEIN;
+	WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
+	WiiSettings.onlineBanners = 1;
 	// Network
 	for(int i=0; i<MAX_SHARES; i++)
 	{
@@ -832,6 +869,10 @@ static void FixInvalidSettings()
 		WiiSettings.startArea = MENU_BROWSE_VIDEOS;
 	if(WiiSettings.artwork < 0 || WiiSettings.artwork > 1)
 		WiiSettings.artwork = 0;
+	if(WiiSettings.bannerLimit < 0 || WiiSettings.bannerLimit > 9999)
+		WiiSettings.bannerLimit = 0;
+	if(WiiSettings.jpegQuality < 0 || WiiSettings.jpegQuality > 1)
+		WiiSettings.jpegQuality = 0;
 	if(WiiSettings.night < 0 || WiiSettings.night > 1)
 		WiiSettings.night = 0;
 	if(WiiSettings.screenDim < 0 || WiiSettings.screenDim > 1)
@@ -850,6 +891,7 @@ static void FixInvalidSettings()
 		WiiSettings.tiledRender = 0;
 
 	CleanupPath(WiiSettings.artworkFolder);
+	CleanupPath(WiiSettings.bannerFolder);
 
 	// Videos
 	if(WiiSettings.videoZoomHor < 0.5 || WiiSettings.videoZoomHor > 1.5)
@@ -910,15 +952,17 @@ static void FixInvalidSettings()
 	// Music
 	if(WiiSettings.playOrder < 0 || WiiSettings.playOrder > PLAY_THROUGH)
 		WiiSettings.playOrder = PLAY_SINGLE;
-	if(WiiSettings.screensaverArt < 0 || WiiSettings.screensaverArt > 2)
-		WiiSettings.screensaverArt = 0;
+	if(WiiSettings.nativeLoops < 0 || WiiSettings.nativeLoops > 9999)
+		WiiSettings.nativeLoops = 0;
 	CleanupPath(WiiSettings.musicFolder);
 
 	// DVD
-	if(WiiSettings.dvdMenu != 0 && WiiSettings.dvdMenu != 1)
+	if(WiiSettings.dvdMenu != 0 && WiiSettings.dvdMenu > 12)
 		WiiSettings.dvdMenu = 1;
 	if(WiiSettings.dvdDisabled != 0 && WiiSettings.dvdDisabled != 1)
 		WiiSettings.dvdDisabled = 0;
+	if(WiiSettings.dvdSyncType < 0 || WiiSettings.dvdSyncType > 2)
+		WiiSettings.dvdSyncType = 0;
 
 	// Online Media
 	if(WiiSettings.onlineCacheFill < 5 || WiiSettings.onlineCacheFill > 100)
@@ -926,6 +970,15 @@ static void FixInvalidSettings()
 
 	if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
 		CleanupPath(WiiSettings.onlinemediaFolder);
+	
+	if(WiiSettings.yggdrasilQuality < 0 || WiiSettings.yggdrasilQuality > 4)
+		WiiSettings.yggdrasilQuality = 1;
+	
+	if(WiiSettings.anisonfmQuality < 0 || WiiSettings.anisonfmQuality > 300)
+		WiiSettings.anisonfmQuality = ANISON_TUNEIN_ANISON;
+	
+	if(WiiSettings.onlineBanners < 0 || WiiSettings.onlineBanners > 1)
+		WiiSettings.onlineBanners = 1;
 
 	// Network
 	for(int i=0; i<MAX_SHARES; i++)
@@ -1212,6 +1265,9 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.debug, "debug");
 				loadXMLSetting(&WiiSettings.artwork, "artwork");
 				loadXMLSetting(WiiSettings.artworkFolder, "artworkFolder", sizeof(WiiSettings.artworkFolder));
+				loadXMLSetting(&WiiSettings.bannerLimit, "bannerLimit");
+				loadXMLSetting(WiiSettings.bannerFolder, "bannerFolder", sizeof(WiiSettings.bannerFolder));
+				loadXMLSetting(&WiiSettings.jpegQuality, "jpegQuality");
 				loadXMLSetting(&WiiSettings.night, "night");
 				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
 				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
@@ -1245,13 +1301,18 @@ static bool LoadSettingsFile(char * filepath)
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(&WiiSettings.screensaverArt, "screensaverArt");
+				loadXMLSetting(&WiiSettings.nativeLoops, "nativeLoops");
 				loadXMLSetting(WiiSettings.musicFolder, "musicFolder", sizeof(WiiSettings.musicFolder));
 				// DVD
 				loadXMLSetting(&WiiSettings.dvdMenu, "dvdMenu");
 				loadXMLSetting(&WiiSettings.dvdDisabled, "dvdDisabled");
+				loadXMLSetting(&WiiSettings.dvdSyncType, "dvdSyncType");
 				// Online Media
 				loadXMLSetting(&WiiSettings.onlineCacheFill, "onlineCacheFill");
 				loadXMLSetting(WiiSettings.onlinemediaFolder, "onlinemediaFolder", sizeof(WiiSettings.onlinemediaFolder));
+				loadXMLSetting(&WiiSettings.yggdrasilQuality, "yggdrasilQuality");
+				loadXMLSetting(&WiiSettings.anisonfmQuality, "anisonfmQuality");
+				loadXMLSetting(&WiiSettings.onlineBanners, "onlineBanners");
 				// Network
 				
 				for(int i=0; i<MAX_SHARES; i++)

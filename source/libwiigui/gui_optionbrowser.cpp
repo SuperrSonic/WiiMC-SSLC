@@ -27,7 +27,7 @@ GuiOptionBrowser::GuiOptionBrowser(int w, int s, OptionList * l)
 	focus = 0; // allow focus
 
 	trigA = new GuiTrigger;
-	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A);
+	trigA->SetSimpleTrigger(-1, WPAD_BUTTON_A | WPAD_CLASSIC_BUTTON_A, PAD_BUTTON_A, CTR_BUTTON_A);
 
 	bgOptionsEntry = new GuiImageData(bg_entry_png);
 	bgOptionsEntryOver = new GuiImageData(bg_entry_over_png);

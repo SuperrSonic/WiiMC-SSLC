@@ -299,6 +299,7 @@ enum CodecID {
     CODEC_ID_PCM_LXF,
     CODEC_ID_S302M,
     CODEC_ID_PCM_S8_PLANAR,
+	CODEC_ID_PCM_S16BE_PLANAR,
 
     /* various ADPCM codecs */
     CODEC_ID_ADPCM_IMA_QT = 0x11000,
@@ -333,7 +334,7 @@ enum CodecID {
     CODEC_ID_ADPCM_IMA_APC,
 
     CODEC_ID_ADPCM_THP_LE = MKBETAG('T','H','P','L'),
-	CODEC_ID_PCM_S16BE_PLANAR,
+	//CODEC_ID_PCM_S16BE_PLANAR,
 
     /* AMR */
     CODEC_ID_AMR_NB = 0x12000,
@@ -413,6 +414,7 @@ enum CodecID {
     CODEC_ID_8SVX_RAW    = MKBETAG('8','S','V','X'),
     CODEC_ID_SONIC       = MKBETAG('S','O','N','C'),
     CODEC_ID_SONIC_LS    = MKBETAG('S','O','N','L'),
+	CODEC_ID_OPUS        = MKBETAG('O','P','U','S'),
 
     /* subtitle codecs */
     CODEC_ID_FIRST_SUBTITLE = 0x17000,          ///< A dummy ID pointing at the start of subtitle codecs.
