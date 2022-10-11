@@ -1,2 +1,5 @@
 *.d
 *.o
+build/*.h
+wiimc.dol
+wiimc.elf

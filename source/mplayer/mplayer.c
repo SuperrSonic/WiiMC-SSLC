@@ -5696,12 +5696,12 @@ char* ogg_title = NULL;
 char* ogg_artist = NULL;
 char* ogg_album = NULL;
 char* ogg_year = NULL;
-//char* ogg_loopstart = NULL;
+char* ogg_loopstart = NULL;
 
 char * wiiGetMetaTitle()
 {
 	if(mpctx->sh_audio->format == 22127) { // OGG VORBIS
-		//loop_st_point = atoi(ogg_loopstart) / mpctx->sh_audio->samplerate;
+		loop_st_point = atoi(ogg_loopstart) / mpctx->sh_audio->samplerate;
 		return ogg_title;
 	}
 

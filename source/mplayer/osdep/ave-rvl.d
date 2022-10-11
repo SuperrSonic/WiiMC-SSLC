@@ -1,211 +1,210 @@
-osdep/ave-rvl.o: osdep/ave-rvl.c \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gccore.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/dsp.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gctypes.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/aram.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/arqueue.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_queue.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/aram.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/arqmgr.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/audio.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/cache.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/card.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/cast.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/color.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/consol.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx_struct.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/dvd.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/disc_io.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/exi.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gu.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gu.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/si.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx_struct.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/irq.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/context.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/mutex.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/message.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/semaphore.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/pad.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/tpl.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/system.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gcutil.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h \
- c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video_types.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usbgecko.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video_types.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/texconv.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/ipc.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/es.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/stm.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/ios.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usb.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/isfs.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/conf.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usbstorage.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/mutex.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/system.h \
- C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/wiilaunch.h
+osdep/ave-rvl.o: osdep/ave-rvl.c C:/devkitPro/libogc/include/gccore.h \
+ C:/devkitPro/libogc/include/ogc/dsp.h \
+ C:/devkitPro/libogc/include/gctypes.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h \
+ C:/devkitPro/libogc/include/ogc/aram.h \
+ C:/devkitPro/libogc/include/ogc/arqueue.h \
+ C:/devkitPro/libogc/include/ogc/lwp_queue.h \
+ C:/devkitPro/libogc/include/ogc/aram.h \
+ C:/devkitPro/libogc/include/ogc/arqmgr.h \
+ C:/devkitPro/libogc/include/ogc/audio.h \
+ C:/devkitPro/libogc/include/ogc/cache.h \
+ C:/devkitPro/libogc/include/ogc/card.h \
+ C:/devkitPro/libogc/include/ogc/cast.h \
+ C:/devkitPro/libogc/include/ogc/color.h \
+ C:/devkitPro/libogc/include/ogc/consol.h \
+ C:/devkitPro/libogc/include/ogc/gx_struct.h \
+ C:/devkitPro/libogc/include/ogc/dvd.h \
+ C:/devkitPro/libogc/include/ogc/disc_io.h \
+ C:/devkitPro/libogc/include/ogc/exi.h \
+ C:/devkitPro/libogc/include/ogc/gu.h \
+ C:/devkitPro/libogc/include/ogc/gx.h \
+ C:/devkitPro/libogc/include/ogc/lwp.h \
+ C:/devkitPro/libogc/include/ogc/gu.h \
+ C:/devkitPro/libogc/include/ogc/si.h \
+ C:/devkitPro/libogc/include/ogc/gx_struct.h \
+ C:/devkitPro/libogc/include/ogc/irq.h \
+ C:/devkitPro/libogc/include/ogc/context.h \
+ C:/devkitPro/libogc/include/ogc/lwp.h \
+ C:/devkitPro/libogc/include/ogc/mutex.h \
+ C:/devkitPro/libogc/include/ogc/message.h \
+ C:/devkitPro/libogc/include/ogc/semaphore.h \
+ C:/devkitPro/libogc/include/ogc/pad.h \
+ C:/devkitPro/libogc/include/ogc/tpl.h \
+ C:/devkitPro/libogc/include/ogc/gx.h \
+ C:/devkitPro/libogc/include/ogc/system.h \
+ C:/devkitPro/libogc/include/gcutil.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h \
+ c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h \
+ C:/devkitPro/libogc/include/ogc/video.h \
+ C:/devkitPro/libogc/include/ogc/video_types.h \
+ C:/devkitPro/libogc/include/ogc/usbgecko.h \
+ C:/devkitPro/libogc/include/ogc/video_types.h \
+ C:/devkitPro/libogc/include/ogc/texconv.h \
+ C:/devkitPro/libogc/include/ogc/ipc.h \
+ C:/devkitPro/libogc/include/ogc/es.h \
+ C:/devkitPro/libogc/include/ogc/stm.h \
+ C:/devkitPro/libogc/include/ogc/ios.h \
+ C:/devkitPro/libogc/include/ogc/usb.h \
+ C:/devkitPro/libogc/include/ogc/isfs.h \
+ C:/devkitPro/libogc/include/ogc/conf.h \
+ C:/devkitPro/libogc/include/ogc/usbstorage.h \
+ C:/devkitPro/libogc/include/ogc/mutex.h \
+ C:/devkitPro/libogc/include/ogc/system.h \
+ C:/devkitPro/libogc/include/ogc/wiilaunch.h
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gccore.h:
+C:/devkitPro/libogc/include/gccore.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/dsp.h:
+C:/devkitPro/libogc/include/ogc/dsp.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gctypes.h:
+C:/devkitPro/libogc/include/gctypes.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdbool.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stdint.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/stdint.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/aram.h:
+C:/devkitPro/libogc/include/ogc/aram.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/arqueue.h:
+C:/devkitPro/libogc/include/ogc/arqueue.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp_queue.h:
+C:/devkitPro/libogc/include/ogc/lwp_queue.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/aram.h:
+C:/devkitPro/libogc/include/ogc/aram.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/arqmgr.h:
+C:/devkitPro/libogc/include/ogc/arqmgr.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/audio.h:
+C:/devkitPro/libogc/include/ogc/audio.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/cache.h:
+C:/devkitPro/libogc/include/ogc/cache.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/card.h:
+C:/devkitPro/libogc/include/ogc/card.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/cast.h:
+C:/devkitPro/libogc/include/ogc/cast.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/color.h:
+C:/devkitPro/libogc/include/ogc/color.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/consol.h:
+C:/devkitPro/libogc/include/ogc/consol.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx_struct.h:
+C:/devkitPro/libogc/include/ogc/gx_struct.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/dvd.h:
+C:/devkitPro/libogc/include/ogc/dvd.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/disc_io.h:
+C:/devkitPro/libogc/include/ogc/disc_io.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/exi.h:
+C:/devkitPro/libogc/include/ogc/exi.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gu.h:
+C:/devkitPro/libogc/include/ogc/gu.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx.h:
+C:/devkitPro/libogc/include/ogc/gx.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp.h:
+C:/devkitPro/libogc/include/ogc/lwp.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gu.h:
+C:/devkitPro/libogc/include/ogc/gu.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/si.h:
+C:/devkitPro/libogc/include/ogc/si.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx_struct.h:
+C:/devkitPro/libogc/include/ogc/gx_struct.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/irq.h:
+C:/devkitPro/libogc/include/ogc/irq.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/context.h:
+C:/devkitPro/libogc/include/ogc/context.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/lwp.h:
+C:/devkitPro/libogc/include/ogc/lwp.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/mutex.h:
+C:/devkitPro/libogc/include/ogc/mutex.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/message.h:
+C:/devkitPro/libogc/include/ogc/message.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/semaphore.h:
+C:/devkitPro/libogc/include/ogc/semaphore.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/pad.h:
+C:/devkitPro/libogc/include/ogc/pad.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/tpl.h:
+C:/devkitPro/libogc/include/ogc/tpl.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/gx.h:
+C:/devkitPro/libogc/include/ogc/gx.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/system.h:
+C:/devkitPro/libogc/include/ogc/system.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/gcutil.h:
+C:/devkitPro/libogc/include/gcutil.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/time.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/newlib.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/config.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/ieeefp.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/features.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/reent.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/_ansi.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/_default_types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/lock.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/include/stddef.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/time.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/sys/types.h:
 
-c:\mingw\media-autobuild_suite\msys64\opt\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h:
+c:\devkitpro\devkitppc\bin\../lib/gcc/powerpc-eabi/4.6.1/../../../../powerpc-eabi/include/machine/types.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video.h:
+C:/devkitPro/libogc/include/ogc/video.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video_types.h:
+C:/devkitPro/libogc/include/ogc/video_types.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usbgecko.h:
+C:/devkitPro/libogc/include/ogc/usbgecko.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/video_types.h:
+C:/devkitPro/libogc/include/ogc/video_types.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/texconv.h:
+C:/devkitPro/libogc/include/ogc/texconv.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/ipc.h:
+C:/devkitPro/libogc/include/ogc/ipc.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/es.h:
+C:/devkitPro/libogc/include/ogc/es.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/stm.h:
+C:/devkitPro/libogc/include/ogc/stm.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/ios.h:
+C:/devkitPro/libogc/include/ogc/ios.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usb.h:
+C:/devkitPro/libogc/include/ogc/usb.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/isfs.h:
+C:/devkitPro/libogc/include/ogc/isfs.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/conf.h:
+C:/devkitPro/libogc/include/ogc/conf.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/usbstorage.h:
+C:/devkitPro/libogc/include/ogc/usbstorage.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/mutex.h:
+C:/devkitPro/libogc/include/ogc/mutex.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/system.h:
+C:/devkitPro/libogc/include/ogc/system.h:
 
-C:/mingw/media-autobuild_suite/msys64/opt/devkitpro/libogc/include/ogc/wiilaunch.h:
+C:/devkitPro/libogc/include/ogc/wiilaunch.h:
