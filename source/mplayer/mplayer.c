@@ -5701,7 +5701,7 @@ char* ogg_loopstart = NULL;
 char * wiiGetMetaTitle()
 {
 	if(mpctx->sh_audio->format == 22127) { // OGG VORBIS
-		loop_st_point = atoi(ogg_loopstart) / mpctx->sh_audio->samplerate;
+		loop_st_point = ogg_loopstart != NULL ? atoi(ogg_loopstart) / mpctx->sh_audio->samplerate : 0;
 		return ogg_title;
 	}
 
