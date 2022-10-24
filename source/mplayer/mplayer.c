@@ -4866,6 +4866,7 @@ goto_next_file:  // don't jump here after ao/vo/getch initialization!
 playing_file=false;
 new_load = true; // hack for avi seek
 thp_vid=false;
+loop_st_point = 0;
 loop_ed_point = 0; //for ADX loops
 monospaced=0; // Go back to original font
 static vu32* const _vigReg = (vu32*)0xCC002030;
