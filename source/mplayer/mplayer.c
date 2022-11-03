@@ -4694,7 +4694,7 @@ total_time_usage_start=GetTimer();
 				}
 				if((demuxer_get_current_time(mpctx->demuxer)+5) < seek_2_sec && !http_block) {
 					wiiSeek(demuxer_get_current_time(mpctx->demuxer)+5, 2);
-					wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
+				//	wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
 					
 				//	wiiSeek(4, 0);
 					mpctx->eof = 0;
