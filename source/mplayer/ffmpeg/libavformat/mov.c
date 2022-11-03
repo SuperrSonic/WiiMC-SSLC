@@ -176,9 +176,9 @@ extern u8 *pos_pic;
 static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
 {
 //	return 0; //memleak is here!
-    AVPacket pkt;
-    AVStream *st;
-    MOVStreamContext *sc;
+  //  AVPacket pkt;
+  //  AVStream *st;
+  //  MOVStreamContext *sc;
     enum CodecID id;
     int ret;
 
@@ -193,17 +193,18 @@ static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
         return 0;
     }
 
-    st = avformat_new_stream(c->fc, NULL);
-    if (!st)
-        return AVERROR(ENOMEM);
-    sc = av_mallocz(sizeof(*sc));
-    if (!sc)
-        return AVERROR(ENOMEM);
-    st->priv_data = sc;
+   // st = avformat_new_stream(c->fc, NULL);
+    //if (!st)
+      //  return AVERROR(ENOMEM);
+   // sc = av_mallocz(sizeof(*sc));
+    //if (!sc)
+      //  return AVERROR(ENOMEM);
+   // st->priv_data = sc;
 
-    ret = av_get_packet(pb, &pkt, len);
-    if (ret < 0)
-        return ret;
+	//here lies caratula memleak, rip
+   // ret = av_get_packet(pb, &pkt, len);
+  //  if (ret < 0)
+      //  return ret;
 
 /*    st->disposition              |= AV_DISPOSITION_ATTACHED_PIC;
 
