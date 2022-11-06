@@ -575,7 +575,7 @@ int read_asf_header(demuxer_t *demuxer,struct asf_priv* asf){
           if (pos > hdr_len) goto len_err_out;
           if ((string = get_ucs2str(wstring, len))) {
             mp_msg(MSGT_HEADER,MSGL_V," Author: %s\n", string);
-            demux_info_add(demuxer, "author", string);
+            demux_info_add(demuxer, "artist", string);
             free(string);
           }
         }
