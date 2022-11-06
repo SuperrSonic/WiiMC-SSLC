@@ -124,7 +124,7 @@ const demuxer_desc_t *const demuxer_list[] = {
 #endif
     &demuxer_desc_avi,
     &demuxer_desc_y4m,
-    &demuxer_desc_asf,
+    //&demuxer_desc_asf,
     &demuxer_desc_nsv,
     &demuxer_desc_real,
     &demuxer_desc_smjpeg,
