@@ -217,7 +217,7 @@ static int mov_read_covr(MOVContext *c, AVIOContext *pb, int type, int len)
 */
 	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
 	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
-	avio_seek(pb, -len, SEEK_CUR);
+	//avio_seek(pb, -len, SEEK_CUR);
 	
 	//If the len is higher than the allocated buffer fix it
 	if(len > 1.5*1024*1024)
