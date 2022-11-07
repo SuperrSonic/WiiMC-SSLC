@@ -190,34 +190,6 @@ static int asf_read_picture(AVFormatContext *s, int len)
         return AVERROR_INVALIDDATA;
     }
 
-	//check for pos with seek then cur pos.
-/*
-	char cur_bytes[4] = { 0 };
-	int i = 0;
-	avio_seek(s->pb, 0x20, SEEK_SET);
-	for(i=0;i<len;i++) {
-		avio_seek(s->pb, i, SEEK_CUR);
-		avio_read(s->pb, cur_bytes, 4);
-		if(cur_bytes[0] == 'M' && cur_bytes[1] == 0x0 && cur_bytes[2] == 0x2F) {
-			avio_rb32(s->pb);
-			avio_rb32(s->pb);
-			avio_rb32(s->pb);
-			avio_rb32(s->pb);
-			
-			pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
-			avio_seek(s->pb, 0x1D, SEEK_CUR);
-			avio_read(s->pb, pos_pic, len);
-			//embedded_pic = 1;
-			break;
-		}
-			
-	} */
-	//pos_pic = (u8 *)mem2_memalign(32, 900*1024, MEM2_OTHER);
-			//avio_seek(s->pb, -len, SEEK_CUR);
-		//	avio_read(s->pb, pos_pic, len);
-			//embedded_pic = 1;
-		//	return 0;
-
 	/* if the file size is big the position of wd/picture different. */
 	if(wm_picture_type2) {
 		avio_seek(s->pb, -len, SEEK_CUR);
@@ -277,16 +249,16 @@ static int asf_read_picture(AVFormatContext *s, int len)
         goto fail;
     }
 	// memleak
-/*    st->priv_data = ast;
+    st->priv_data = ast;
 
-    st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
+    //st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
     st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id   = id;
+    //st->codec->codec_id   = id;
 
     st->attached_pic      = pkt;
     st->attached_pic.stream_index = st->index;
     st->attached_pic.flags |= AV_PKT_FLAG_KEY;
-*/
+
 	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 	avio_seek(s->pb, -picsize, SEEK_CUR);
 	
@@ -505,7 +477,9 @@ static int asf_read_stream_properties(AVFormatContext *s, int64_t size)
         if (sizeX > 40) {
             st->codec->extradata_size = sizeX - 40;
             st->codec->extradata = av_mallocz(st->codec->extradata_size + FF_INPUT_BUFFER_PADDING_SIZE);
-            avio_read(pb, st->codec->extradata, st->codec->extradata_size);
+            if (!st->codec->extradata)
+                return AVERROR(ENOMEM);
+			avio_read(pb, st->codec->extradata, st->codec->extradata_size);
         }
 
         /* Extract palette from extradata if bpp <= 8 */
@@ -1002,6 +976,7 @@ static int asf_read_frame_header(AVFormatContext *s, AVIOContext *pb){
         asf->packet_obj_size = avio_rl32(pb);
         if(asf->packet_obj_size >= (1<<24) || asf->packet_obj_size <= 0){
             av_log(s, AV_LOG_ERROR, "packet_obj_size invalid\n");
+			asf->packet_obj_size = 0;
             return -1;
         }
         asf->packet_frag_timestamp = avio_rl32(pb); // timestamp
@@ -1100,21 +1075,33 @@ static int ff_asf_parse_packet(AVFormatContext *s, AVIOContext *pb, AVPacket *pk
                 asf->packet_segments= 0;
                 continue;
             }
-            if (asf->stream_index < 0
-                || s->streams[asf->stream_index]->discard >= AVDISCARD_ALL
-                || (!asf->packet_key_frame && s->streams[asf->stream_index]->discard >= AVDISCARD_NONKEY)
-                ) {
+            if (asf->stream_index < 0 ||
+                s->streams[asf->stream_index]->discard >= AVDISCARD_ALL ||
+                (!asf->packet_key_frame &&
+                 (s->streams[asf->stream_index]->discard >= AVDISCARD_NONKEY || asf->streams[s->streams[asf->stream_index]->id].skip_to_key))) {
                 asf->packet_time_start = 0;
                 /* unhandled packet (should not happen) */
                 avio_skip(pb, asf->packet_frag_size);
                 asf->packet_size_left -= asf->packet_frag_size;
-                if(asf->stream_index < 0)
-                    av_log(s, AV_LOG_ERROR, "ff asf skip %d (unknown stream)\n", asf->packet_frag_size);
+                if (asf->stream_index < 0)
+                    av_log(s, AV_LOG_ERROR, "ff asf skip %d (unknown stream)\n",
+                           asf->packet_frag_size);
                 continue;
             }
             asf->asf_st = s->streams[asf->stream_index]->priv_data;
+			asf->asf_st->skip_to_key = 0;
         }
         asf_st = asf->asf_st;
+
+		if (!asf_st->frag_offset && asf->packet_frag_offset) {
+           // av_dlog(s, "skipping asf data pkt with fragment offset for "
+           //         "stream:%d, expected:%d but got %d from pkt)\n",
+            //        asf->stream_index, asf_st->frag_offset,
+            //        asf->packet_frag_offset);
+            avio_skip(pb, asf->packet_frag_size);
+            asf->packet_size_left -= asf->packet_frag_size;
+            continue;
+        }
 
         if (asf->packet_replic_size == 1) {
             // frag_offset is here used as the beginning timestamp
@@ -1321,6 +1308,21 @@ static void asf_reset_header(AVFormatContext *s)
     asf->asf_st= NULL;
 }
 
+static void skip_to_key(AVFormatContext *s)
+{
+    ASFContext *asf = s->priv_data;
+    int i;
+
+    for (i = 0; i < 128; i++) {
+        int j = asf->asfid2avid[i];
+        ASFStream *asf_st = &asf->streams[i];
+        if (j < 0 || s->streams[j]->codec->codec_type != AVMEDIA_TYPE_VIDEO)
+            continue;
+
+        asf_st->skip_to_key = 1;
+    }
+}
+
 static int asf_read_close(AVFormatContext *s)
 {
     asf_reset_header(s);
@@ -1451,6 +1453,13 @@ static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int 
             return ret;
     }
 
+	/* explicitly handle the case of seeking to 0 */
+    if (!pts) {
+        asf_reset_header(s);
+        avio_seek(s->pb, s->data_offset, SEEK_SET);
+        return 0;
+    }
+
     if (!asf->index_read)
         asf_build_simple_index(s, stream_index);
 
@@ -1465,6 +1474,7 @@ static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int 
             if(avio_seek(s->pb, pos, SEEK_SET) < 0)
                 return -1;
             asf_reset_header(s);
+			skip_to_key(s);
             return 0;
         }
     }
@@ -1472,6 +1482,7 @@ static int asf_read_seek(AVFormatContext *s, int stream_index, int64_t pts, int 
     if (ff_seek_frame_binary(s, stream_index, pts, flags) < 0)
         return -1;
     asf_reset_header(s);
+	skip_to_key(s);
     return 0;
 }
 

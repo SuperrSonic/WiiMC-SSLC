@@ -36,6 +36,7 @@ typedef struct {
     int frag_offset;
     int timestamp;
     int64_t duration;
+	int skip_to_key;
 
     int ds_span;                /* descrambling  */
     int ds_packet_size;

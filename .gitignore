@@ -4,5 +4,3 @@
 build/*.h
 wiimc.dol
 wiimc.elf
-source/mplayer/ffmpeg/libavformat/libavformat.a
-*.a
