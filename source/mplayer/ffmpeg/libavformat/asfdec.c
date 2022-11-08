@@ -175,7 +175,7 @@ int wm_picture_type2 = 0;
  * but in reality this is only loosely similar */
 static int asf_read_picture(AVFormatContext *s, int len)
 {
-    AVPacket pkt = { 0 };
+    //AVPacket pkt = { 0 };
     const CodecMime *mime = ff_id3v2_mime_tags;
     enum  CodecID      id = CODEC_ID_NONE;
     char mimetype[64];
@@ -237,9 +237,10 @@ static int asf_read_picture(AVFormatContext *s, int len)
         return AVERROR(ENOMEM);
     len -= avio_get_str16le(s->pb, len - picsize, desc, desc_len);
 
-    ret = av_get_packet(s->pb, &pkt, picsize);
+    //aqui 'ta el memleak
+    /*ret = av_get_packet(s->pb, &pkt, picsize);
     if (ret < 0)
-        goto fail;
+        goto fail;*/
 
     st = avformat_new_stream(s, NULL);
     if (!st) {
@@ -269,7 +270,7 @@ static int asf_read_picture(AVFormatContext *s, int len)
 
 fail:
     av_freep(&desc);
-    av_free_packet(&pkt);
+    //av_free_packet(&pkt);
     return ret;
 }
 
