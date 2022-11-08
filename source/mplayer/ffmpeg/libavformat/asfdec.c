@@ -180,7 +180,6 @@ static int asf_read_picture(AVFormatContext *s, int len)
     enum  CodecID      id = CODEC_ID_NONE;
     char mimetype[64];
     uint8_t  *desc = NULL;
-    ASFStream *ast = NULL;
     AVStream   *st = NULL;
     int ret, type, picsize, desc_len;
 
@@ -217,7 +216,7 @@ static int asf_read_picture(AVFormatContext *s, int len)
         }
         mime++;
     }
-	//fails here
+
 //wiim_inf = type;
     if (id == CODEC_ID_NONE) {
         av_log(s, AV_LOG_ERROR, "Unknown attached picture mimetype: %s.\n",
@@ -243,22 +242,11 @@ static int asf_read_picture(AVFormatContext *s, int len)
         goto fail;
 
     st = avformat_new_stream(s, NULL);
-    ast = av_mallocz(sizeof(*ast));
-    if (!st || !ast) {
+    if (!st) {
         ret = AVERROR(ENOMEM);
         goto fail;
     }
-	// memleak
-/*    st->priv_data = ast;
 
-    st->disposition      |= AV_DISPOSITION_ATTACHED_PIC;
-    st->codec->codec_type = AVMEDIA_TYPE_VIDEO;
-    st->codec->codec_id   = id;
-
-    st->attached_pic      = pkt;
-    st->attached_pic.stream_index = st->index;
-    st->attached_pic.flags |= AV_PKT_FLAG_KEY;
-*/
 	pos_pic = (u8 *)mem2_memalign(32, 1.5*1024*1024, MEM2_OTHER);
 	avio_seek(s->pb, -picsize, SEEK_CUR);
 	
@@ -280,7 +268,6 @@ static int asf_read_picture(AVFormatContext *s, int len)
     return 0;
 
 fail:
-    av_freep(&ast);
     av_freep(&desc);
     av_free_packet(&pkt);
     return ret;
@@ -656,7 +643,7 @@ static int asf_read_metadata(AVFormatContext *s, int64_t size)
         //av_log(s, AV_LOG_ERROR, "%d %d %d %d %d <%s>\n", i, stream_num, name_len, value_type, value_len, name);
         value_num= avio_rl16(pb);//we should use get_value() here but it does not work 2 is le16 here but le32 elsewhere
         avio_skip(pb, value_len - 2);
-		
+
 		if (!strcmp(name, "WM/Picture")) {
 			//so far so good
 			wm_picture_type2 = 1;
@@ -974,6 +961,7 @@ static int asf_read_frame_header(AVFormatContext *s, AVIOContext *pb){
         asf->packet_obj_size = avio_rl32(pb);
         if(asf->packet_obj_size >= (1<<24) || asf->packet_obj_size <= 0){
             av_log(s, AV_LOG_ERROR, "packet_obj_size invalid\n");
+			asf->packet_obj_size = 0;
             return -1;
         }
         asf->packet_frag_timestamp = avio_rl32(pb); // timestamp
@@ -1286,6 +1274,8 @@ static void asf_reset_header(AVFormatContext *s)
 
     for(i=0; i<s->nb_streams; i++){
         asf_st= s->streams[i]->priv_data;
+		if (!asf_st)
+            continue;
         av_free_packet(&asf_st->pkt);
         asf_st->frag_offset=0;
         asf_st->seq=0;
