@@ -5693,43 +5693,28 @@ bool wiiAudioOnly()
 	return true;
 }
 
-char* ogg_title = NULL;
-char* ogg_artist = NULL;
-char* ogg_album = NULL;
-char* ogg_year = NULL;
-char* ogg_loopstart = NULL;
-
 char * wiiGetMetaTitle()
 {
-	if(mpctx->sh_audio->format == 22127) { // OGG VORBIS
-		loop_st_point = ogg_loopstart != NULL ? atoi(ogg_loopstart) / mpctx->sh_audio->samplerate : 0;
-		return ogg_title;
-	}
+	//if(mpctx->sh_audio->format == 22127) { // OGG VORBIS
+		//loop_st_point = ogg_loopstart != NULL ? atoi(ogg_loopstart) / mpctx->sh_audio->samplerate : 0;
+		//return ogg_title;
+	//}
 
 	return get_metadata(META_INFO_TITLE);
 }
 
 char * wiiGetMetaArtist()
 {
-	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
-		return ogg_artist;
-
 	return get_metadata(META_INFO_ARTIST);
 }
 
 char * wiiGetMetaAlbum()
 {
-	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
-		return ogg_album;
-
 	return get_metadata(META_INFO_ALBUM);
 }
 
 char * wiiGetMetaYear()
 {
-	if(mpctx->sh_audio->format == 22127) // OGG VORBIS
-		return ogg_year;
-
 	return get_metadata(META_INFO_YEAR);
 }
 
