@@ -1,0 +1,2 @@
+//3DS Netflix app style encode
+ffmpeg -i name_src.mkv -vf scale=368x208 -vcodec mpeg4 -vb 370k -acodec adpcm_ima_wav -ac 1 -ar 32000 name_3ds.mkv
