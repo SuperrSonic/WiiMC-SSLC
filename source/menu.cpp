@@ -40,6 +40,20 @@ extern "C" {
 #include "mplayer/stream/url.h"
 }
 
+u32 getipbyname(char *domain)
+{
+	//Care should be taken when using net_gethostbyname,
+	//it returns a static buffer which makes it not threadsafe
+	struct hostent *host = net_gethostbyname(domain);
+
+	if(host == NULL) {
+		return 0;
+	}
+
+	u32 *ip = (u32*)host->h_addr_list[0];
+	return *ip;
+}
+
 #define THREAD_SLEEP 	200
 #define GSTACK 			(16384)
 #define GUITH_STACK 	(16384)
@@ -6341,6 +6355,7 @@ static void MenuSettingsNetworkSMB()
 	OptionList options;
 	wchar_t titleStr[100];
 	char shareName[100];
+	bool ip_failed = false; //try to use disp name for IP lookup
 
 	sprintf(options.name[i++], "Display Name");
 	sprintf(options.name[i++], "Share IP");
@@ -6450,7 +6465,27 @@ static void MenuSettingsNetworkSMB()
 				break;
 
 			case 1:
-				if(WiiSettings.smbConf[netEditIndex].ip[0] == 0)
+				if(WiiSettings.smbConf[netEditIndex].displayname[0] != 0 && wiiIP[0] != 0)
+				{
+					u32 useDisp = getipbyname(WiiSettings.smbConf[netEditIndex].displayname);
+					u8 oct1 = useDisp >> 24;
+					u8 oct2 = useDisp >> 16;
+					u8 oct3 = useDisp >> 8;
+					u8 oct4 = useDisp;
+					//printf("DEV IP: 0x%X,,", useDisp);
+					
+					if(oct1 == 0 && oct2 == 0 && oct3 == 0 && oct4 == 0) {
+						ip_failed = true;
+						WiiSettings.smbConf[netEditIndex].ip[0] = 0;
+					}
+					
+					char dispIP[16] = {0};
+					sprintf(dispIP, "%d.%d.%d.%d", oct1, oct2, oct3, oct4);
+					
+					strcpy(WiiSettings.smbConf[netEditIndex].ip, dispIP);
+				}
+				//if getting the IP from display name failed, IP will be 0.0.0.
+				if(WiiSettings.smbConf[netEditIndex].ip[0] == 0 || ip_failed)
 				{
 					// pre-populate IP
 					if(wiiIP[0] != 0)
