@@ -3993,8 +3993,8 @@ stream_cache_min_percent=0.2;
                  strcmp(att->type, "application/x-font") == 0))
                 ass_add_font(ass_library, att->name, att->data, att->data_size); */
 			  if (alt_font && att->name && att->type && att->data && att->data_size &&
-			      (strcmp(att->type, "application/x-truetype-font") == 0 ||
-				   strcmp(att->type, "application/x-font")))
+			      //(strcmp(att->type, "application/x-truetype-font") == 0 ||
+				   (strcmp(att->type, "application/x-font")))
 				     monospaced = 1;
         }
     }
