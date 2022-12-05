@@ -50,6 +50,9 @@
 #include <bzlib.h>
 #endif
 
+extern int monospaced;
+extern int alt_font;
+
 typedef enum {
     EBML_NONE,
     EBML_UINT,
@@ -1463,14 +1466,8 @@ static int matroska_read_header(AVFormatContext *s)
     if (matroska->duration)
         matroska->ctx->duration = matroska->duration * matroska->time_scale
                                   * 1000 / AV_TIME_BASE;
+
     av_dict_set(&s->metadata, "title", matroska->title, 0);
-	//find_prob = matroska->ctx->duration; //matroska->duration * matroska->time_scale
-                                 // * 1000 / AV_TIME_BASE;
-								 //AV_TIME_BASE = 1000000
-								 //matroska->duration = good is 534618
-								 //matroska->duration = bad  is 534619
-								 //good ctx = 267309000.000000030
-								 //whatsoconfuse
 
     if (matroska->date_utc.size == 8)
         matroska_metadata_creation_time(&s->metadata, AV_RB64(matroska->date_utc.data));
@@ -1677,6 +1674,14 @@ static int matroska_read_header(AVFormatContext *s)
         st->start_time = 0;
         if (strcmp(track->language, "und"))
             av_dict_set(&st->metadata, "language", track->language, 0);
+
+		//try to use title to determine if monospace font should be use
+		if(track->name != NULL && alt_font) {
+			if(!av_strncasecmp(track->name, "closed", 6) || !av_strncasecmp(track->name, "monospace", 9)
+				|| !av_strncasecmp(track->name, "eia", 3) || !av_strncasecmp(track->name, "CC", 2))
+				monospaced = 1;
+		}
+
         av_dict_set(&st->metadata, "title", track->name, 0);
 
         if (track->flag_default)
