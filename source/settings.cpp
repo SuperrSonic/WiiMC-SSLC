@@ -346,7 +346,6 @@ prepareSettingsData ()
 	createXMLSetting("night", "Night Filter", toStr(WiiSettings.night));
 	createXMLSetting("screenDim", "Burn-in Reduction", toStr(WiiSettings.screenDim));
 	createXMLSetting("doubleStrike", "Double Strike", toStr(WiiSettings.doubleStrike));
-	createXMLSetting("smallCache", "Set cache to 2MB", toStr(WiiSettings.smallCache));
 	createXMLSetting("libass", "ASS Renderer", toStr(WiiSettings.libass));
 	createXMLSetting("saveExit", "Only save to device on exit", toStr(WiiSettings.saveExit));
 	createXMLSetting("force576p", "Force 576p 50Hz", toStr(WiiSettings.force576p));
@@ -406,8 +405,10 @@ prepareSettingsData ()
 	createXMLSetting("subtitleCodepage", "Subtitle codepage", WiiSettings.subtitleCodepage);
 	createXMLSetting("subtitleColor", "Subtitle color", WiiSettings.subtitleColor);
 	createXMLSetting("subtitleSize", "Subtitle size", FtoStr(WiiSettings.subtitleSize));
-	createXMLSetting("shadow", "Shadow rendering", toStr(WiiSettings.shadow));
-	createXMLSetting("bold", "Force bold font", toStr(WiiSettings.bold));
+	createXMLSetting("borderstyle", "BorderStyle override", toStr(WiiSettings.borderstyle));
+	createXMLSetting("outline", "Outline override", FtoStr(WiiSettings.outline));
+	createXMLSetting("shadow", "Shadow override", FtoStr(WiiSettings.shadow));
+	createXMLSetting("bold", "Always bold typeface", toStr(WiiSettings.bold));
 	createXMLSetting("monofont", "Use monospaced font", toStr(WiiSettings.monofont));	
 
 	int datasize = mxmlSaveString(xml, (char *)savebuffer, SAVEBUFFERSIZE, XMLSaveCallback);
@@ -769,7 +770,6 @@ void DefaultSettings ()
 	WiiSettings.night = 0;
 	WiiSettings.screenDim = CONF_GetScreenSaverMode();
 	WiiSettings.doubleStrike = 0;
-	WiiSettings.smallCache = 0;
 	WiiSettings.libass = 1;
 	WiiSettings.saveExit = 1;
 	WiiSettings.force576p = 0;
@@ -833,8 +833,10 @@ void DefaultSettings ()
 	WiiSettings.subtitleLanguage[0] = 0;
 	WiiSettings.subtitleCodepage[0] = 0;
 	sprintf(WiiSettings.subtitleColor, "FFFFFF00");
-	WiiSettings.subtitleSize = 2;
-	WiiSettings.shadow = 1;
+	WiiSettings.subtitleSize = 2.5;
+	WiiSettings.borderstyle = 0;
+	WiiSettings.outline = -1;
+	WiiSettings.shadow = -1;
 	WiiSettings.bold = 0;
 	WiiSettings.monofont = 0;
 }
@@ -879,8 +881,6 @@ static void FixInvalidSettings()
 		WiiSettings.screenDim = 0;
 	if(WiiSettings.doubleStrike < 0 || WiiSettings.doubleStrike > 1)
 		WiiSettings.doubleStrike = 0;
-	if(WiiSettings.smallCache < 0 || WiiSettings.smallCache > 1)
-		WiiSettings.smallCache = 0;
 	if(WiiSettings.libass < 0 || WiiSettings.libass > 1)
 		WiiSettings.libass = 1;
 	if(WiiSettings.saveExit < 0 || WiiSettings.saveExit > 1)
@@ -1036,8 +1036,13 @@ static void FixInvalidSettings()
 	
 	if(WiiSettings.subtitleSize > 5 || WiiSettings.subtitleSize < 1)
 		WiiSettings.subtitleSize = 2.0;
-	if(WiiSettings.shadow < 0 || WiiSettings.shadow > 2)
-		WiiSettings.shadow = 1;
+	
+	if(WiiSettings.borderstyle < 0 || WiiSettings.borderstyle > 4)
+		WiiSettings.borderstyle = 0;
+	if(WiiSettings.outline < -1 || WiiSettings.outline > 10)
+		WiiSettings.outline = -1;
+	if(WiiSettings.shadow < -1 || WiiSettings.shadow > 10)
+		WiiSettings.shadow = -1;
 	if(WiiSettings.bold < 0 || WiiSettings.bold > 1)
 		WiiSettings.bold = 0;
 	if(WiiSettings.monofont < 0 || WiiSettings.monofont > 1)
@@ -1271,7 +1276,6 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.night, "night");
 				loadXMLSetting(&WiiSettings.screenDim, "screenDim");
 				loadXMLSetting(&WiiSettings.doubleStrike, "doubleStrike");
-				loadXMLSetting(&WiiSettings.smallCache, "smallCache");
 				loadXMLSetting(&WiiSettings.libass, "libass");
 				loadXMLSetting(&WiiSettings.saveExit, "saveExit");
 				loadXMLSetting(&WiiSettings.force576p, "force576p");
@@ -1328,6 +1332,8 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(WiiSettings.subtitleCodepage, "subtitleCodepage", sizeof(WiiSettings.subtitleCodepage));
 				loadXMLSetting(WiiSettings.subtitleColor, "subtitleColor", sizeof(WiiSettings.subtitleColor));
 				loadXMLSetting(&WiiSettings.subtitleSize, "subtitleSize");
+				loadXMLSetting(&WiiSettings.borderstyle, "borderstyle");
+				loadXMLSetting(&WiiSettings.outline, "outline");
 				loadXMLSetting(&WiiSettings.shadow, "shadow");
 				loadXMLSetting(&WiiSettings.bold, "bold");
 				loadXMLSetting(&WiiSettings.monofont, "monofont");

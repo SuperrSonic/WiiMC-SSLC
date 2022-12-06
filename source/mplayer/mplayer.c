@@ -349,7 +349,7 @@ int capture_dump;
 static float default_max_pts_correction = -1;
 static float max_pts_correction; //default_max_pts_correction;
 //test smooth
-int dup_frames;
+//int dup_frames;
 int pts_counter;
 
 static float c_total;
@@ -361,9 +361,10 @@ static int softsleep;
 double force_fps;
 //double first_fps;
 char styleChanges[128] = {0};
-char shadowStyle[56] = {0};
-char boxStyle[32] = {0};
-char boldStyle[8] = {0};
+char boxStyle[16] = {0x20};
+char outlineStyle[16] = {0x20};
+char shadowStyle[16] = {0x20};
+char boldStyle[8] = {0x20};
 
 unsigned guiDelay = 1;
 
@@ -3273,8 +3274,11 @@ m_config_set_option(mconfig,"ass-font-scale","2.5");
 //m_config_set_option(mconfig,"ass-hinting","0");
 #endif
 SetMPlayerSettings();
-sprintf(styleChanges,"%s,%s,%s", boldStyle, boxStyle, shadowStyle);
-m_config_set_option(mconfig,"ass-force-style", styleChanges);
+
+sprintf(styleChanges,"%s,%s,%s,%s", boldStyle, boxStyle, shadowStyle, outlineStyle);
+
+char* stylep = styleChanges;
+m_config_set_option(mconfig,"ass-force-style", stylep);
 
 orig_stream_cache_min_percent=stream_cache_min_percent;
 orig_stream_cache_seek_min_percent=stream_cache_seek_min_percent;
@@ -5442,16 +5446,16 @@ void wiiSFD()
 	else
 		m_config_set_option(mconfig,"demuxer","lavf=0");
 }
-
+/*
 void wiiDup()
 {
 	dup_frames = true;
-}
-
+}*/
+/*
 void wiiCacheSmall()
 {
 	stream_cache_size=2*1024; // 2MB cache
-}
+}*/
 
 void wiiAssOff()
 {
@@ -5461,24 +5465,27 @@ void wiiAssOff()
 	m_config_set_option(mconfig,"ass","0");
 }
 
-void wiiRemoveShadows()
+void wiiForceOutline(float outline)
 {
-	//force style, for it to work must be used once.
-	//m_config_set_option(mconfig,"ass-force-style","ScaledBorderAndShadow=no,Shadow=0,Outline=1.7");
-	//sprintf(shadowStyle, "%s", "ScaledBorderAndShadow=no,Shadow=0,Outline=1.7");
-	sprintf(shadowStyle, "%s", "ScaledBorderAndShadow=no,Shadow=0");
+	sprintf(outlineStyle, "Outline=%.1f", outline);
 }
 
-void wiiBoxShadows()
+void wiiForceShadow(float shadow)
 {
-	//m_config_set_option(mconfig,"ass-force-style","BorderStyle=3,Outline=0,Shadow=0");
-	sprintf(boxStyle, "%s", "BorderStyle=3,Outline=0,Shadow=0");
+	//force style, works throughout program run
+	//m_config_set_option(mconfig,"ass-force-style","ScaledBorderAndShadow=no,Shadow=0,Outline=1.7");
+	sprintf(shadowStyle, "Shadow=%.1f", shadow);
+}
+
+void wiiForceStyle(int borderstyle)
+{
+	sprintf(boxStyle, "BorderStyle=%d", borderstyle);
 }
 
 void wiiForceBold()
 {
 	//m_config_set_option(mconfig,"ass-force-style","Bold=1");
-	sprintf(boldStyle, "%s", "Bold=1");
+	sprintf(boldStyle, "Bold=1");
 }
 
 void wiiUseAltFont()

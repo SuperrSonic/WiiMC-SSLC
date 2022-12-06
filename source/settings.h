@@ -89,7 +89,7 @@ typedef struct _lang {
 } LANG;
 
 //#define LANGUAGE_SIZE 139
-#define LANGUAGE_SIZE 7
+#define LANGUAGE_SIZE 6
 #define CODEPAGE_SIZE 28
 #define MAX_SHARES 9
 
@@ -144,7 +144,6 @@ struct SWiiSettings {
 	int 	night;
 	int		screenDim;
 	int 	doubleStrike;
-	int 	smallCache;
 	int 	libass;
 	int 	saveExit;
 	int 	numThumb;
@@ -200,7 +199,9 @@ struct SWiiSettings {
 	char	subtitleCodepage[13];
 	char	subtitleColor[9];
 	float	subtitleSize;
-	int		shadow;
+	int		borderstyle;
+	float	outline;
+	float	shadow;
 	int 	bold;
 	int 	monofont;
 };

@@ -663,6 +663,21 @@ bool InitMPlayer()
 		fread (mono_mem, 1, mono_mem_size, fp);
 		fclose(fp);
 	}
+	
+	//TEST, MEM WASTE MEM1
+/*	u8 *binar_mem = NULL;
+	u32 binar_mem_size = 0;
+	FILE *fp;
+		fp = fopen("sd1:/apps/WiiMC/dat.bin", "rb");
+		
+		fseeko(fp,0,SEEK_END);
+		binar_mem_size = ftello(fp);
+		binar_mem = (u8 *)memalign(32, binar_mem_size);
+		
+		fseeko(fp,0,SEEK_SET);
+		fread (binar_mem, 1, binar_mem_size, fp);
+		fclose(fp);
+	//END */
 
 	sprintf(MPLAYER_DATADIR,"%s",appPath);
 	sprintf(MPLAYER_CONFDIR,"%s",appPath);
@@ -866,18 +881,22 @@ void wiiSetAssOff()
 		wiiAssOff();
 }
 
-void wiiSetMem()
+void wiiBStyleOverride()
 {
-	if (WiiSettings.smallCache == 1)
-		wiiCacheSmall();
+	if (WiiSettings.borderstyle > 0)
+		wiiForceStyle(WiiSettings.borderstyle);
 }
 
-void wiiShadowOff()
+void wiiOutlineOverride()
 {
-	if (WiiSettings.shadow == 0)
-		wiiRemoveShadows();
-	else if (WiiSettings.shadow == 2)
-		wiiBoxShadows();
+	if (WiiSettings.outline > -1)
+		wiiForceOutline(WiiSettings.outline);
+}
+
+void wiiShadowOverride()
+{
+	if (WiiSettings.shadow > -1)
+		wiiForceShadow(WiiSettings.shadow);
 }
 
 void wiiBoldFont()
@@ -911,8 +930,9 @@ void SetMPlayerSettings()
 	wiiSetSeekForward(WiiSettings.skipForward);
 	//wiiSetVideoDelay(WiiSettings.videoDelay);
 	wiiSetAssOff();
-	wiiSetMem();
-	wiiShadowOff();
+	wiiBStyleOverride();
+	wiiOutlineOverride();
+	wiiShadowOverride();
 	wiiBoldFont();
 	wiiExtraFont();
 	wiiSetCacheFill(WiiSettings.cacheFill);
