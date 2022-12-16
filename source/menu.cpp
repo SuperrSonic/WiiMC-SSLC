@@ -2531,17 +2531,18 @@ SettingWindow(const char *title, GuiWindow *w)
 //int debug_mem = 0;
 char name[] = "Diego A.";
 char neona[] = "http://archive.org/download/";
-char neonaII[] = "link/to/pls";
-//char neonaII[] = "neona-rev04/NeonAlleyRev02";
+char neonaII[] = "neona-rev04/NeonAlleyRev02";
 
 //static vu32* SIPOLL = (vu32*)0xCC006430;
 
 //int wiim_inf = 0;
 //int getINFO = 0;
 //int valSTM = 0;
-int getMESS = 0;
-int getWeird = 0;
 //int waitReload = 0;
+
+//these are used in cache2.c, move 'em, and name them better geez
+int getWeird = 0;
+int getMESS = 0;
 int cntReconnect = 0;
 
 static void CreditsWindow()
@@ -2621,10 +2622,24 @@ static void CreditsWindow()
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
 
-	txt[i] = new GuiText("& menu design", 20, (GXColor){160, 160, 160, 255});
-	txt[i]->SetAlignment(ALIGN_RIGHT, ALIGN_TOP);
-	txt[i]->SetPosition(-15,y); i++;
-	txt[i] = new GuiText("Tantric & rodries", 20, (GXColor){255, 255, 255, 255});
+	txt[i] = new GuiText("Tantric", 20, (GXColor){255, 255, 255, 255});
+	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	txt[i]->SetPosition(15,y); i++;
+	
+	txt[i] = new GuiText("|  rodries", 20, (GXColor){255, 255, 255, 255});
+	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	txt[i]->SetPosition(15+80,y); i++; y+=26;
+	
+	txt[i] = new GuiText("Extrems", 20, (GXColor){255, 255, 255, 255});
+	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	txt[i]->SetPosition(15,y); i++;
+	
+	txt[i] = new GuiText("|  FFmpeg", 20, (GXColor){255, 255, 255, 255});
+	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
+	txt[i]->SetPosition(15+80,y); i++; y+=26;
+	
+	//break
+	txt[i] = new GuiText(" ", 20, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=26;
 	
@@ -2642,19 +2657,19 @@ static void CreditsWindow()
 	txt[i]->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	txt[i]->SetPosition(15,y); i++; y+=44;
 
-	txt[i] = new GuiText("Thanks to", 20, (GXColor){160, 160, 160, 255});
+	txt[i] = new GuiText("\0Thanks to", 20, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	txt[i]->SetPosition(0,y); i++; y+=36;
 
-	txt[i] = new GuiText("Yuji Naka", 16, (GXColor){255, 255, 255, 255});
+	txt[i] = new GuiText("\0Yuji Naka", 16, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	txt[i]->SetPosition(0,y); i++; y+=20;
 
-	txt[i] = new GuiText("Makoto Raiku", 16, (GXColor){255, 255, 255, 255});
+	txt[i] = new GuiText("\0Makoto Raiku", 16, (GXColor){255, 255, 255, 255});
 	txt[i]->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	txt[i]->SetPosition(0,y); i++; y+=44;
 
-	txt[i] = new GuiText("This is a private build of WiiMC.", 14, (GXColor){160, 160, 160, 255});
+	txt[i] = new GuiText("\0This is a private build of WiiMC.", 14, (GXColor){160, 160, 160, 255});
 	txt[i]->SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	txt[i]->SetPosition(0,y);
 	txt[i]->SetWrap(true, 500);
