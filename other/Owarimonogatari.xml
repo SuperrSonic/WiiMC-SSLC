@@ -6,7 +6,7 @@
 
 <!-- The name of the xml must match the video or folder name. -->
 <!-- "image number" sets the limit of how many covers to cycle through randomly. -->
-<!-- An image must share the same name as xml but with an "_1" e.g. Owarimonogatari_01.jpg -->
+<!-- An image must share the same name as xml but with a "_1" e.g. Owarimonogatari_01.jpg -->
 <!-- Both PNG and JPEG will work, but it uses the .jpg extension only. -->
 <!-- "year" is a string that can contain info such as runtime or number of episodes. -->
 <!-- "desc" is the short description of the content, linebreaks are unavailable, length depends on the current font. -->
