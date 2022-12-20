@@ -58,11 +58,10 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Byelorussian", "be", "bel" },
 	{ "Cambodian", "km", "khm" },
 	{ "Catalan", "ca", "cat" },*/
-	//{ "Chinese", "zh", "chi" },
+	
 	/*{ "Corsican", "co", "cos" },
 	{ "Ceske", "cs", "cze" },
-	{ "Dansk", "da", "dan" },
-	{ "Deutsch", "de", "ger" },*/
+	{ "Dansk", "da", "dan" },*/
 	{ "English", "en", "eng" },
 	//{ "Esperanto", "eo", "epo" },
 	{ "Español", "es", "spa" },
@@ -87,8 +86,11 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Inupiak", "ik", "ipk" },
 	{ "Irish", "ga", "gle" },
 	{ "Islenska", "is", "ice" },
-	{ "Italiano", "it", "ita" },
 	{ "Inuktitut", "iu", "iku" },*/
+	{ "Italiano", "it", "ita" },
+	{ "Portugues", "pt", "por" },
+	//{ "Deutsch", "de", "ger" },
+	{ "Chinese", "zh", "chi" },
 	{ "Japanese", "ja", "jpn" },
 	//{ "Javanese", "jw", "jav" },
 	//{ "Kannada", "kn", "kan" },
@@ -124,7 +126,6 @@ LANG languages[LANGUAGE_SIZE] = {
 	{ "Pashto,", "ps", "pus" },
 	{ "Persian", "fa", "per" },
 	{ "Polish", "pl", "pol" },
-	{ "Portugues", "pt", "por" },
 	{ "Panjabi", "pa", "pan" },
 	{ "Quechua", "qu", "que" },
 	{ "Romanian", "ro", "rum" },
@@ -371,8 +372,7 @@ prepareSettingsData ()
 	createXMLSetting("videoDf", "Deflicker", toStr(WiiSettings.videoDf));
 	createXMLSetting("viWidth", "Set VI Width to Max", toStr(WiiSettings.viWidth));
 	createXMLSetting("skipLoop", "Skip Deblocking Filter", toStr(WiiSettings.skipLoop));
-	//createXMLSetting("duplicateFrame", "Duplicate Frames", toStr(WiiSettings.duplicateFrame));
-	//createXMLSetting("videoDelay", "Delay video by ms", toStr(WiiSettings.videoDelay));
+	createXMLSetting("interlaceHandle", "How to handle interlacing", toStr(WiiSettings.interlaceHandle));
 	// Music
 	createXMLSection("Music", "Music Settings");
 	createXMLSetting("playOrder", "Play order", toStr(WiiSettings.playOrder));
@@ -794,7 +794,7 @@ void DefaultSettings ()
 	WiiSettings.videoDf = 0;
 	WiiSettings.viWidth = 0;
 	WiiSettings.skipLoop = 0;
-	//WiiSettings.videoDelay = 0;
+	WiiSettings.interlaceHandle = 1; //let TV handle it
 	// Music
 	WiiSettings.playOrder = PLAY_SINGLE;
 	WiiSettings.screensaverArt = ART_NONE;
@@ -918,8 +918,8 @@ static void FixInvalidSettings()
 		WiiSettings.viWidth = 0;
 	if(WiiSettings.skipLoop < 0 || WiiSettings.skipLoop > 1)
 		WiiSettings.skipLoop = 0;
-	//if(WiiSettings.videoDelay < 0 || WiiSettings.videoDelay > 1)
-		//WiiSettings.videoDelay = 0;
+	if(WiiSettings.interlaceHandle < 0 || WiiSettings.interlaceHandle > 2)
+		WiiSettings.interlaceHandle = 0;
 
 	if(WiiSettings.audioLanguage[0] != 0)
 	{
@@ -1300,8 +1300,7 @@ static bool LoadSettingsFile(char * filepath)
 				loadXMLSetting(&WiiSettings.videoDf, "videoDf");
 				loadXMLSetting(&WiiSettings.viWidth, "viWidth");
 				loadXMLSetting(&WiiSettings.skipLoop, "skipLoop");
-				//loadXMLSetting(&WiiSettings.duplicateFrame, "duplicateFrame");
-				//loadXMLSetting(&WiiSettings.videoDelay, "videoDelay");
+				loadXMLSetting(&WiiSettings.interlaceHandle, "interlaceHandle");
 				// Music
 				loadXMLSetting(&WiiSettings.playOrder, "playOrder");
 				loadXMLSetting(&WiiSettings.screensaverArt, "screensaverArt");

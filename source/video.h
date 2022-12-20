@@ -32,6 +32,8 @@ void Menu_DrawRectangle(f32 x, f32 y, f32 width, f32 height, GXColor color, u8 f
 int DrawMPlayerGui();
 void SetMplTiled();
 void SetMplTiledOff();
+void SetInterlaceOff();
+void SetInterlace();
 
 extern GXRModeObj *vmode;
 extern int screenheight;

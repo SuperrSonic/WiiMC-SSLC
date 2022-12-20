@@ -89,7 +89,7 @@ typedef struct _lang {
 } LANG;
 
 //#define LANGUAGE_SIZE 139
-#define LANGUAGE_SIZE 6
+#define LANGUAGE_SIZE 9
 #define CODEPAGE_SIZE 28
 #define MAX_SHARES 9
 
@@ -172,6 +172,7 @@ struct SWiiSettings {
 	int		videoDf;
 	int		viWidth;
 	int		skipLoop;
+	int		interlaceHandle;
 	//int		duplicateFrame;
 	//int 	videoDelay;
 	// Music

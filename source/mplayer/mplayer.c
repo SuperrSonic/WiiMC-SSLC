@@ -4880,7 +4880,6 @@ else if(*_vigReg == 0x10010001)
 	*_vigReg = 0x120E0001; //0x1001(30fps) go back to 480p60
 halve_fps=true;
 http_hack = 1;
-sync_interlace = 0;
 guiDelay = 1;
 //use_nocorrect = 0;
 http_block = false;
@@ -4888,6 +4887,9 @@ http_block = false;
 // and avoids a flicker when loading a new file.
 if(vmode->fbWidth == 720)
   SetMplTiledOff();
+if(sync_interlace > 0)
+  SetInterlaceOff();
+sync_interlace = 0;
 
 //if (controlledbygui == 0) // If using 576p it causes the TV to display info each time a video has ended.
   //   VIDEO_SetBlack(TRUE);
@@ -5228,7 +5230,10 @@ void PauseAndGotoGUI()
 		//	wiiTiledRender = false;
 		SetMplTiledOff();
 #endif
-
+	//if content is identified as interlaced, consult setting and figure out what to reset to
+	if(sync_interlace > 0)
+		SetInterlaceOff();
+	
 	// Reset video loop mode, which is now ON during video or OFF if in GUI
 	mpctx->loop_times = -1;
 	

@@ -615,6 +615,11 @@ else {
 		drawMode = DrawMPlayerGui();
 	}
 	}
+	
+	//set interlace mode if needed
+	if(sync_interlace > 0)
+		SetInterlace();
+	
 	// Switch to tile rendering
 	SetMplTiled();
 	
@@ -653,6 +658,8 @@ else {
 			//	VIDEO_Configure(vmode);
 			//	VIDEO_Flush();
 				SetMplTiledOff();
+				if(sync_interlace > 0)
+					SetInterlaceOff();
 			//	GX_CopyDisp(xfb[whichfb], GX_TRUE);
 				//TakeScreenshot();
 				goBackto = true;

@@ -554,6 +554,66 @@ void SetDfOff()
 	GX_Flush();
 }
 
+void SetInterlaceOff()
+{
+	if(!WiiSettings.interlaceHandle)
+		return;
+	else if(WiiSettings.interlaceHandle == 1)
+		SetDoubleStrikeOff();
+	//else if(WiiSettings.interlaceHandle == 2)
+		
+	//handle deflicker
+	if(WiiSettings.videoDf == 1)
+		SetDf();
+	else
+		SetDfOff();
+	//handle 240p and 576p
+	if(WiiSettings.doubleStrike == 1)
+		SetDoubleStrike();
+	if(WiiSettings.force576p == 1)
+		Set576p();
+}
+
+void SetInterlace()
+{
+	if(!WiiSettings.interlaceHandle)
+		return;
+
+	if(WiiSettings.interlaceHandle == 2 && vmode->vfilter[0] == 0) //deflicker in video only to hide combing
+		SetDf();
+	else if(WiiSettings.interlaceHandle == 2 && vmode->vfilter[0] != 0)
+		return;
+	if(WiiSettings.interlaceHandle != 1 || vmode->viTVMode != VI_PROGRESSIVE)
+		return;
+
+	CONF_GetVideo();
+	if (want576i)
+		vmode = &TVPal576IntDfScale;
+	else if(pal60)
+		vmode = &TVEurgb60Hz480IntDf;
+	else
+		vmode = &TVNtsc480IntDf;
+
+	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
+	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
+	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopySrc(0,0,vmode->fbWidth,vmode->efbHeight);
+	GX_SetDispCopyDst(vmode->fbWidth,xfbHeight);
+	GX_SetFieldMode(GX_DISABLE, GX_DISABLE);
+	GX_Flush();
+
+    VIDEO_Configure(vmode);
+    VIDEO_Flush();
+    VIDEO_WaitVSync();
+    VIDEO_WaitVSync();
+
+	//otherwise we waste our time
+	SetDfOff();
+	
+	//sleep(2);
+}
+
 #if 1
 void SetMplTiled()
 {
