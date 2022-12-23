@@ -1139,7 +1139,7 @@ get_outline_glyph(ASS_Renderer *priv, GlyphInfo *info)
                 advance = info->advance;
 
             draw_opaque_box(priv, v.asc, v.desc, v.border, advance,
-					double_to_d6(16 * priv->border_scale),
+					double_to_d6(info->border_x * priv->border_scale),
                     double_to_d6(info->border_y * priv->border_scale));
 		} else if (priv->state.style->BorderStyle == 4 &&
                 (info->border_x > 0 || info->border_y > 0)) {
