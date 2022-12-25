@@ -80,7 +80,7 @@ void avcodec_register_all(void)
     REGISTER_DECODER (BINK, bink);
     REGISTER_DECODER (CDXL, cdxl);
     REGISTER_DECODER (DIRAC, dirac);
-    REGISTER_DECODER (DSICINVIDEO, dsicinvideo);
+//    REGISTER_DECODER (DSICINVIDEO, dsicinvideo);
     REGISTER_DECODER (DXTORY, dxtory);
     REGISTER_DECODER (EIGHTSVX_EXP, eightsvx_exp);
     REGISTER_DECODER (EIGHTSVX_FIB, eightsvx_fib);
@@ -124,7 +124,7 @@ void avcodec_register_all(void)
     REGISTER_ENCODER (PRORES_KOSTYA, prores_kostya);
     REGISTER_DECODER (PRORES_LGPL, prores_lgpl);
     REGISTER_ENCDEC  (RAWVIDEO, rawvideo);
-    REGISTER_DECODER (SMACKER, smacker);
+//    REGISTER_DECODER (SMACKER, smacker);
     REGISTER_DECODER (SP5X, sp5x);
     REGISTER_ENCDEC  (SVQ1, svq1);
     REGISTER_DECODER (SVQ3, svq3);
@@ -335,7 +335,7 @@ void avcodec_register_all(void)
     REGISTER_PARSER  (ADX, adx);
     REGISTER_PARSER  (CAVSVIDEO, cavsvideo);
     REGISTER_PARSER  (COOK, cook);
-    REGISTER_PARSER  (DCA, dca);
+//    REGISTER_PARSER  (DCA, dca);
     REGISTER_PARSER  (DIRAC, dirac);
     REGISTER_PARSER  (DNXHD, dnxhd);
     REGISTER_PARSER  (DVBSUB, dvbsub);

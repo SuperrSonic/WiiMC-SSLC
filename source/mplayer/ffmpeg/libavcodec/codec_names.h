@@ -120,9 +120,9 @@ case CODEC_ID_VP6:
 case CODEC_ID_VP6F:
     { extern AVCodec ff_vp6f_decoder;
       return ff_vp6f_decoder.name; }
-case CODEC_ID_DSICINVIDEO:
-    { extern AVCodec ff_dsicinvideo_decoder;
-      return ff_dsicinvideo_decoder.name; }
+//case CODEC_ID_DSICINVIDEO:
+   // { extern AVCodec ff_dsicinvideo_decoder;
+    //  return ff_dsicinvideo_decoder.name; }
 case CODEC_ID_DXA:
     return "dxa";
 case CODEC_ID_THP:
@@ -422,12 +422,12 @@ case CODEC_ID_WMAV1:
 case CODEC_ID_WMAV2:
     { extern AVCodec ff_wmav2_decoder;
       return ff_wmav2_decoder.name; }
-case CODEC_ID_MACE3:
-    { extern AVCodec ff_mace3_decoder;
-      return ff_mace3_decoder.name; }
-case CODEC_ID_MACE6:
-    { extern AVCodec ff_mace6_decoder;
-      return ff_mace6_decoder.name; }
+//case CODEC_ID_MACE3:
+ //   { extern AVCodec ff_mace3_decoder;
+ //     return ff_mace3_decoder.name; }
+//case CODEC_ID_MACE6:
+ //   { extern AVCodec ff_mace6_decoder;
+  //    return ff_mace6_decoder.name; }
 case CODEC_ID_VMDAUDIO:
     { extern AVCodec ff_vmdaudio_decoder;
       return ff_vmdaudio_decoder.name; }
@@ -445,9 +445,9 @@ case CODEC_ID_ALAC:
       return ff_alac_decoder.name; }
 case CODEC_ID_WESTWOOD_SND1:
     return "westwood_snd1";
-case CODEC_ID_GSM:
-    { extern AVCodec ff_gsm_decoder;
-      return ff_gsm_decoder.name; }
+//case CODEC_ID_GSM:
+ //   { extern AVCodec ff_gsm_decoder;
+  //    return ff_gsm_decoder.name; }
 case CODEC_ID_TRUESPEECH:
     { extern AVCodec ff_truespeech_decoder;
       return ff_truespeech_decoder.name; }
@@ -457,20 +457,20 @@ case CODEC_ID_TTA:
 case CODEC_ID_WAVPACK:
     { extern AVCodec ff_wavpack_decoder;
       return ff_wavpack_decoder.name; }
-case CODEC_ID_DSICINAUDIO:
-    { extern AVCodec ff_dsicinaudio_decoder;
-      return ff_dsicinaudio_decoder.name; }
-case CODEC_ID_IMC:
-    { extern AVCodec ff_imc_decoder;
-      return ff_imc_decoder.name; }
+//case CODEC_ID_DSICINAUDIO:
+ //   { extern AVCodec ff_dsicinaudio_decoder;
+  //    return ff_dsicinaudio_decoder.name; }
+//case CODEC_ID_IMC:
+ //   { extern AVCodec ff_imc_decoder;
+   //   return ff_imc_decoder.name; }
 case CODEC_ID_MUSEPACK7:
     return "musepack7";
 case CODEC_ID_MLP:
     { extern AVCodec ff_mlp_decoder;
       return ff_mlp_decoder.name; }
-case CODEC_ID_GSM_MS:
-    { extern AVCodec ff_gsm_ms_decoder;
-      return ff_gsm_ms_decoder.name; }
+//case CODEC_ID_GSM_MS:
+  //  { extern AVCodec ff_gsm_ms_decoder;
+   //   return ff_gsm_ms_decoder.name; }
 case CODEC_ID_ATRAC3:
     { extern AVCodec ff_atrac3_decoder;
       return ff_atrac3_decoder.name; }
@@ -497,9 +497,9 @@ case CODEC_ID_ATRAC3P:
 case CODEC_ID_EAC3:
     { extern AVCodec ff_eac3_decoder;
       return ff_eac3_decoder.name; }
-case CODEC_ID_SIPR:
-    { extern AVCodec ff_sipr_decoder;
-      return ff_sipr_decoder.name; }
+//case CODEC_ID_SIPR:
+//    { extern AVCodec ff_sipr_decoder;
+   //   return ff_sipr_decoder.name; }
 case CODEC_ID_MP1:
     { extern AVCodec ff_mp1_decoder;
       return ff_mp1_decoder.name; }
