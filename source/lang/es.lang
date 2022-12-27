@@ -574,8 +574,14 @@ msgstr "Idioma para el audio"
 msgid "DVD Support"
 msgstr "Soporte DVD"
 
-msgid "Enabled"
-msgstr "Habilitado"
+msgid "Interlacing"
+msgstr "Entrelazado"
+
+msgid "Interlacing"
+msgstr "Entrelazar"
+
+msgid "Blur"
+msgstr "Filtro Vertical"
 
 msgid "Resolution exceeds maximum allowed (1024x720)!"
 msgstr "La resolución excede el máximo permitido (1024x720)!"
@@ -615,9 +621,6 @@ msgstr "Filtro nocturno"
 
 msgid "Screen Burn-in Reduction"
 msgstr "Protector de pantalla"
-
-msgid "Double Strike"
-msgstr "Modo "Double-Strike""
 
 msgid "Force 576p"
 msgstr "Modo 576p"
