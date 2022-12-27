@@ -42,4 +42,8 @@ echo  Converting video for Wii...
 ::  main profile up to 750 kbps 30fps, on the old ladder this was always 512x384 but after
 ::  the changes this could typically be the max MPL size of 720x480, and framedrops were possible.
 ::  However, the baseline profile remained quite consistent after many years.
+
+:: NOTE 5 - A much older version of this recipe is known because one of the NF sample videos is still available online
+:: without encryption and has the date of 2012, this is very similar to the current recipe, this is what changes:
+:: subme is 6, me range is 16, fast pskip is off, trellis is off, and since it's an older x264 no 'stitchable' setting.
 PAUSE

@@ -3,7 +3,7 @@ streamlink --player-external-http --player-external-http-port 8080 --hls-segment
 :: NOTE: If you want PST change 'est' in the url with 'pst'
 
 :: This script will make streamlink output two addresses, one seems static, while the other uses the current IP address
-:: but the static one doesn't seem to work in WiiMc, so I use the IP one with the "search" type (see onlinemedia.xml for details.)
+:: but the static one doesn't seem to work in WiiMC, so I use the IP one with the "search" type (see onlinemedia.xml for details.)
 :: in order to quickly update if the IP changes.
 
 :: It may be possible to change the port from 8080 to 40, this should make WiiMC only require writing the last octet of the IP.
