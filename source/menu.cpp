@@ -6009,7 +6009,7 @@ static void MenuSettingsDVD()
 			}
 			switch(WiiSettings.interlaceHandle)
 			{
-				case 0:	sprintf(options.value[3], "Keep"); break;
+				case 0:	sprintf(options.value[3], "Original"); break;
 				case 1:	sprintf(options.value[3], "TV"); break;
 				case 2:	sprintf(options.value[3], "Blur"); break;
 			}
