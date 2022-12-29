@@ -4139,9 +4139,24 @@ static void MenuBrowse(int menu)
 					strcpy(origname, browser.selIndex->file); // save original URL
 					url_escape_string(escquery, query); // escape the string for use in a URL
 
+					//check original url for first asterisk, wildcard
+					bool wild = false;
+					char *dCh = strstr(browser.selIndex->file, "*");
+					if(dCh != NULL)
+						wild = true; // append query replacing asterisk
+					if(wild) {
+						char* loc_ast;
+						loc_ast = strrchr(browser.selIndex->file,'*');
+						if (loc_ast != NULL)
+						*loc_ast = 0;
+					}
+
 					// append query to search URL
 					char tmp[1024];
-					snprintf(tmp, 1024, "%s%s", browser.selIndex->file, escquery);
+					if(wild)
+						snprintf(tmp, 1024, "%s%s%s", browser.selIndex->file, escquery, dCh+1);
+					else
+						snprintf(tmp, 1024, "%s%s", browser.selIndex->file, escquery);
 					mem2_free(browser.selIndex->file, MEM2_BROWSER);
 					browser.selIndex->file = mem2_strdup(tmp, MEM2_BROWSER);
 				}
@@ -8221,7 +8236,9 @@ static void SetupGui()
 		navDividerImg->SetScaleX(1.112f);
 	navDividerImg->SetPosition(0, 85);
 
-	//sprintf(WiiSettings.theme, "%s", "dynamic");
+	//for dolphin
+	//sprintf(WiiSettings.theme, "%s", "red");
+
 	//For arg themes
 	ChangeTheme();
 
