@@ -6,8 +6,6 @@ streamlink --player-external-http --player-external-http-port 8080 --hls-segment
 :: but the static one doesn't seem to work in WiiMC, so I use the IP one with the "search" type (see onlinemedia.xml for details.)
 :: in order to quickly update if the IP changes.
 
-:: It may be possible to change the port from 8080 to 40, this should make WiiMC only require writing the last octet of the IP.
-
 :: When disconnecting make sure the "stream has ended" message appears in the command window, otherwise re-connecting in WiiMC may hang until exit.
 
 :: Final note, this re-muxes the stream, it doesn't transcode/encode the video or audio, as such it isn't much of a CPU-hog,

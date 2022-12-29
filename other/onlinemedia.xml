@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<file app="WiiMC" version="2.0.0">
+<file app="WiiMC" version="3.0.0">
 <link name="Radio SEGA" addr="http://content.radiosega.net:8006/live" image="http://cdn-profiles.tunein.com/s117456/images/logoq.png" tunein="http://feed.tunein.com/profiles/s117456/nowPlaying?&amp;partnerId=RadioTime" />
 <link name="Radio Nintendo" addr="http://play.radionintendo.com:8005/stream" />
 <link name="Anison.FM" addr="http://pool.anison.fm:9000/AniSonFM(320)" image="http://cdn-radiotime-logos.tunein.com/s185342q.png" tunein="http://feed.tunein.com/profiles/s185342/nowPlaying?&amp;partnerId=RadioTime" />
@@ -7,9 +7,9 @@
 <link name="Yggdrasil Radio" addr="http://yggdrasilradio.net:8000" image="http://cdn-radiotime-logos.tunein.com/s120196q.png" tunein="http://feed.tunein.com/profiles/s120196/nowPlaying?&amp;partnerId=RadioTime" />
 <link name="NoLife Radio" addr="http://listen.nolife-radio.com:8000" image="http://cdn-radiotime-logos.tunein.com/s116600q.png" />
 <link name="Allegro 91.3 FM" addr="http://192.254.105.36:8080/broadwavehigh.mp3?src=1" />
-<link name="Toonami AM" addr="http://192.168.0." type="search" image="" />
+<link name="Toonami AM" addr="http://192.168.0.*:8080" type="search" image="" />
 
 <!-- For Toonami AM, WiiMC will ask to write the last octet of the IP address of the system hosting using Streamlink -->
-<!-- Streamlink is a PC tool that allows you to redirect the chunked Toonami AM m3u list and host it as a single stream. -->
+<!-- Streamlink is a PC tool that allows you to redirect the chunked m3u lists and host it as a single stream. -->
 <!-- See the example script for further details. -->
 </file>
