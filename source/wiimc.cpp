@@ -1057,7 +1057,7 @@ void setOption(char* key, char* valuePointer){
 			if(atoi(valuePointer) == 0)
 				useDumbRP = false;
 		} else if(!strcmp("3ds", key)) {
-			if(atoi(valuePointer) == 0)
+			if(atoi(valuePointer) == 1)
 				want3DS = true;
 		}
 		//break;
