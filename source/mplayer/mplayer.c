@@ -4681,7 +4681,7 @@ total_time_usage_start=GetTimer();
 					wiiTiledRender = true;
 			}
 
-			if(mpctx->sh_video && strncmp(filename, "http:", 5) == 0 && mpctx->eof == 1) {
+			if(mpctx->sh_video && mpctx->eof == 1 && strncmp(filename, "http://archive.", 15) == 0) {
 				//mpctx->eof = 0;
 				//int seek_2_sec = 0;
 				//seek_to_sec = demuxer_get_current_time(mpctx->demuxer);
@@ -4701,6 +4701,7 @@ total_time_usage_start=GetTimer();
 				//	wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
 					
 				//	wiiSeek(4, 0);
+					//seek hack, to restore connection, only for seekable streams
 					mpctx->eof = 0;
 					//mpctx->stream->eof = 0;
 				//	wiiSeek(4, 0); // spams too much so it moves too far.
