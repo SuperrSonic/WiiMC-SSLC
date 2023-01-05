@@ -1,0 +1,14 @@
+cd /opt/devkitpro
+
+export DEVKITPRO=/opt/devkitpro
+
+export DEVKITPPC=$DEVKITPRO/devkitPPC
+
+cd /opt
+
+cd wiimc-NAME
+
+cd trunk
+
+make
+
