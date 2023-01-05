@@ -55,6 +55,8 @@
 
 static VLC mv_vlc;
 
+extern int sync_interlace;
+
 /* as H.263, but only 17 codes */
 static int mpeg_decode_motion(MpegEncContext *s, int fcode, int pred)
 {
@@ -1554,6 +1556,27 @@ static void mpeg_decode_picture_coding_extension(Mpeg1Context *s1)
     s->repeat_first_field         = get_bits1(&s->gb);
     s->chroma_420_type            = get_bits1(&s->gb);
     s->progressive_frame          = get_bits1(&s->gb);
+
+	//sync_interlace = 0;
+	//Try to use interlace mode
+	//NOTE: progressive checking is not needed
+	//because rips from many programs will mark interlaced as progressive
+	//Plus, if the content has random telecining changing from i output to p will be
+	//annoying on most TVs.
+	
+	//NOTE 2: MKV variable fps is currently not working, so mixed content will desync
+	//audio on MKV containers.
+	//Otherwise the following should be safe to enable.
+	
+	//To ignore these flags simply turn off 'Enhanced Resolution' in the settings.
+	
+	//if (!s->progressive_frame) {
+		if(s->top_field_first)
+			sync_interlace = 1;
+		else
+			sync_interlace = 2;
+	//} else
+	//	sync_interlace = 0;
 
     if (s->progressive_sequence && !s->progressive_frame) {
         s->progressive_frame = 1;
