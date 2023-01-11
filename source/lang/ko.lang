@@ -7,9 +7,6 @@ msgstr "비디오"
 msgid "Music"
 msgstr "음악"
 
-msgid "Pictures"
-msgstr "그림"
-
 msgid "Online Media"
 msgstr "온라인 미디어"
 
@@ -30,9 +27,6 @@ msgstr "취소"
 
 msgid "Information"
 msgstr "정보"
-
-msgid "Credits"
-msgstr "크레딧"
 
 msgid "Play"
 msgstr "재생"
@@ -57,6 +51,21 @@ msgstr "계속"
 
 msgid "Through"
 msgstr "처음부터 끝까지"	   
+
+msgid "Screensaver Art"
+msgstr "화면보호기 삽화"
+
+msgid "Internal Loops"
+msgstr "내부 반복재생"
+
+msgid "Top"
+msgstr "위"
+
+msgid "Side"
+msgstr "옆"
+
+msgid "Full"
+msgstr "전체"
 
 msgid "Playlist"
 msgstr "재생목록"
@@ -124,21 +133,6 @@ msgstr "DVD 비디오"
 msgid "Go back"
 msgstr "뒤로"
 
-msgid "Update Available"
-msgstr "업데이트 있음"
-
-msgid "An update is available!"
-msgstr "업데이트 가능!"
-
-msgid "Update now"
-msgstr "지금 업데이트"
-
-msgid "Update later"
-msgstr "나중에 업데이트"
-
-msgid "Online media file not found."
-msgstr "온라인 미디어파일 없음"
-
 msgid "Unrecognized DVD format!"
 msgstr "인식되지 않는 DVD 형식!"
 
@@ -149,7 +143,7 @@ msgid "Port is not a number!"
 msgstr "포트가 숫자가 아닙니다!"
 
 msgid "Port is outside the allowed range (4-49151)!"
-msgstr "포트가 허용된 범위는 넘었읍니다.(4-49151)!"
+msgstr "포트가 허용된 범위 (4-49151)를 벗어났습니다!"
 
 msgid "Settings - Global"
 msgstr "설정 - 글로벌"
@@ -159,9 +153,6 @@ msgstr "설정 - 비디오"
 
 msgid "Settings - Music"
 msgstr "설정 - 음악"
-
-msgid "Settings - Pictures"
-msgstr "설정 - 그림"
 
 msgid "Settings - Online Media"
 msgstr "설정 - 온라인미디어"
@@ -184,7 +175,7 @@ msgstr "볼륨"
 msgid "Exit Action"
 msgstr "종료 동작"
 
-msgid "Wiimote Rumble"
+msgid "Wii Remote Rumble"
 msgstr "위모트 진동"
 
 msgid "Hide"
@@ -212,7 +203,7 @@ msgid "Screen Position"
 msgstr "스크린 위치"
 
 msgid "Frame Dropping"
-msgstr "프레임수"
+msgstr "프레임 누락"
 
 msgid "Aspect Ratio"
 msgstr "화면비율"
@@ -236,7 +227,7 @@ msgid "Volume Normalizer"
 msgstr "표준 볼륨"
 
 msgid "Deflicker"
-msgstr "디플리커"
+msgstr "깜박임"
 
 msgid "Set VI Width to 720"
 msgstr "VI 너비를 720으로 설정"
@@ -266,19 +257,19 @@ msgid "Username"
 msgstr "사용자 이름"
 
 msgid "Password"
-msgstr "암호"
+msgstr "비밀번호"
 
 msgid "New Share"
 msgstr "새로운 공유"
 
 msgid "Delete"
-msgstr "지우기"
+msgstr "삭제"
 
 msgid "Delete Share"
-msgstr "공유 지우기"
+msgstr "공유 삭제"
 
 msgid "Are you sure that you want to delete this share?"
-msgstr "정말 이 공유를 지우시길 원하십니까?"
+msgstr "정말 이 공유를 삭제하길 원하십니까?"
 
 msgid "IP"
 msgstr "IP"
@@ -299,10 +290,10 @@ msgid "Active"
 msgstr "활동적"
 
 msgid "Delete Site"
-msgstr "사이트 지우기"
+msgstr "사이트 삭제"
 
 msgid "Are you sure that you want to delete this site?"
-msgstr "이 사이트를 지우기를 원하십니까?"
+msgstr "이 사이트를 삭제하기 원하십니까?"
 
 msgid "Port"
 msgstr "포트"
@@ -311,10 +302,13 @@ msgid "Error loading file!"
 msgstr "파일 로딩 오류!"
 
 msgid "Resume"
-msgstr "재시작"
+msgstr "다시시작"
 
 msgid "Online Media Folder"
 msgstr "온라인 미디어 폴더"
+
+msgid "Banner Screensaver"
+msgstr "배너 스크린세이버"	   
 
 msgid "Add SMB Share"
 msgstr "SMB 공유 추가"
@@ -324,6 +318,12 @@ msgstr "FTP 사이트 추가"
 
 msgid "DVD Menu"
 msgstr "DVD 메뉴"
+
+msgid "DVD Sync Type"
+msgstr "DVD 동기화 유형"
+
+msgid "Mixed"
+msgstr "혼합"		  
 
 msgid "Skip to Main Title"
 msgstr "메인 타이틀 넘어가기"
@@ -496,6 +496,9 @@ msgstr "설정 - 자막"
 msgid "Visibility"
 msgstr "자막표시"
 
+msgid "Monospaced"
+msgstr "고정폭"
+
 msgid "Delay"
 msgstr "지연"
 
@@ -514,9 +517,6 @@ msgstr "언어를 바꿀수 없습니다. 메모리가 부족합니다."
 msgid "Font Required"
 msgstr "폰트 파일이 필요합니다."
 
-msgid "Unable to save font file!"
-msgstr "폰트파일을 저장할 수가 없읍니다."
-
 msgid "Out of Memory"
 msgstr "메모리 초과"
 
@@ -529,8 +529,17 @@ msgstr "이 디렉토리는 허용된 최대값 이상의 내용물을 담고 �
 msgid "This playlist contains more entries than the maximum allowed. Not all entries will be visible."
 msgstr "이 재생목록은 허용된 최대값 이상의 내용물을 담고 있습니다. 모든 것이 안보일 수 있습니다."
 
-msgid "Color"
-msgstr "색깔"
+msgid "White"
+msgstr "흰색"
+
+msgid "Black"
+msgstr "검정색"
+
+msgid "Yellow"
+msgstr "노란색"
+
+msgid "Red"
+msgstr "빨간색"
 
 msgid "Size"
 msgstr "크기"
@@ -565,11 +574,14 @@ msgstr "오디오 언어"
 msgid "DVD Support"
 msgstr "DVD 지원"
 
-msgid "Enabled"
-msgstr "활성화"
+msgid "Interlacing"
+msgstr "인터레이스"
 
-msgid "Rotate"
-msgstr "회전"
+msgid "Interlacing"
+msgstr "인터레이스"
+
+msgid "Blur"
+msgstr "흐릿함"				
 
 msgid "Resolution exceeds maximum allowed (1024x720)!"
 msgstr "해상도가 최대 허용치 (1024x720)를 초과합니다!"
@@ -581,13 +593,28 @@ msgid "Subtitle font file not found. Subtitles will not be visible."
 msgstr "자막 폰트 파일을 찾을 수 없습니다. 자막은 표시되지 않습니다."
 
 msgid "WiiMC does not have DVD access."
-msgstr "WiiMC에는 DVD 액세스가 없습니다."
+msgstr "WiiMC에는 DVD 접속 권한이 없습니다."
 
 msgid "Starting Area"
 msgstr "시작 지역"
 
 msgid "Artwork Viewer"
-msgstr "아트워크 뷰어"					  						  
+msgstr "아트워크 뷰어"		
+	  						  
+msgid "Artwork Viewer"
+msgstr "아트워크 뷰어"
+
+msgid "Art Folder"
+msgstr "아트 폴더"
+
+msgid "Screensaver Banner Limiter"
+msgstr "스크린세이버 배너 제한기"
+
+msgid "Banner Folder"
+msgstr "배너 폴더"
+
+msgid "JPEG Resample"
+msgstr "JPEG 리샘플링"
 
 msgid "Night Filter"
 msgstr "야간 필터"										
@@ -595,8 +622,11 @@ msgstr "야간 필터"
 msgid "Screen Burn-in Reduction"
 msgstr "스크린 번인 감소"
 
-msgid "Double Strike"
-msgstr "더블 스트라이크"
+msgid "Force 576p"
+msgstr "강제 576p"
+
+msgid "Enhanced Resolution"
+msgstr "향상된 해상도"						   
 
 msgid "Error opening font file!"
 msgstr "폰트 파일 여는 중 오류 발생!"
@@ -618,6 +648,3 @@ msgstr "자막 지연이 잘못되었습니다."
 
 msgid "DVD playback is not supported on this Wii."
 msgstr "이 Wii에서는 DVD 재생이 지원되지 않습니다."
-
-msgid "Art Folder"
-msgstr "아트워크 폴더"
