@@ -183,7 +183,6 @@ struct SWiiSettings {
 	// DVD
 	int		dvdMenu;
 	int		dvdDisabled;
-	int 	dvdSyncType;
 	// Online Media
 	int 	onlineCacheFill;
 	char	onlinemediaFolder[MAXPATHLEN];

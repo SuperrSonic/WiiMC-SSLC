@@ -5896,7 +5896,6 @@ static void MenuSettingsDVD()
 
 	sprintf(options.name[i++], "DVD Menu");
 	sprintf(options.name[i++], "DVD Support");
-	sprintf(options.name[i++], "Video Sync Type");
 	if(CONF_GetProgressiveScan() && VIDEO_HaveComponentCable())
 		sprintf(options.name[i++], "Interlacing");
 	else
@@ -5980,12 +5979,12 @@ static void MenuSettingsDVD()
 			case 1:
 				WiiSettings.dvdDisabled ^= 1;
 				break;
-			case 2:
+		/*	case 2:
 				++WiiSettings.dvdSyncType;
 				if(WiiSettings.dvdSyncType > 2)
 					WiiSettings.dvdSyncType = 0;
-				break;
-			case 3:
+				break;*/
+			case 2:
 				++WiiSettings.interlaceHandle;
 				if(WiiSettings.interlaceHandle > 2)
 					WiiSettings.interlaceHandle = 0;
@@ -6016,17 +6015,17 @@ static void MenuSettingsDVD()
 				sprintf(options.value[0], "%d", WiiSettings.dvdMenu);
 			
 			sprintf(options.value[1], "%s", WiiSettings.dvdDisabled ? "Disabled" : "Enabled");
-			switch(WiiSettings.dvdSyncType)
+		/*	switch(WiiSettings.dvdSyncType)
 			{
 				case 0:	sprintf(options.value[2], "Mixed"); break;
 				case 1:	sprintf(options.value[2], "TFF"); break;
 				case 2:	sprintf(options.value[2], "BFF"); break;
-			}
+			}*/
 			switch(WiiSettings.interlaceHandle)
 			{
-				case 0:	sprintf(options.value[3], "Original"); break;
-				case 1:	sprintf(options.value[3], "TV"); break;
-				case 2:	sprintf(options.value[3], "Blur"); break;
+				case 0:	sprintf(options.value[2], "Original"); break;
+				case 1:	sprintf(options.value[2], "TV"); break;
+				case 2:	sprintf(options.value[2], "Blur"); break;
 			}
 			optionBrowser.TriggerUpdate();
 		}

@@ -735,10 +735,11 @@ void LoadMPlayerFile()
 	if(strlen(ext) > 0 && 
 		(strcasecmp(ext, "iso") == 0 || strcasecmp(ext, "ifo") == 0))
 	{
-		if(WiiSettings.dvdSyncType == 1)
+		//handled in MPEG demuxer
+	/*	if(WiiSettings.dvdSyncType == 1)
 			sync_interlace = 1;
 		else if(WiiSettings.dvdSyncType == 2)
-			sync_interlace = 2;
+			sync_interlace = 2; */
 		if(strcasecmp(ext, "ifo") == 0)
 		{
 			char *end = strrchr(loadedFile, '/');
@@ -763,10 +764,11 @@ void LoadMPlayerFile()
 	else
 	{
 		if (strncmp(loadedFile, "dvd://", 6) == 0 || strncmp(loadedFile, "dvdnav://", 9) == 0) {
-			if(WiiSettings.dvdSyncType == 1)
+			//this is now set automatically in the MPEG demuxer
+		/*	if(WiiSettings.dvdSyncType == 1)
 				sync_interlace = 1;
 			else if(WiiSettings.dvdSyncType == 2)
-				sync_interlace = 2;
+				sync_interlace = 2;*/
 			
 		    wiiSetDVDDevice(loadedDevice);
 		}

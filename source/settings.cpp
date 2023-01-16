@@ -383,7 +383,7 @@ prepareSettingsData ()
 	createXMLSection("DVD", "DVD Settings");
 	createXMLSetting("dvdMenu", "DVD Menu", toStr(WiiSettings.dvdMenu));
 	createXMLSetting("dvdDisabled", "DVD Disabled", toStr(WiiSettings.dvdDisabled));
-	createXMLSetting("dvdSyncType", "DVD Sync Type", toStr(WiiSettings.dvdSyncType));
+	//createXMLSetting("dvdSyncType", "DVD Sync Type", toStr(WiiSettings.dvdSyncType));
 	// Online Media
 	createXMLSection("Online Media", "Online Media Settings");
 	createXMLSetting("onlineCacheFill", "Online Cache Fill %", toStr(WiiSettings.onlineCacheFill));
@@ -803,7 +803,7 @@ void DefaultSettings ()
 	// DVD
 	WiiSettings.dvdMenu = 1;
 	WiiSettings.dvdDisabled = 0;
-	WiiSettings.dvdSyncType = 0;
+	//WiiSettings.dvdSyncType = 0;
 	// Online Media
 	WiiSettings.onlineCacheFill = 20;
 	WiiSettings.onlinemediaFolder[0] = 0;
@@ -961,8 +961,8 @@ static void FixInvalidSettings()
 		WiiSettings.dvdMenu = 1;
 	if(WiiSettings.dvdDisabled != 0 && WiiSettings.dvdDisabled != 1)
 		WiiSettings.dvdDisabled = 0;
-	if(WiiSettings.dvdSyncType < 0 || WiiSettings.dvdSyncType > 2)
-		WiiSettings.dvdSyncType = 0;
+	//if(WiiSettings.dvdSyncType < 0 || WiiSettings.dvdSyncType > 2)
+		//WiiSettings.dvdSyncType = 0;
 
 	// Online Media
 	if(WiiSettings.onlineCacheFill < 5 || WiiSettings.onlineCacheFill > 100)
@@ -1309,7 +1309,7 @@ static bool LoadSettingsFile(char * filepath)
 				// DVD
 				loadXMLSetting(&WiiSettings.dvdMenu, "dvdMenu");
 				loadXMLSetting(&WiiSettings.dvdDisabled, "dvdDisabled");
-				loadXMLSetting(&WiiSettings.dvdSyncType, "dvdSyncType");
+			//	loadXMLSetting(&WiiSettings.dvdSyncType, "dvdSyncType");
 				// Online Media
 				loadXMLSetting(&WiiSettings.onlineCacheFill, "onlineCacheFill");
 				loadXMLSetting(WiiSettings.onlinemediaFolder, "onlinemediaFolder", sizeof(WiiSettings.onlinemediaFolder));
