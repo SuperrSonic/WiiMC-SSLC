@@ -1457,14 +1457,14 @@ void ChangeLanguage()
 				sprintf(filepath, "%s/ko.ttf", appPath);
 				newFont = FONT_KOREAN;
 				break;
-			case LANG_JAPANESE:
+		/*	case LANG_JAPANESE:
 				if(currentFont == FONT_JAPANESE) return;
 				sprintf(filepath, "%s/jp.ttf", appPath);
 				newFont = FONT_JAPANESE;
-				break;
+				break;*/
 			case LANG_ENGLISH:
 			case LANG_SPANISH:
-			case LANG_FRENCH:
+			//case LANG_FRENCH:
 				//if(currentFont == FONT_GENERIC) return;
 				sprintf(filepath, "%s/def.ttf", appPath);
 				newFont = FONT_GENERIC;
@@ -4467,17 +4467,17 @@ static void MenuSettingsGlobal()
 						WiiSettings.language = LANG_SPANISH;
 						break;
 					case LANG_SPANISH:
-						WiiSettings.language = LANG_FRENCH;
-						break;
-					case LANG_FRENCH:
 						WiiSettings.language = LANG_KOREAN;
 						break;
+				//	case LANG_FRENCH:
+				//		WiiSettings.language = LANG_KOREAN;
+				//		break;
 					case LANG_KOREAN:
-						WiiSettings.language = LANG_JAPANESE;
-						break;
-					case LANG_JAPANESE:
 						WiiSettings.language = LANG_ENGLISH;
 						break;
+				//	case LANG_JAPANESE:
+				//		WiiSettings.language = LANG_ENGLISH;
+				//		break;
 				}
 			//WiiSettings.language++;
 			/*	if(WiiSettings.language == LANG_GERMAN)
@@ -4624,10 +4624,11 @@ static void MenuSettingsGlobal()
 
 			switch(WiiSettings.language)
 			{
-				case LANG_JAPANESE:				sprintf(options.value[0], "Japanese"); break;
+				//case LANG_JAPANESE:				sprintf(options.value[0], "Japanese"); break;
 				case LANG_ENGLISH:				sprintf(options.value[0], "English"); break;
+				//only support languages that can have all text translated
 				//case LANG_GERMAN:				sprintf(options.value[0], "Deutsch"); break;
-				case LANG_FRENCH:				sprintf(options.value[0], "Français"); break;
+				//case LANG_FRENCH:				sprintf(options.value[0], "Français"); break;
 				case LANG_SPANISH:				sprintf(options.value[0], "Español"); break;
 				/*case LANG_ITALIAN:				sprintf(options.value[0], "Italiano"); break;
 				case LANG_DUTCH:				sprintf(options.value[0], "Dutch"); break;
