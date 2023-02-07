@@ -38,5 +38,9 @@ to control nearly everything.
 <!--	<arg>32khz=1</arg> -->
 <!--	<arg>dumbRestorePoints=0</arg> -->
 <!--	<arg>3ds=1</arg> -->
+<!--	<arg>fadeArtwork=40</arg> -->
+<!--	<arg>artForceVal=1</arg> -->
+<!--	<arg>onlinePlaylist=http://link-to-m3u</arg> -->
+<!--	<arg>onlineBanners=http://link-to-text</arg> -->
   </arguments>
 </app>

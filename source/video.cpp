@@ -21,6 +21,8 @@
 #include "utils/mem2_manager.h"
 #include "settings.h"
 
+#include "utils/vi_encoder.h"
+
 extern bool AutobootExit; //if autobooting a video, ignore delay.
 
 extern "C" {
@@ -136,39 +138,39 @@ void nofade_cb()
 
 void fadein_copyfilter()
 {
-  night++;
-  if (night > 21 && fade_not) {
-    night = 22;
-    fade_not = false;
-  }
+	night++;
+	if (night > 21 && fade_not) {
+    	night = 22;
+    	fade_not = false;
+	}
 
-  u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
-  u8* vfilter = sharp;
+	u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
+	u8* vfilter = sharp;
 
-  GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
 
-  GX_Flush();
+	GX_Flush();
 
-  VIDEO_Configure(vmode);
-  VIDEO_Flush();
+	VIDEO_Configure(vmode);
+	VIDEO_Flush();
 }
 
 void fadeout_copyfilter()
 {
-  night--;
-  if (night < 1 && fade_boot) {
-	  night = 0;
-      fade_boot = false;
-  }
+	night--;
+	if (night < 1 && fade_boot) {
+		night = 0;
+		fade_boot = false;
+	}
 
-  u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
-  u8* vfilter = sharp;
+	u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
+	u8* vfilter = sharp;
 
-  GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
-  GX_Flush();
+	GX_SetCopyFilter(vmode->aa,vmode->sample_pattern,GX_TRUE,vfilter);
+	GX_Flush();
 
-  VIDEO_Configure(vmode);
-  VIDEO_Flush();
+	VIDEO_Configure(vmode);
+	VIDEO_Flush();
 }
 
 /****************************************************************************
@@ -520,13 +522,7 @@ void SetVIscaleback()
 
 void SetDf()
 {
-	/*if (vmode == &TVNtsc480Prog) {
-		CONF_GetVideo();
-		vmode = &TVNtsc480ProgSoft;
-	} else if (vmode == &TVPal576ProgScale) {
-		CONF_GetVideo();
-		vmode = &TVEurgb60Hz480ProgSoft;
-	} else */ if (vmode == &TVNtsc240Ds || vmode == &TVEurgb60Hz240Ds) {
+	if (vmode == &TVNtsc240Ds || vmode == &TVEurgb60Hz240Ds) {
 		return;
 	}
 
@@ -539,14 +535,6 @@ void SetDf()
 
 void SetDfOff()
 {
-	/*if (vmode == &TVNtsc480ProgSoft) {
-		CONF_GetVideo();
-		vmode = &TVNtsc480Prog;
-	} else if (vmode == &TVEurgb60Hz480ProgSoft) {
-		CONF_GetVideo();
-		vmode = &TVPal576ProgScale;
-	}*/
-
 	u8 sharp[7] = {0, 0, 21, night, 21, 0, 0};
 	u8* vfilter = sharp;
 
@@ -560,7 +548,6 @@ void SetInterlaceOff()
 		return;
 	else if(WiiSettings.interlaceHandle == 1)
 		SetDoubleStrikeOff();
-	//else if(WiiSettings.interlaceHandle == 2)
 		
 	//handle deflicker
 	if(WiiSettings.videoDf == 1)
@@ -610,8 +597,6 @@ void SetInterlace()
 
 	//otherwise we waste our time
 	SetDfOff();
-	
-	//sleep(2);
 }
 
 #if 1
@@ -635,13 +620,10 @@ void SetMplTiled()
 	GX_Flush();
 	
 	// Clear framebuffers
-//	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
-//	VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
     VIDEO_Configure(vmode);
     VIDEO_Flush();
-    //VIDEO_WaitVSync();
 }
 
 void SetMplTiledOff()
@@ -649,20 +631,13 @@ void SetMplTiledOff()
 	if(!WiiSettings.tiledRender || !wiiTiledRender || ssIsActive)
 		return;
 	
-	// needed, this fixes tearing when calling the menu.
+	// This fixes tearing when calling the menu.
 	int i = 0;
 	do {
 		VIDEO_WaitVSync();
 		VIDEO_ClearFrameBuffer (vmode, xfb[i], COLOR_BLACK);
 		i++;
 	} while(i < 2);
-	
-//	for(int i=0;i < 2;++i) {
-//		VIDEO_ClearFrameBuffer (vmode, xfb[i], COLOR_BLACK);
-//	}
-	//VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
-	//VIDEO_ClearFrameBuffer (vmode, xfb[1], COLOR_BLACK);
-	//usleep(500);
 
 	timerBlack = 12; //12 is good, lower might be too annoying.
 	tiledBlack = true;
@@ -671,10 +646,6 @@ void SetMplTiledOff()
 	VIDEO_SetBlack(TRUE);
 
 	GX_SetScissorBoxOffset(0, 0);
-	//GX_SetScissor(0,0,720,vmode->efbHeight);
-	//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
-	//GX_SetDispCopySrc(0, 0, 640, vmode->efbHeight);
-	//GX_SetDispCopyDst(vmode->fbWidth,vmode->xfbHeight);
 
 	if(WiiSettings.viWidth)
 		//SetVIscale();
@@ -705,9 +676,6 @@ void SetMplTiledOff()
 
     VIDEO_Configure(vmode);
     VIDEO_Flush();
-	
-    //VIDEO_WaitVSync();
-	//VIDEO_SetBlack(FALSE);
 }
 #endif
 
@@ -716,9 +684,7 @@ InitVideo ()
 {
 	VIDEO_Init();
 	vmode = VIDEO_GetPreferredMode(NULL); // get default video mode
-	//vmode = &TVPal576ProgScale;
 	vmode->viWidth = 704;
-	//vmode->fbWidth = 720;
 
 	//static vu32* const _vigReg = (vu32*)0xCC002030;
 	//*_vigReg = 0x1001; //0x1001(30fps), 0x120E(60fps)
@@ -732,7 +698,6 @@ InitVideo ()
 
 	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 		vmode->viWidth = 711;
-		//screenwidth = 768;
 		screenwidth = 854;
 	}
 
@@ -746,18 +711,14 @@ void
 InitVideo2 ()
 {
 	// Allocate framebuffers
-	//test
 	vmode->fbWidth = 720;
 	vmode->xfbHeight = 576;
 	xfb[0] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	xfb[1] = (u32 *) SYS_AllocateFramebuffer (vmode);
-	//xfb[2] = (u32 *) SYS_AllocateFramebuffer (vmode);
 	DCInvalidateRange(xfb[0], VIDEO_GetFrameBufferSize(vmode));
 	DCInvalidateRange(xfb[1], VIDEO_GetFrameBufferSize(vmode));
-//	DCInvalidateRange(xfb[2], VIDEO_GetFrameBufferSize(vmode));
 	xfb[0] = (u32 *) MEM_K0_TO_K1 (xfb[0]);
 	xfb[1] = (u32 *) MEM_K0_TO_K1 (xfb[1]);
-	//xfb[2] = (u32 *) MEM_K0_TO_K1 (xfb[2]);
 
 	// Clear framebuffers
 	VIDEO_ClearFrameBuffer (vmode, xfb[0], COLOR_BLACK);
@@ -769,7 +730,7 @@ InitVideo2 ()
 	vmode->xfbHeight = want576i ? 576 : 480;
 	VIDEO_SetNextFramebuffer (xfb[0]);
 
-	VIDEO_Flush ();
+	VIDEO_Flush();
 	VIDEO_WaitVSync();
 	VIDEO_WaitVSync();
 
@@ -779,7 +740,9 @@ InitVideo2 ()
 		while (VIDEO_GetNextField())
 			VIDEO_WaitVSync();
 */
-	//VIDEO_SetBlack (FALSE);
+
+	// TODO: Should this be a setting?
+	VIDEO_SetTrapFilter(1);
 
 	// Initialize GX
 	GXColor background = { 0, 0, 0, 0xff };

@@ -151,7 +151,6 @@ struct SWiiSettings {
 	char* 	descTxt;
 	int 	force576p;
 	int 	tiledRender;
-	char 	theme[10];
 	// Videos
 	float	videoZoomHor; // horizontal zoom amount
 	float	videoZoomVert; // vertical zoom amount

@@ -4680,15 +4680,9 @@ total_time_usage_start=GetTimer();
 				if(mplayerwidth > 640 && mpctx->sh_video->aspect < 1.6f)
 					wiiTiledRender = true;
 			}
-
+#if 0
 			if(mpctx->sh_video && mpctx->eof == 1 && strncmp(filename, "http://archive.", 15) == 0) {
 				//mpctx->eof = 0;
-				//int seek_2_sec = 0;
-				//seek_to_sec = demuxer_get_current_time(mpctx->demuxer);
-				//seek_to_sec = load_restore_point(fileplaying, partitionlabelplaying) - 8;
-				//if(seek_to_sec < 0 || seek_to_sec+120 > demuxer_get_time_length(mpctx->demuxer))
-					//seek_to_sec = 0; //enable eof here?
-				
 				//This workaround allows videos to reconnect after idling for too long.
 				//But it also might cause the video to skip forward by some 20 secs.
 				
@@ -4700,24 +4694,10 @@ total_time_usage_start=GetTimer();
 					wiiSeek(demuxer_get_current_time(mpctx->demuxer)+5, 2);
 				//	wiiSeek(demuxer_get_current_time(mpctx->demuxer)-5, 2);
 					
-				//	wiiSeek(4, 0);
-					//seek hack, to restore connection, only for seekable streams
 					mpctx->eof = 0;
-					//mpctx->stream->eof = 0;
-				//	wiiSeek(4, 0); // spams too much so it moves too far.
-			//		wiiSeek(demuxer_get_current_time(mpctx->demuxer), 2);
-					//++find_prob;
-					//wiiSeek((int)demuxer_get_current_time(mpctx->demuxer), 2);
-				} //else
-					//mpctx->eof = 1; // this prevents it from working half the time.
-				
-				//if(seek_2_sec < 0 || seek_2_sec+120 > demuxer_get_time_length(mpctx->demuxer))
-					//mpctx->eof = 1; //enable eof here?
-				//Here's another more convoluted way,
-				//use a variable once per video to record the total time of video.
-				//reset it after video is eof.
+				}
 			}
-			
+#endif
 			//helps play more audio that gets cutoff by eof
 			if(mpctx->eof == 1)
 				//usleep(465000);
@@ -4737,15 +4717,7 @@ total_time_usage_start=GetTimer();
             if ((mpctx->eof == 1 && mpctx->loop_times >= 0) || (mpctx->eof == 1 && loop_tm > 0 &&
 														(loop_st_point != 0 || loop_ed_point != 0))) {
                 mp_msg(MSGT_CPLAYER, MSGL_V, "loop_times = %d, eof = %d\n", mpctx->loop_times, mpctx->eof);
-
-				//try to read loop_start
-				//char loopInfo[8] = {0};
-				//strcpy(loopInfo, get_demuxer_info("loop_start"));
-		//		if(get_demuxer_info("loop_start") != NULL)
-				/*if(loop_st_point != 0)
-					seek_to_sec = loop_st_point;
-				loop_st_point = 0;
-				*/
+				
 				if(loop_tm > 0)
 					--loop_tm;
 				
@@ -4753,7 +4725,6 @@ total_time_usage_start=GetTimer();
 					seek_to_sec = loop_st_point;
 					if(loop_tm == 0) //don't end on the endpoint
 						loop_ed_point = 0;
-				//	loop_ed_point = 0;
 					loop_mode = 0;
 					if(loop_tm < 1)
 						loop_st_point = 0;
@@ -4764,7 +4735,6 @@ total_time_usage_start=GetTimer();
 					loop_mode = 0;
 				}
 				
-				
                 if (mpctx->loop_times > 1)
                     mpctx->loop_times--;
                 else if (mpctx->loop_times == 1)
@@ -4772,12 +4742,9 @@ total_time_usage_start=GetTimer();
                 play_n_frames = play_n_frames_mf;
                 mpctx->eof    = 0;
                 abs_seek_pos  = SEEK_ABSOLUTE;
-                rel_seek_secs = seek_to_sec; //atoi(loopInfo);//seek_to_sec;
+                rel_seek_secs = seek_to_sec;
                 loop_seek     = 1;
             }
-			//if(mpctx->eof == 1)
-			//	sleep(1);
-			//mpctx->eof = 0;
 
             if (rel_seek_secs || abs_seek_pos) {
                 if (seek(mpctx, rel_seek_secs, abs_seek_pos) >= 0) {
@@ -5209,26 +5176,8 @@ void PauseAndGotoGUI()
 		else if(*_vigReg == 0x10010001)
 			*_vigReg = 0x120E0001; //0x1001(30fps) go back to 480p60
 		halve_fps = true;
-	/*	if(*_vigReg == 0x1001) {
-			*_vigReg = 0x120E;
-			halve_fps = true;
-		}*/
 	}
 #if 1
-	//vmode->fbWidth = 640;
-	//VIDEO_Configure(vmode);
-	//VIDEO_Flush();
-	// 720x480 tile rendering
-	/*
-		GX_SetScissor(0,0,720,vmode->efbHeight);
-		GX_SetScissorBoxOffset(0, 0);
-		//GX_SetDispCopySrc(0, 0, ((640) + 15) & ~15, vmode->efbHeight);
-		GX_SetDispCopySrc(0, 0, 640, vmode->efbHeight);
-		GX_SetDispCopyDst(vmode->fbWidth,vmode->xfbHeight);
-		//GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
-		*/
-		//if(wiiTiledAuto)
-		//	wiiTiledRender = false;
 		SetMplTiledOff();
 #endif
 	//if content is identified as interlaced, consult setting and figure out what to reset to

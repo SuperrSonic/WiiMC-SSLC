@@ -315,6 +315,9 @@ bool artFirst = true; // is static
 static bool hide_onlinemediafolder = false;
 extern bool isDynamic;
 int isRepeat = 0;
+extern char curTheme[];
+extern int cover_fade;
+extern int forceArtVal;
 //extern int loop_ed_point; //for ADX endpoints, could probably move this to mplayer
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
@@ -459,6 +462,7 @@ static void SuspendGui()
 
 static u64 reloadTimer = 0;
 int waitReload = 0;
+int getMESS;
 static int LoadNewFile();
 
 //bool testBoolean = true;
@@ -919,7 +923,7 @@ done:
 
 		//dynamic themes
 		if(isDynamic) {
-			sprintf(WiiSettings.theme, "%s", "dynamic");
+			sprintf(curTheme, "%s", "dynamic");
 			ChangeTheme();
 		}
 
@@ -1033,7 +1037,8 @@ extern "C" void DoMPlayerGuiDraw()
 static bool thumbLoad = false;
 int banner_pic = 0;
 char banner_path[1024] = { 0 };
-char onlineBNR[] = "http://ia601507.us.archive.org/13/items/var_rvmp/val.txt";
+extern char onlineBNR[];
+extern char onlinePLS[];
 
 //Try to avoid crash when loading files and suddenly starting the SS
 //static bool isLoadingFile = false;
@@ -1355,14 +1360,7 @@ static void *GuiThread (void *arg)
 			}
 		}
 		
-		//yggdrasil fix for reconnect...
-		//u8 add_time = 0;
-		//if(!memcmp(loadedFile, "http://shirayuki.org:9200/", 26))
-			//add_time = 80;
-		//else
-			//add_time = 0;
-		
-		//hack for reconnect radio
+		// Hack to reconnect radio streams
 		if(waitReload && reloadTimer == 0)
 			reloadTimer = gettime();
 		if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 69) {
@@ -1386,10 +1384,9 @@ static void *GuiThread (void *arg)
 			//if()
 			//	wiiLoadFile("http://shirayuki.org:9200/", NULL);
 			//else
+			getMESS = 0;
 			wiiLoadFile(loadedFile, NULL);
 		}
-
-
 
 		CheckSleepTimer();
 
@@ -1490,155 +1487,6 @@ void ChangeLanguage()
 {
 	char error[128] = {0};
 
-	/*if(WiiSettings.language == LANG_JAPANESE ||
-		WiiSettings.language == LANG_SIMP_CHINESE ||
-		WiiSettings.language == LANG_TRAD_CHINESE ||
-		WiiSettings.language == LANG_KOREAN ||
-		WiiSettings.language == LANG_RUSSIAN || 
-		WiiSettings.language == LANG_TAMIL || 
-		WiiSettings.language == LANG_BULGARIAN)
-	{
-		char filepath[MAXPATHLEN];
-		char httppath[MAXPATHLEN];
-		char httpRoot[] = "http://wiimc.googlecode.com/svn/trunk/fonts";
-		int newFont;
-
-		switch(WiiSettings.language)
-		{
-			case LANG_SIMP_CHINESE:
-				if(currentFont == FONT_SIMP_CHINESE) return;
-				sprintf(filepath, "%s/zh_cn.ttf", appPath);
-				sprintf(httppath, "%s/zh_cn.ttf", httpRoot);
-				newFont = FONT_SIMP_CHINESE;
-				break;
-			case LANG_TRAD_CHINESE:
-				if(currentFont == FONT_TRAD_CHINESE) return;
-				sprintf(filepath, "%s/zh_cn.ttf", appPath);
-				sprintf(httppath, "%s/zh_cn.ttf", httpRoot);
-				newFont = FONT_TRAD_CHINESE;
-				break;
-			case LANG_KOREAN:
-				if(currentFont == FONT_KOREAN) return;
-				sprintf(filepath, "%s/ko.ttf", appPath);
-				sprintf(httppath, "%s/ko.ttf", httpRoot);
-				newFont = FONT_KOREAN;
-				break;
-			case LANG_JAPANESE:
-				if(currentFont == FONT_JAPANESE) return;
-				sprintf(filepath, "%s/jp.ttf", appPath);
-				sprintf(httppath, "%s/jp.ttf", httpRoot);
-				newFont = FONT_JAPANESE;
-				break;
-			case LANG_TAMIL:
-				if(currentFont == FONT_TAMIL) return;
-				sprintf(filepath, "%s/ta.ttf", appPath);
-				sprintf(httppath, "%s/ta.ttf", httpRoot);
-				newFont = FONT_TAMIL;
-				break;
-			case LANG_RUSSIAN:
-			case LANG_BULGARIAN:
-				if(currentFont == FONT_GENERIC) return;
-				sprintf(filepath, "%s/gen.ttf", appPath);
-				sprintf(httppath, "%s/gen.ttf", httpRoot);
-				newFont = FONT_GENERIC;
-				break;	
-		}
-
-		// try to load font
-restart:
-		FILE *file = fopen (filepath, "rb");
-
-		if(file)
-		{
-			fseeko(file,0,SEEK_END);
-			u32 loadSize = ftello(file);
-
-			if(loadSize == 0)
-			{
-				if(remove(filepath) == 0)
-				{
-					goto restart;
-				}
-				else
-				{
-					ErrorPrompt("Error opening font file!");
-					goto error;
-				}
-			}
-
-			if(ext_font_ttf)
-			{
-				SuspendGui();
-				mem2_free(ext_font_ttf, MEM2_EXTFONT);
-				ext_font_ttf = NULL;
-			}
-
-			if(AddMem2Area(loadSize+1024,MEM2_EXTFONT))
-			{
-				ext_font_ttf = (u8 *)mem2_memalign(32, loadSize, MEM2_EXTFONT); // can be a problem we have to see how to manage it
-				if(ext_font_ttf)
-				{
-					fseeko(file,0,SEEK_SET);
-					fread (ext_font_ttf, 1, loadSize, file);
-				}
-			}
-			fclose(file);
-
-			if(ext_font_ttf)
-			{
-				SuspendGui();
-				DeinitFreeType();
-
-				currentFont = newFont;
-				if(InitFreeType(ext_font_ttf, loadSize))
-				{
-					ResetText();
-					ResumeGui();
-					return;
-				}
-				else
-				{
-					sprintf(error, "Could not change language. The font file is corrupted!");
-				}
-			}
-			else
-			{
-				sprintf(error, "Could not change language. Not enough memory!");
-			}
-		}
-		else
-		{
-			bool installFont = WindowPrompt(
-				"Font Required",
-				gettext("A new font is required to display this language."),
-				"Download font",
-				"Cancel");
-
-			if(installFont)
-			{
-				FILE *hfile = fopen (filepath, "wb");
-
-				if (hfile > 0)
-				{
-					int res = http_request(httppath, hfile, NULL, 1024*1024*2, NOTSILENT);
-					fclose (hfile);
-
-					if(res > 0)
-						goto restart;
-
-					remove(filepath);
-					ErrorPrompt("Error downloading font file!");
-				}
-				else
-				{
-					ErrorPrompt("Unable to save font file!");
-				}
-			}
-		}
-error:
-		WiiSettings.language = LANG_ENGLISH;
-	}*/
-	
 	//if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE)
 	if(WiiSettings.language < 7)
 	{
@@ -1758,12 +1606,12 @@ error:
 
 void ChangeTheme()
 {
-	if(WiiSettings.theme[1] == 0)
+	if(curTheme[1] == 0)
 		return;
 
 	SuspendGui();
 #if 1
-	if(strcmp(WiiSettings.theme, "random") == 0 || strcmp(WiiSettings.theme, "dynamic") == 0)
+	if(strcmp(curTheme, "random") == 0 || strcmp(curTheme, "dynamic") == 0)
 	{
 		int val = rand() % 4 + 1;
 		if(isRepeat == val) {
@@ -1775,15 +1623,15 @@ void ChangeTheme()
 		
 		isRepeat = val;
 		switch(val) {
-			case 1: sprintf(WiiSettings.theme, "%s", "gray"); break;
-			case 2: sprintf(WiiSettings.theme, "%s", "red"); break;
-			case 3: sprintf(WiiSettings.theme, "%s", "green"); break;
-			case 4: sprintf(WiiSettings.theme, "%s", "blue"); break;
-			//case 5: sprintf(WiiSettings.theme, "%s", "blank"); break;
+			case 1: sprintf(curTheme, "%s", "gray"); break;
+			case 2: sprintf(curTheme, "%s", "red"); break;
+			case 3: sprintf(curTheme, "%s", "green"); break;
+			case 4: sprintf(curTheme, "%s", "blue"); break;
+			//case 5: sprintf(curTheme, "%s", "blank"); break;
 		}
 	}
 	
-	if(strcmp(WiiSettings.theme, "blue") == 0)
+	if(strcmp(curTheme, "blue") == 0)
 	{
 		bg->SetImage(bg_blue_jpg, bg_blue_jpg_size);
 		navDivider->SetImage(nav_divider_blue_png);
@@ -1791,7 +1639,7 @@ void ChangeTheme()
 		btnBottomOver->SetImage(button_bottom_over_blue_png);
 		arrowRightSmall->SetImage(arrow_right_small_blue_png);
 	}
-	else if(strcmp(WiiSettings.theme, "green") == 0)
+	else if(strcmp(curTheme, "green") == 0)
 	{
 		bg->SetImage(bg_green_jpg, bg_green_jpg_size);
 		navDivider->SetImage(nav_divider_green_png);
@@ -1799,7 +1647,7 @@ void ChangeTheme()
 		btnBottomOver->SetImage(button_bottom_over_green_png);
 		arrowRightSmall->SetImage(arrow_right_small_green_png);
 	}
-	else if(strcmp(WiiSettings.theme, "red") == 0)
+	else if(strcmp(curTheme, "red") == 0)
 	{
 		bg->SetImage(bg_red_jpg, bg_red_jpg_size);
 		navDivider->SetImage(nav_divider_red_png);
@@ -1807,7 +1655,7 @@ void ChangeTheme()
 		btnBottomOver->SetImage(button_bottom_over_red_png);
 		arrowRightSmall->SetImage(arrow_right_small_red_png);
 	}
-	else if(strcmp(WiiSettings.theme, "gray") == 0) //for dynamic option
+	else if(strcmp(curTheme, "gray") == 0) //for dynamic option
 	{
 		bg->SetImage(bg_jpg, bg_jpg_size);
 		navDivider->SetImage(nav_divider_png);
@@ -1815,7 +1663,7 @@ void ChangeTheme()
 		btnBottomOver->SetImage(button_bottom_over_png);
 		arrowRightSmall->SetImage(arrow_right_small_png);
 	}
-/*	else if(strcmp(WiiSettings.theme, "pink") == 0)
+/*	else if(strcmp(curTheme, "pink") == 0)
 	{
 		//idea to add simple themes that don't take so much space.
 		GuiImage *pink_blend = NULL;
@@ -1826,7 +1674,7 @@ void ChangeTheme()
 		bgImg->SetAlpha(0);
 		menuWindow->Append(pink_blend);
 	} */
-	else if(strcmp(WiiSettings.theme, "blank") == 0)
+	else if(strcmp(curTheme, "blank") == 0)
 	{
 		bgImg->SetAlpha(0);
 	}
@@ -2530,42 +2378,24 @@ SettingWindow(const char *title, GuiWindow *w)
 
 //int debug_mem = 0;
 char name[] = "Diego A.";
-char neona[] = "http://archive.org/download/";
-char neonaII[] = "neona-rev04/NeonAlleyRev02";
 
 //static vu32* SIPOLL = (vu32*)0xCC006430;
 
-//int wiim_inf = 0;
-//int getINFO = 0;
-//int valSTM = 0;
-//int waitReload = 0;
+/*int lp0 = 0;
+int lp1 = 0;
+int lp2 = 0;
+int lp3 = 0;
+*/
 
-//these are used in cache2.c, move 'em, and name them better geez
+// these are used in cache2.c, move 'em, and name them better geez
 int getWeird = 0;
-int getMESS = 0;
+//int getMESS = 0;
 int cntReconnect = 0;
 
 static void CreditsWindow()
 {
 	int i = 0;
 	int y = 76;
-	
-	//static vu32* const _vigReg = (vu32*)0xCC002030;
-	//static vu32* const _rateReg = (vu32*)0xCC006C00;
-#if 0
-	*_rateReg &= ~(1 << 12); //Disable scaling
-	*_rateReg &= ~(1 << 0);
-	*_rateReg &= ~(1 << 1);
-	*_rateReg &= ~(1 << 2);
-	*_rateReg &= ~(1 << 3);
-	*_rateReg &= ~(1 << 4);
-	*_rateReg &= ~(1 << 5);
-	*_rateReg &= ~(1 << 6);
-	*_rateReg &= ~(1 << 7);
-	*_rateReg &= ~(1 << 8);
-//	*_rateReg |= 1 << 12;
-#endif
-//getMESS ^= 1;
 
 	GuiWindow *oldWindow = mainWindow;
 	GuiWindow creditsWindow(screenwidth, screenheight);
@@ -2575,7 +2405,7 @@ static void CreditsWindow()
 	GuiImage logoImg(logo);
 	logoImg.SetAlignment(ALIGN_CENTRE, ALIGN_TOP);
 	logoImg.SetPosition(0, 30);
-	
+
 	creditsWindow.Append(&logoImg);
 
 	GuiWindow alignWindow(0, screenheight);
@@ -2589,18 +2419,8 @@ static void CreditsWindow()
 	swprintf(appVersion, 20, L"%s %s", gettext("Version"), APPVERSION);
 
 	char iosVersion[30];
-	//sprintf(iosVersion, "0x%4X, 0x%X", *_vigReg, *_rateReg);
 
-	//sprintf(iosVersion, "fails: %d", cntReconnect);
-	//sprintf(iosVersion, "success: %d", test_if_work);
 	sprintf(iosVersion, "IOS: %d", IOS_GetVersion());
-	//sprintf(iosVersion, "IOS: %d,,0x%X", IOS_GetVersion(), valSTM);
-//	sprintf(iosVersion, "IOS: %d", getINFO);
-	//sprintf(iosVersion, "0x%X", wiim_inf);
-	
-	// Write value 2, for now, using credits to exit while loop
-	//getINFO = 2;
-	//StopMPlayerFile();
 
 	txt[i] = new GuiText(NULL, 16, (GXColor){255, 255, 255, 255});
 	txt[i]->SetWText(appVersion);
@@ -2718,7 +2538,7 @@ static void CreditsWindow()
 	ResumeGui();
 
 	if(isDynamic) {
-		sprintf(WiiSettings.theme, "%s", "dynamic");
+		sprintf(curTheme, "%s", "dynamic");
 		ChangeTheme();
 	}
 
@@ -2861,11 +2681,6 @@ void ShuffleBanners()
             numarray[randindex] = temp;
         }
     }
-
-/*    for (i = 0; i < arraylength; i++)
-    {
-        printf("hereVal: %d,,", numarray[i]);
-    } */
 }
 #endif
 
@@ -2887,13 +2702,9 @@ bool secure_type = false; // Make sure xml info doesn't stick with other types
 char year_txt[32] = { 0 };
 char desc_txt[1024] = { 0 };
 
-//moved up
-//unsigned get_inf = time(0);
-//int get_num = 0;
-
 bool isTunein = false;
 bool isYggdrasil = false;
-//bool isAnisonFM = false;
+//bool isAnisonFM = false; //moved, NOTE: anison.fm wants to drop http support
 bool isCVGM = false;
 char linktoArt[8*1024] = { 0 };
 char finalArt[8*1024] = { 0 };
@@ -2998,7 +2809,6 @@ static void *ThumbThread (void *arg)
 							//char ygg_trans[8*1024] = { 0 };
 							sprintf(ygg_merge, "%s?transactionid=%s", dataofArt, transactionid);
 							read = http_request(ygg_merge, NULL, upArt_hard, 1024*8, SILENT); // use Yggdrasil site
-							//read = http_request("https://archive.org/download/M-PLS_SS_NA/yggdrasil_download.json", NULL, upArt, 1024*8, SILENT);
 							if(read > 0) {
 								sprintf(linktoArt, "%s", upArt_hard);
 								//sprintf(ygg_trans, "%s", upArt_hard);
@@ -3048,7 +2858,7 @@ static void *ThumbThread (void *arg)
 									char* loc_dot;
 									loc_dot = strchr(linktoArt,'"'); // " gets both jpg and png
 									if (loc_dot != NULL) {
-										loc_dot-=1; // clip the 'g' in jpg
+									//	loc_dot-=1; // clip the 'g' in jpg
 										*loc_dot = 0;
 									} else
 										artFailed = true;
@@ -3113,7 +2923,8 @@ static void *ThumbThread (void *arg)
 						if(pCh == NULL && isYggdrasil) {
 							switch(WiiSettings.yggdrasilQuality) {
 								case YGG_HI:
-									sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/%sg", linktoArt); // site highest quality
+									sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/%s", linktoArt); // site highest quality
+									//TODO: test -- no longer append g to url.
 									//clipping .jpg and adding 'g' fixes reconnection after no image.
 									//this creates a small issue because not every file has the correct ext.
 									//e.g. http://yggdrasilradio.net/images/albumart/az_B71819__Kimura%20Yuki.na
@@ -3197,12 +3008,26 @@ static void *ThumbThread (void *arg)
 			thumbLoad = false;
 
 			SuspendGui();
-			thumbImg->SetVisible(false);
-			thumbImg->SetImage(NULL);
+			//Only enable this if fades are off
+			if(!cover_fade || !screensaverThreadHalt) {
+				thumbImg->SetVisible(false);
+				thumbImg->SetImage(NULL);
+			}
 			ResumeGui();
 
 			if(thumb)
 			{
+				if(cover_fade != 0 && screensaverThreadHalt) {
+					thumbImg->SetEffect(EFFECT_FADE, -cover_fade);
+					// If the images load fast enough, the fade is useless
+					do {
+						usleep(50);
+						//for some reason EFFECT_FADE is not reset when exiting ssaver
+						if(!thumbImg->IsVisible())
+							break;
+					} while (thumbImg->GetEffect() == EFFECT_FADE);
+				}
+				
 				delete thumb;
 				thumb = NULL;
 			}
@@ -3211,7 +3036,8 @@ static void *ThumbThread (void *arg)
 			{
 				BROWSERENTRY *loadIndex = thumbIndex;
 				int read = 0;
-				if(!bannerSSactive && loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0) {
+				//if(!bannerSSactive && loadIndex->image && strncmp(loadIndex->image, "http:", 5) == 0) {
+				if(!bannerSSactive && loadIndex->image && strncmp(browser.selIndex->file, "http:", 5) == 0) {
 					//read = http_request(loadIndex->image, NULL, thumbBuffer, 200*1024, SILENT);
 					//read = http_request("https://cdn-albums.tunein.com/gn/B3XTN3P0BRg.jpg", NULL, thumbBuffer, 200*1024, SILENT);
 
@@ -3220,10 +3046,14 @@ static void *ThumbThread (void *arg)
 						read = http_request(finalArt, NULL, thumbBuffer, 880*1024, SILENT);
 						// If art downloading fails fallback to xml image.
 						if(read < 1) {
-							read = http_request(loadIndex->image, NULL, thumbBuffer, 880*1024, SILENT);
+							read = loadIndex->image[0] == 'h' ? http_request(loadIndex->image, NULL, thumbBuffer, 880*1024, SILENT)
+							//load from sd or usb
+							: LoadFile(thumbBuffer, 880*1024, loadIndex->image, SILENT);
 						}
 					} else
-						read = http_request(loadIndex->image, NULL, thumbBuffer, 880*1024, SILENT);
+						read = loadIndex->image[0] == 'h' ? http_request(loadIndex->image, NULL, thumbBuffer, 880*1024, SILENT)
+							//load from sd or usb
+							: LoadFile(thumbBuffer, 880*1024, loadIndex->image, SILENT);
 					
 					// Reset flag
 					//artFailed = false;
@@ -3276,6 +3106,9 @@ static void *ThumbThread (void *arg)
 					//printf("THUMBS: %s", locate_paths);
 					if (WiiSettings.numThumb > 0) {
 						int rand_jpg = rand_r(&get_inf) % (WiiSettings.numThumb + 1 - 1) + 1;
+						if(forceArtVal > 0)
+							rand_jpg = forceArtVal > WiiSettings.numThumb ? 1 : forceArtVal;
+						
 						/* art_disp_2 has the og title(without the _xx appended)
 						 * so it's the best way to maintain the actual_path fresh. */
 						sprintf(actual_path, "%s%s_%02d.jpg", WiiSettings.artworkFolder, art_disp_2, rand_jpg);
@@ -3328,6 +3161,12 @@ static void *ThumbThread (void *arg)
 								if(BNRread) {
 									uint16_t value = (dlBNR[0] << 8) | dlBNR[1];
 									WiiSettings.bannerLimit = value;
+									
+									// remove the file from the link
+									char* loc_dot;
+									loc_dot = strrchr(onlineBNR, 0x2F); // /
+									if (loc_dot != NULL)
+										*loc_dot = 0;
 								}
 							}
 						}
@@ -3342,10 +3181,9 @@ static void *ThumbThread (void *arg)
 						}
 						if(!WiiSettings.onlineBanners) {
 							sprintf(banner_path,"%s%04d.jpg", WiiSettings.bannerFolder, numarray[cnt_tes]);
-						//	printf("%s,,",banner_path);
 							read = LoadFile(thumbBuffer, 880*1024, banner_path, SILENT);
 						} else {
-							sprintf(banner_path,"%s%04d.jpg", "http://ia601507.us.archive.org/13/items/var_rvmp/", numarray[cnt_tes]);
+							sprintf(banner_path,"%s/%04d.jpg", onlineBNR, numarray[cnt_tes]);
 							read = http_request(banner_path, NULL, thumbBuffer, 880*1024, SILENT);
 						}
 						cnt_tes++;
@@ -3381,6 +3219,10 @@ static void *ThumbThread (void *arg)
 							thumbImg->SetScale(256, screenheight-100);
 						else
 							thumbImg->SetScale(188, screenheight-100);
+						
+						//Fade in effect makes scrolling through art not flashy
+						if(cover_fade != 0 && screensaverThreadHalt)
+							thumbImg->SetEffect(EFFECT_FADE, cover_fade);
 						
 						//For ss set to full
 						if((!screensaverThreadHalt && WiiSettings.screensaverArt >= ART_FULL) ||
@@ -3440,30 +3282,15 @@ static void *ThumbThread (void *arg)
 									GX_CopyDisp((void *)((u32)xfb[whichfb] + xfb_offset), GX_TRUE);
 								}
 							}
-							
-							//fade-in effect
-						/*	for(int j = 255; j >= 0; j -= 15)
-							{
-								mainWindow->Draw();
-								Menu_DrawRectangle(0,0,screenwidth,screenheight,(GXColor){0, 0, 0, j},1);
-								Menu_Render();
-							} */
 						}
 						
 						// Should work but because of the 768px difference I increase it depending on size.
 						//thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)192/thumbImg->GetWidth() : (float)138/thumbImg->GetWidth());
-				/*		if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
+						/* if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)(192+38)/thumbImg->GetWidth() :
 							(float)(141+30)/thumbImg->GetWidth()); // (float)(141+30) for 141
 						*/
 						//printf("get that width: %.4f", thumbImg->GetScaleX());
-						
-					/*	if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-							//thumbImg->SetScaleX(screenwidth/(float)vmode->fbWidth);
-							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? .89f : .485f); // 16:9 correct
-							//thumbImg->SetScaleX(.75f);
-							//printf("get that width: %.3f", thumbImg->GetScaleX());
-						*/
 						thumbHeight *= thumbImg->GetScaleY();
 						//banner ss
 						if(!screensaverThreadHalt && menuCurrent == MENU_BROWSE_VIDEOS)
@@ -3475,18 +3302,7 @@ static void *ThumbThread (void *arg)
 						if(WiiSettings.yearNum != NULL && !secure_type)
 							fileYear->SetText(WiiSettings.yearNum);
 						
-						/*if(same_dir || secure_type) {
-							fileYear->SetText(NULL);
-							fileInfo->SetText(NULL);
-							same_dir = false;
-							secure_type = false;
-						} */
 						ResumeGui();
-						
-					//	memset(locate_paths,0,strlen(locate_paths));
-					//	memset(art_disp,0,strlen(art_disp));
-					//	memset(actual_path,0,strlen(actual_path));
-					//printf("THUMBS: %d", get_num);
 					}
 					else
 					{
@@ -3525,7 +3341,7 @@ static int LoadNewFile()
 	
 	//dynamic themes, this is too much
 /*	if(isDynamic) {
-		sprintf(WiiSettings.theme, "%s", "dynamic");
+		sprintf(curTheme, "%s", "dynamic");
 		ChangeTheme();
 	} */
 
@@ -3606,151 +3422,6 @@ static int LoadNewFile()
 
 static void HideAudioVolumeLevelBar();
 
-/*bool LoadYouTubeFile(char *url, char *newurl)
-{
-	if(!ChangeInterface(DEVICE_INTERNET,0,NOTSILENT))
-		return false;
-
-	char *buffer = (char *)mem2_malloc(128*1024, MEM2_OTHER);
-
-	if(!buffer)
-		return false;
-		
-	int size = http_request(url, NULL, buffer, (128*1024), SILENT);
-
-	if(size <= 0)
-	{
-		mem2_free(buffer, MEM2_OTHER);
-		return false;
-	}
-	
-	buffer[size-1] = 0;
-	char *str = strstr(buffer, "url_encoded_fmt_stream_map");
-
-	if(str == NULL)
-	{
-		mem2_free(buffer, MEM2_OTHER);
-		return false;
-	}
-
-	int fmt, chosenFormat = 0;
-	char *urlc, *urlcod, *urlcend, *fmtc, *fmtcend;
-	char format[5];
-	
-	// get start point
-	urlc = str+30;
-	
-	// get end point
-	char *strend = strstr(urlc,"\"");
-	
-	if(strend == NULL)
-	{
-		mem2_free(buffer, MEM2_OTHER);
-		return false;
-	}
-	
-	strend[0] = 0; //terminate the string
-	
-	// work through the string looking for required format
-	while(chosenFormat != WiiSettings.youtubeFormat && urlc < strend-10)
-	{
-		//find section end ,
-		//and set pointer to next section
-		urlcend = strstr(urlc, ",");
-	    char *nexturl = urlcend + 1;
-		if(!urlcend) urlcend = strend; // last section
-		
-		snprintf(newurl,urlcend-urlc+1,"%s",urlc); //get section with 0
-
-		// remove 3 levels of url codes
-		url_unescape_string(newurl, newurl); // %252526 = %2526
-		url_unescape_string(newurl, newurl); // %2526 = %26
-		url_unescape_string(newurl, newurl); // %26 = &
-		
-		char *sig;
-		int siglen;
-		
-		while (1)
-		{
-			// replace \u0026 with &
-			sig = strstr(newurl,"u0026");
-			if (!sig) break;
-			siglen = strlen(newurl)-(sig+5-newurl)+1;
-			if(siglen <= 0) break;
-			memmove(sig,sig+5,siglen);
-			memmove(sig-1,"&",1);
-		}
-		
-		//get format code of this section
-		fmtc = strstr(newurl, "itag="); // find itag= within section
-		if(!fmtc) break;
-		
-		fmtcend = strstr(fmtc+5,"&");  // delimited by next & tag within url
-		if(!fmtcend) break;
-		
-		snprintf(format, fmtcend-fmtc-5+1, "%s", fmtc+5);
-		
-		fmt = atoi(format);
-
-		if((fmt == 5 || fmt == 18 || fmt == 35) && fmt <= WiiSettings.youtubeFormat && fmt > chosenFormat)
-		{
-			// section is decoded in newurl
-			urlcod = strstr(newurl,"url="); //find start of url in urlc
-			if(!urlcod) break;
-			
-			// put start of section back in urlc
-			snprintf(urlc,urlcod-newurl+1,"%s",newurl); //includes & before url= 
-			
-			// shift end of section after url= to newline with & on end
-			strcpy(newurl,urlcod+4);
-			strcat(newurl,"&");
-			
-			// add start of section to end of section
-			strcat(newurl,urlc);
-			
-			// expand signature   http://xxx&parm=xxx&sig=xxx&parm=xxx&0
-			sig = strstr(newurl,"&sig=");  // = 19
-			// get length of shift data including = and/0
-			siglen = strlen(newurl)-(sig-newurl)-3; // =37-(19-0)-3= 15   =xxx&parm=xxx&0
-			// shift signature data within newurl  
-			memmove(sig+10,sig+4,siglen);   // make 6 spaces                 http://xxx&parm=xxx&sig......=xxx&parm=xxx&0
-			memmove(sig,"&signature=",11);  // insert &signature= in newurl  http://xxx&parm=xxx&signature=xxx&parm=xxx&0
-			
-			// remove &type=
-			sig = strstr(newurl,"&type=");    //http://xxx&type=xxx&signature=xxx&parm=xxx&0 =  10
-			char *sigend = strstr(sig+6,"&"); // = 19
-			siglen = strlen(newurl)-(sigend-newurl)+1; // get length of shift data including /0 = 43-(19-0)+1=25
-			memmove(sig,sigend,siglen);     // shift data within newurl  http://xxx&type=xxx&signature=xxx&parm=xxx&0
-			
-			// remove &fallback_host=
-			sig = strstr(newurl,"&fallback_host=");
-			sigend = strstr(sig+15,"&");
-			siglen = strlen(newurl)-(sigend-newurl)+1; // get length of shift data including /0
-			memmove(sig,sigend,siglen);                // shift data within newurl
-
-			// remove duplicate &itag=
-			sig = strstr(newurl,"&itag=");
-			sigend = strstr(sig+6,"&");
-			siglen = strlen(newurl)-(sigend-newurl)+1; // get length of shift data including /0
-			memmove(sig,sigend,siglen);                // shift data within newurl
-
-			//remove last &    http://xxx&parm=xxx&parm=xxx&parm=xxx&0
-			siglen = strlen(newurl);  //  =38
-			newurl[siglen-1] = 0;  //  http://xxx&parm=xxx&sig=xxx&parm=xxx00
-
-			chosenFormat = fmt;
-		}
-		urlc = nexturl; // do next section
-	}
-	
-	mem2_free(buffer, MEM2_OTHER);
-
-	if(chosenFormat > 0)
-		return true;
-
-	return false;
-}*/
-
 static GuiFileBrowser *fileBrowser = NULL;
 
 void UpdateBrowser()
@@ -3794,7 +3465,7 @@ static void MenuBrowse(int menu)
 	upOneLevelBtn.SetSelectable(false);
 
 	if(isDynamic) {
-		sprintf(WiiSettings.theme, "%s", "dynamic");
+		sprintf(curTheme, "%s", "dynamic");
 		ChangeTheme();
 	}
 	
@@ -3866,8 +3537,7 @@ static void MenuBrowse(int menu)
 			//else
 			//	ErrorPrompt("Online media file not found.");
 
-			//strcpy(browser.dir, "http://.m3u");
-			sprintf(filepath, "%s%s.plx", neona, neonaII);
+			sprintf(filepath, "%s", onlinePLS);
 			strcpy(browser.dir, filepath);
 			hide_onlinemediafolder = true;
 			
@@ -5675,10 +5345,6 @@ static void MenuSettingsVideos()
 			case 16:
 				WiiSettings.skipLoop ^= 1;
 				break;
-		/*	case 17:
-				WiiSettings.videoDelay += 1;
-				if (WiiSettings.videoDelay > 15)
-					WiiSettings.videoDelay = 0; */
 		}
 
 		if(ret >= 0 || firstRun)
@@ -8236,7 +7902,7 @@ static void SetupGui()
 	navDividerImg->SetPosition(0, 85);
 
 	//for dolphin
-	//sprintf(WiiSettings.theme, "%s", "red");
+	//sprintf(curTheme, "%s", "red");
 
 	//For arg themes
 	ChangeTheme();

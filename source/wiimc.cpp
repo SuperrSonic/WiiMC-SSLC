@@ -1026,6 +1026,11 @@ void cIOS_access(void)
 
 bool use32kHz = false;
 bool useDumbRP = true;
+char curTheme[8] = {0};
+int cover_fade = 0;
+int forceArtVal = 0;
+char onlinePLS[256] = {0};
+char onlineBNR[256] = {0};
 
 void setOption(char* key, char* valuePointer){
 	bool isString = valuePointer[0] == '"';
@@ -1039,19 +1044,17 @@ void setOption(char* key, char* valuePointer){
 		//value = atoi(valuePointer);
 	
 	unsigned int i = 0;
-	for(i=0; i<5; i++){
+	for(i=0; i<10; i++){
 		if(!strcmp("path", key)) {
 			sprintf(loadedFile, valuePointer);
 			AutobootExit = true;
 		} else if(!strcmp("theme", key)) {
-			sprintf(WiiSettings.theme, "%s", valuePointer);
-			if(strcmp(WiiSettings.theme, "dynamic") == 0)
+			sprintf(curTheme, "%s", valuePointer);
+			if(strcmp(curTheme, "dynamic") == 0)
 				isDynamic = true;
-			//printf("give me info: %s", valuePointer);
 		} else if(!strcmp("ios", key)) {
 			isReload = true;
 			iosVal = atoi(valuePointer);
-			//IOS_ReloadIOS(atoi(valuePointer));
 		} else if(!strcmp("32khz", key)) {
 			if(atoi(valuePointer) == 1)
 				use32kHz = true;
@@ -1061,6 +1064,16 @@ void setOption(char* key, char* valuePointer){
 		} else if(!strcmp("3ds", key)) {
 			if(atoi(valuePointer) == 1)
 				want3DS = true;
+		} else if(!strcmp("fadeArtwork", key)) {
+			if(atoi(valuePointer) > 1)
+				cover_fade = atoi(valuePointer);
+		} else if(!strcmp("artForceVal", key)) {
+			if(atoi(valuePointer) > 0)
+				forceArtVal = atoi(valuePointer);
+		} else if(!strcmp("onlinePlaylist", key)) {
+			sprintf(onlinePLS, valuePointer);
+		} else if(!strcmp("onlineBanners", key)) {
+			sprintf(onlineBNR, valuePointer);
 		}
 		//break;
 	}
@@ -1122,19 +1135,6 @@ int main(int argc, char *argv[])
 	SYS_SetResetCallback(ResetCB);
 	
 	__exception_setreload(8);
-	
-	/*if(__di_check_ahbprot() != 1) */
-
-	//if(argc > 2) {
-//		bool ehci = false;
-//		IOS_ReloadIOS(202);
-		//mload_init();
-		//if(mload_init() >= 0 && load_ehci_module())
-//		if(mload_init())
-//			ehci = load_ehci_module();
-			//USB2Enable(true);
-//		USB2Enable(ehci);
-	//}
 
 	// path sent by the plugin's argument
 	if(argc > 1 && (argv[1][0] == 'u' || argv[1][0] == 's' || argv[1][0] == 'h'))
@@ -1149,6 +1149,8 @@ int main(int argc, char *argv[])
 		}
 	}
 	
+	sprintf(onlineBNR, "%s", "http://ia601507.us.archive.org/13/items/var_rvmp/val.txt");
+
 	// My usb drive fails to mount if I use 202, only on Wii boot
 	handleIOSreload();
 

@@ -516,15 +516,6 @@ inline void DrawMPlayer()
 
 	u32 level = 0;
 	_CPU_ISR_Disable(level);
-	//if(flip_pending && !sync_interlace)
-		//VIDEO_WaitVSync();
-/*	if(!CONF_GetProgressiveScan() && vmode->xfbHeight > 240) {
-		//Plays 480i DVDs correctly but breaks everything else.
-		do VIDEO_WaitVSync();
-		while (!VIDEO_GetNextField());
-	}
-	else if(flip_pending)
-		VIDEO_WaitVSync(); */
 	if(sync_interlace == 1 && vmode->fbWidth > 640) {
 		do VIDEO_WaitVSync();
 		while (!VIDEO_GetNextField());
@@ -588,32 +579,16 @@ inline void DrawMPlayer()
 	}
 #if 1
 else {
-	/*u16 xfb_copypt = vmode->fbWidth >> 1;
-	
-	for (int dxs = 0; dxs < 2; dxs++) {
-		u16 efb_offset = (xfb_copypt & ~15) * dxs;
-		GX_SetScissorBoxOffset(efb_offset, 0);
-		GX_CallDispList(dlist, 32);
-		
-		u32 xfb_offset = (xfb_copypt * VI_DISPLAY_PIX_SZ) * dxs;
-		
-		//printf("get size: %d...", xfb_offset);
-		GX_CopyDisp(xfb[whichfb] + xfb_offset, GX_TRUE);
-	}*/
-	
 	if(!point_on) {
-	if(copyScreen == 1) // For GC controller
-	{
-		;
-	//	if(controlledbygui != 2)
-		//	TakeScreenshot();
-		//copyScreen = 2;
-	}
-	else
-	{
-		safe_gc = true;
-		drawMode = DrawMPlayerGui();
-	}
+		if(copyScreen == 1) // For GC controller
+		{
+			;
+		}
+		else
+		{
+			safe_gc = true;
+			drawMode = DrawMPlayerGui();
+		}
 	}
 	
 	//set interlace mode if needed
@@ -645,23 +620,12 @@ else {
 			GX_SetDispCopySrc(0, 0, corr_wh, half_ht);
 
 			GX_CallDispList(dlist, 32);
-		/*	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);
-				GX_Position1x8(0); GX_Color1x8(0); GX_TexCoord1x8(0); GX_TexCoord1x8(4); GX_TexCoord1x8(0);
-				GX_Position1x8(1); GX_Color1x8(0); GX_TexCoord1x8(1); GX_TexCoord1x8(5); GX_TexCoord1x8(1);
-				GX_Position1x8(2); GX_Color1x8(0); GX_TexCoord1x8(2); GX_TexCoord1x8(6); GX_TexCoord1x8(2);
-				GX_Position1x8(3); GX_Color1x8(0); GX_TexCoord1x8(3); GX_TexCoord1x8(7); GX_TexCoord1x8(3);
-			GX_End();*/
 		if(copyScreen == 1)
 		{
 			if(controlledbygui != 2) {
-			//	vmode->fbWidth = 640;
-			//	VIDEO_Configure(vmode);
-			//	VIDEO_Flush();
 				SetMplTiledOff();
 				if(sync_interlace > 0)
 					SetInterlaceOff();
-			//	GX_CopyDisp(xfb[whichfb], GX_TRUE);
-				//TakeScreenshot();
 				goBackto = true;
 				break;
 			}
@@ -712,7 +676,6 @@ else {
 	GX_SetDrawDone();
 	//VIDEO_SetNextFramebuffer(xfb[whichfb]);
 	need_wait=true;
-	//usleep(1000 * delay_amount);
 }
 
 void GX_AllocTextureMemory()
