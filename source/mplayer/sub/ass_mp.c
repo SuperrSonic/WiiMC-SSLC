@@ -70,6 +70,8 @@ static void init_style(ASS_Style *style, const char *name, double playres)
 		fs *= 1.3;
 	else if (subtitle_autoscale == 3)
 		fs *= 1.4;
+	else
+		fs = 24;
 	style->FontSize = fs;
 
 	if (ass_color) c1 = strtoll(ass_color, NULL, 16);
@@ -271,9 +273,10 @@ static void adjust_font_scale(ASS_Track* track)
 	extern int mplayerheight;
 	extern float mplayer_ass_font_scale;
 
-	//TODO: find out why this code is here, there is no embedded font support.
-	//This messes EIA-608 FFmpeg converted ASS files that use those playres values.
+	//The case that I've commented out handles the font size of non-ass subs
+	//to fix this, just rely on setting init_styles FontSize to a hard default.
 	
+	//This messes EIA-608 FFmpeg converted ASS files that use those playres values.
 	//if(track && track->PlayResY == 288	&& (!track->PlayResX || track->PlayResX==384)) // embedded font not detected
 		//ass_font_scale = ((double)mplayerheight / (double)gx_height * mplayer_ass_font_scale * 2.0f)+3.0f;
 	//else
