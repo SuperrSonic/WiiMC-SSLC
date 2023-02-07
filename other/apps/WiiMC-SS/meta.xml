@@ -42,5 +42,6 @@ to control nearly everything.
 <!--	<arg>artForceVal=1</arg> -->
 <!--	<arg>onlinePlaylist=http://link-to-m3u</arg> -->
 <!--	<arg>onlineBanners=http://link-to-text</arg> -->
+<!--	<arg>hide240p=true</arg> -->
   </arguments>
 </app>

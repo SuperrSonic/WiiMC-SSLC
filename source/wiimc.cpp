@@ -58,7 +58,6 @@ static bool load_ehci_module()
 		return false;
 	
 	if (mload_run_thread(my_data_elf.start, my_data_elf.stack, my_data_elf.size_stack, my_data_elf.prio) < 0) {
-	//	usleep(1000);
 		usleep(100);
 		if (mload_run_thread(my_data_elf.start, my_data_elf.stack, my_data_elf.size_stack, 0x47) < 0)
 			return false;
@@ -1026,6 +1025,7 @@ void cIOS_access(void)
 
 bool use32kHz = false;
 bool useDumbRP = true;
+bool hide240p = false;
 char curTheme[8] = {0};
 int cover_fade = 0;
 int forceArtVal = 0;
@@ -1034,17 +1034,15 @@ char onlineBNR[256] = {0};
 
 void setOption(char* key, char* valuePointer){
 	bool isString = valuePointer[0] == '"';
-	//char value = 0;
 	
 	if(isString) {
 		char* p = valuePointer++;
 		while(*++p != '"');
 		*p = 0;
-	} //else
-		//value = atoi(valuePointer);
+	}
 	
 	unsigned int i = 0;
-	for(i=0; i<10; i++){
+	for(i=0; i<12; i++){
 		if(!strcmp("path", key)) {
 			sprintf(loadedFile, valuePointer);
 			AutobootExit = true;
@@ -1074,6 +1072,9 @@ void setOption(char* key, char* valuePointer){
 			sprintf(onlinePLS, valuePointer);
 		} else if(!strcmp("onlineBanners", key)) {
 			sprintf(onlineBNR, valuePointer);
+		} else if(!strcmp("hide240p", key)) {
+			if(atoi(valuePointer) == 0)
+				hide240p = true;
 		}
 		//break;
 	}
@@ -1148,8 +1149,6 @@ int main(int argc, char *argv[])
 			handleConfigPair(argv[i]);
 		}
 	}
-	
-	sprintf(onlineBNR, "%s", "http://ia601507.us.archive.org/13/items/var_rvmp/val.txt");
 
 	// My usb drive fails to mount if I use 202, only on Wii boot
 	handleIOSreload();

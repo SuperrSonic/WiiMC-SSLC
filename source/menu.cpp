@@ -304,21 +304,19 @@ static u64 ssTimer_2 = 0; // banner ss
 int cnt_tes = 0; //delete ??
 static vu32* HW_VIDIM = (vu32*)0xCD80001C;
 bool dontdim = false;
-//int adjustSS;
-//bool forwardOK = false;
 
 bool isUpdateArt = false; // Start looking for new art.
 bool update_art = false; // Removes current art.
 bool ssUpdateArt = false; // Sigh
 static u64 artTimer = 0;
-bool artFirst = true; // is static
+bool artFirst = true; // is static (well... is it?)
 static bool hide_onlinemediafolder = false;
 extern bool isDynamic;
 int isRepeat = 0;
 extern char curTheme[];
 extern int cover_fade;
 extern int forceArtVal;
-//extern int loop_ed_point; //for ADX endpoints, could probably move this to mplayer
+extern bool hide240p;
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
 {	
@@ -562,17 +560,6 @@ static void *ScreensaverThread(void *arg)
 							if(audiobarNowPlayingBtn->IsVisible())
 								audiobarNowPlayingBtn->SetVisible(false);
 						}
-					/*	if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
-							thumbImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
-							thumbImg->SetPosition(((thumbImg->GetWidth()*thumbImg->GetScaleX())-screenwidth)/2, (448-screenheight)/2);
-							thumbImg->SetScale(448, screenheight-32);
-							if(audiobarNowPlayingBtn->IsVisible())
-								audiobarNowPlayingBtn->SetVisible(false);
-							if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
-								w.SetPosition(586, 170);
-							} else
-							w.SetPosition(372, 170);
-						} */
 						break;
 					case ART_FULL:
 						thumbImg->SetAlignment(ALIGN_CENTRE, ALIGN_MIDDLE);
@@ -680,11 +667,6 @@ static void *ScreensaverThread(void *arg)
 			// Hide text info
 			if(audiobarNowPlayingBtn->IsVisible())
 				audiobarNowPlayingBtn->SetVisible(false);
-			
-			/*if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
-				w.SetPosition(530, 170);
-			} else
-				w.SetPosition(372, 170);*/
 		}
 		
 		if((menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit == 0 && !thumbImg->IsVisible() && !audiobarNowPlayingBtn->IsVisible() && WiiSettings.screensaverArt < ART_FULL)
@@ -821,17 +803,6 @@ static void *ScreensaverThread(void *arg)
 			} else
 				logoReset = 0; //check if this fixes it.
 
-			//printf("give me size: %d,%d -", x, y); //348x172
-			//while(x < 210 solves Type Side.
-			//while(y < 104 solves the Top clipping.
-			
-			//y = thumbHeight-172+30;
-			//y = screenheight-160;
-		/*	y=thumbHeight-72;
-			char debug_txtmem[8];
-			sprintf(debug_txtmem, "%d", y);
-			audiobarNowPlaying[0]->SetText(debug_txtmem); */
-			//w.SetPosition(560, 308);
 			if(menuCurrent == MENU_BROWSE_VIDEOS && WiiSettings.bannerLimit != 0) {
 				if (CONF_GetAspectRatio() == CONF_ASPECT_16_9) {
 					x = 530;
@@ -1065,21 +1036,6 @@ static void *GuiThread (void *arg)
 		if(guiHalt == 2)
 			break;
 
-		//hack for reconnecting audio streams
-		/*	if(waitReload && reloadTimer == 0)
-				reloadTimer = gettime();
-			if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 6) {
-				waitReload = 0;
-				reloadTimer = 0;
-				
-				//FindNextFile(true);
-				
-				LoadNewFile();
-				//it keeps crashing but works sometimes.
-				
-				//wiiLoadFile(loadedFile, NULL);
-			}*/
-		
 		//Tiled rendering might be out of the question pero que tal para el screensaver??
 		//if(!screensaverThreadHalt) {
 		//if(ssIsActive && menuCurrent == MENU_BROWSE_VIDEOS) { //works well to avoid rare crash in music tab.
@@ -1663,17 +1619,6 @@ void ChangeTheme()
 		btnBottomOver->SetImage(button_bottom_over_png);
 		arrowRightSmall->SetImage(arrow_right_small_png);
 	}
-/*	else if(strcmp(curTheme, "pink") == 0)
-	{
-		//idea to add simple themes that don't take so much space.
-		GuiImage *pink_blend = NULL;
-		pink_blend = new GuiImage(768,screenheight,(GXColor){255, 192, 203, 200});
-		if(screenwidth > 640)
-			pink_blend->SetScaleX(1.112f);
-		
-		bgImg->SetAlpha(0);
-		menuWindow->Append(pink_blend);
-	} */
 	else if(strcmp(curTheme, "blank") == 0)
 	{
 		bgImg->SetAlpha(0);
@@ -2747,14 +2692,6 @@ static void *ThumbThread (void *arg)
 
 					if(upArt && upArt_hard && isUpdateArt) {
 							isUpdateArt = false;
-							
-						/*	ShowAreaInfo(MEM2_OTHER); // Check gui and other
-							char debug_txtmem[32];
-							//sprintf(debug_txtmem, "%d", debug_space);
-							sprintf(debug_txtmem, "m1(%.4f) m2(%.4f) gui(%d) #%d",
-							((float)((char*)SYS_GetArena1Hi()-(char*)SYS_GetArena1Lo()))/0x100000,
-							((float)((char*)SYS_GetArena2Hi()-(char*)SYS_GetArena2Lo()))/0x100000, debug_space, artCounter);
-							audiobarNowPlaying[0]->SetText(debug_txtmem); */
 
 						//NOTE: Changing all sprintf to snprintf gave me constant crashes.
 						//Why? Maybe I should remove all snprintf to avoid random crashes?
@@ -2792,7 +2729,6 @@ static void *ThumbThread (void *arg)
 									*loc_dot = 0;
 								} else
 									artFailed = true;
-								//audiobarNowPlaying[0]->SetText(linktoArt);
 							} else
 								artFailed = true;
 						} else
@@ -2917,7 +2853,6 @@ static void *ThumbThread (void *arg)
 						//printf("give me info: %s", linktoArt);
 						//test links
 						//http://yggdrasilradio.net/images/albumart/az_B6177_Beatless_Tokyo Performance Doll.jpg
-						//http://yggdrasilradio.net/images/albumart/az_B112623_Blend S_Waki Azumi, Kito Akari, Haruno Anzu.jpg
 						//http://yggdrasilradio.net/images/albumart/az_B5275__Kawada Mami.jpg
 						
 						if(pCh == NULL && isYggdrasil) {
@@ -2937,12 +2872,6 @@ static void *ThumbThread (void *arg)
 									sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/thumbs/%s.jpg", linktoArt); // site thumbs
 									break;
 							}
-						/*	if(WiiSettings.yggdrasilQuality == YGG_HI)
-								sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/%s", linktoArt); // site highest quality
-							else if(WiiSettings.yggdrasilQuality == YGG_THUMB_LARGE)
-								sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/largethumbs/%s.jpg", linktoArt); // site thumbs
-							else
-								sprintf(finalArt, "http://yggdrasilradio.net/images/albumart/thumbs/%s.jpg", linktoArt); // site thumbs */
 						} else if(pCh == NULL && isAnisonFM) {
 							switch(WiiSettings.anisonfmQuality)
 							{
@@ -2978,7 +2907,6 @@ static void *ThumbThread (void *arg)
 							update_art = true;
 						if(yggNoUpdate)
 							update_art = false;
-						//strcpy(dupeArt, finalArt);
 						sprintf(dupeArt, "%s", finalArt);
 						artFirst = false;
 						
@@ -2990,19 +2918,7 @@ static void *ThumbThread (void *arg)
 						//++artCounter;
 						// Report: #2620 runs, no problem so far (~4 hours)
 					}
-		
-		//Workaround for regular art conflicting with banner ss
-		//needs more testing, weird dolphin error.
-		//if(embedded_pic == 1 && bannerSSactive) {
-	/*	if(embedded_pic == 1 && menuCurrent == MENU_BROWSE_VIDEOS) {
-			embedded_pic = 0;
-			thumbIndex = NULL;
-			if(pos_pic) mem2_free(pos_pic, MEM2_OTHER);
-			thumbLoad = false;
-			//NOTE: I want embedded art on videos too, but it's causing problems
-			//especially with the banner ss.
-		}*/
-		
+					
 		if(thumbBuffer && thumbLoad)
 		{
 			thumbLoad = false;
@@ -3058,11 +2974,6 @@ static void *ThumbThread (void *arg)
 					// Reset flag
 					//artFailed = false;
 					
-				//	sprintf(year_txt, "%s", "\0");
-				//	sprintf(desc_txt, "%s", "\0");
-				//	memset(WiiSettings.descTxt,0,strlen(WiiSettings.descTxt));
-				//	memset(WiiSettings.yearNum,0,strlen(WiiSettings.yearNum));
-					
 					LoadThumbsFileHTTP(loadIndex->xml);
 					
 					if (WiiSettings.numThumb > 0) {
@@ -3076,8 +2987,6 @@ static void *ThumbThread (void *arg)
 							mem2_free(WiiSettings.yearNum, MEM2_DESC);
 						}
 					}
-				//	mem2_free(WiiSettings.descTxt, MEM2_DESC);
-				//	mem2_free(WiiSettings.yearNum, MEM2_DESC);
 					loadIndex->year = mem2_strdup(year_txt, MEM2_DESC);
 					loadIndex->desc = mem2_strdup(desc_txt, MEM2_DESC);
 					mem2_free(loadIndex->year, MEM2_DESC);
@@ -3286,10 +3195,7 @@ static void *ThumbThread (void *arg)
 						
 						// Should work but because of the 768px difference I increase it depending on size.
 						//thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)192/thumbImg->GetWidth() : (float)138/thumbImg->GetWidth());
-						/* if (CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-							thumbImg->SetScaleX(thumbImg->GetWidth() == 256 ? (float)(192+38)/thumbImg->GetWidth() :
-							(float)(141+30)/thumbImg->GetWidth()); // (float)(141+30) for 141
-						*/
+						
 						//printf("get that width: %.4f", thumbImg->GetScaleX());
 						thumbHeight *= thumbImg->GetScaleY();
 						//banner ss
@@ -4480,7 +4386,11 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "JPEG Resample");
 	sprintf(options.name[i++], "Night Filter");
 	sprintf(options.name[i++], "Screen Burn-in Reduction");
-	sprintf(options.name[i++], "Double Strike");
+	
+	if(hide240p)
+		sprintf(options.name[i++], nulo);
+	else
+		sprintf(options.name[i++], "Double Strike");
 	
 	if(VIDEO_HaveComponentCable())
 		sprintf(options.name[i++], "Force 576p");
@@ -5729,7 +5639,6 @@ static void MenuSettingsOnlineMedia()
 	char nulo[1] = {'\0'};
 
 	sprintf(options.name[i++], "Cache Fill");
-	//sprintf(options.name[i++], "YouTube Quality");
 	if(!hide_onlinemediafolder)
 		sprintf(options.name[i++], "Online Media Folder");
 	else
@@ -5804,14 +5713,6 @@ static void MenuSettingsOnlineMedia()
 				if(WiiSettings.onlineCacheFill > 100)
 					WiiSettings.onlineCacheFill = 5;
 				break;
-			/*case 1:
-				if(WiiSettings.youtubeFormat == 5)
-					WiiSettings.youtubeFormat = 43;
-				else if(WiiSettings.youtubeFormat == 18)
-					WiiSettings.youtubeFormat = 35;
-				else
-					WiiSettings.youtubeFormat = 5;
-				break;*/
 			case 1:
 				OnScreenKeyboard(WiiSettings.onlinemediaFolder, MAXPATHLEN);
 				if(!IsOnlineMediaPath(WiiSettings.onlinemediaFolder))
@@ -8010,6 +7911,8 @@ static void SetupGui()
 	onlineBtn->SetAlignment(ALIGN_LEFT, ALIGN_TOP);
 	onlineBtn->SetPosition(210, 30);
 	onlineBtnTip->SetPosition(1, 0); //fixes misalignment in anamorphic mode
+	if(screenwidth > 640)
+		onlineBtnTip->SetPosition(4, 0); //same
 	onlineBtn->SetTooltip(onlineBtnTip);
 	onlineBtn->SetImage(onlineBtnImg);
 	onlineBtn->SetImageOver(onlineBtnOverImg);
