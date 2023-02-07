@@ -1795,6 +1795,9 @@ static bool ParseDirEntries()
 			//	GetDisplay(f_entry, art_disp, 256);
 				/* Remove the extension. */
 				StripExt(entry->d_name);
+				//NOTE: A folder will be assumed to have an extension if a period is detected.
+				//An exception could be made, but more stuff in menu.cpp would need to be changed
+				//so for now it's best to adjust folder names to avoid this issue.
 
 				/* Add .thumb extension */
 				strcat(entry->d_name, ".jpg");
@@ -1811,7 +1814,7 @@ static bool ParseDirEntries()
 				f_entry->type = TYPE_FOLDER;
 
 				if(strcmp(entry->d_name, "..") == 0)
-					sprintf(tmp, "%s (%s)", gettext("Up One Level"), GetParentDir());
+					sprintf(tmp, "%s (%s)", gettext(" .."), GetParentDir());
 				else
 					snprintf(tmp, MAXJOLIET, "%s", f_entry->file);
 
@@ -1956,7 +1959,7 @@ ParseDirectory(bool waitParse)
 		DeleteEntryFiles(f_entry);
 		return 0;
 	}
-	f_entry->display = mem2_strdup(gettext("Up One Level"), MEM2_BROWSER);
+	f_entry->display = mem2_strdup(gettext(" .."), MEM2_BROWSER);
 	if(!f_entry->display) // no mem
 	{
 		DeleteEntryFiles(f_entry);
@@ -2163,7 +2166,7 @@ static int ParsePLXPlaylist()
 		mem2_free(buffer, MEM2_OTHER);
 		return -1;
 	}	
-	f_entry->display = mem2_strdup(gettext("Up One Level"), MEM2_BROWSER);
+	f_entry->display = mem2_strdup(gettext(" .."), MEM2_BROWSER);
 	if(!f_entry->display) // no mem
 	{
 		DeleteEntryFiles(f_entry);
@@ -2387,7 +2390,7 @@ int ParsePlaylistFile()
 				f_entry->type = TYPE_FOLDER;
 			}
 
-			f_entry->display = mem2_strdup(gettext("Up One Level"), MEM2_BROWSER);
+			f_entry->display = mem2_strdup(gettext(" .."), MEM2_BROWSER);
 			if(!f_entry->display) // no mem
 			{
 				DeleteEntryFiles(f_entry);
@@ -2516,7 +2519,7 @@ int ParseOnlineMedia()
 			DeleteEntryFiles(f_entry);
 			return 0;
 		}
-		f_entry->display = mem2_strdup(gettext("Up One Level"), MEM2_BROWSER);
+		f_entry->display = mem2_strdup(gettext(" .."), MEM2_BROWSER);
 		if(!f_entry->display) // no mem
 		{
 			DeleteEntryFiles(f_entry);
