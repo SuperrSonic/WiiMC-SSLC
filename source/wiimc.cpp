@@ -1026,6 +1026,7 @@ void cIOS_access(void)
 bool use32kHz = false;
 bool useDumbRP = true;
 bool hide240p = false;
+bool hide576p = false;
 char curTheme[8] = {0};
 int cover_fade = 0;
 int forceArtVal = 0;
@@ -1073,8 +1074,11 @@ void setOption(char* key, char* valuePointer){
 		} else if(!strcmp("onlineBanners", key)) {
 			sprintf(onlineBNR, valuePointer);
 		} else if(!strcmp("hide240p", key)) {
-			if(atoi(valuePointer) == 0)
+			if(atoi(valuePointer) == 1)
 				hide240p = true;
+		} else if(!strcmp("hide576p", key)) {
+			if(atoi(valuePointer) == 1)
+				hide576p = true;
 		}
 		//break;
 	}

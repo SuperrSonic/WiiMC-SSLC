@@ -317,6 +317,7 @@ extern char curTheme[];
 extern int cover_fade;
 extern int forceArtVal;
 extern bool hide240p;
+extern bool hide576p;
 
 static void UpdateMenuImages(int oldBtn, int newBtn)
 {	
@@ -4392,7 +4393,7 @@ static void MenuSettingsGlobal()
 	else
 		sprintf(options.name[i++], "Double Strike");
 	
-	if(VIDEO_HaveComponentCable())
+	if(VIDEO_HaveComponentCable() && !hide576p)
 		sprintf(options.name[i++], "Force 576p");
 	else
 		sprintf(options.name[i++], nulo);

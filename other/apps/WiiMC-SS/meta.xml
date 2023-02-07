@@ -43,5 +43,6 @@ to control nearly everything.
 <!--	<arg>onlinePlaylist=http://link-to-m3u</arg> -->
 <!--	<arg>onlineBanners=http://link-to-text</arg> -->
 <!--	<arg>hide240p=true</arg> -->
+<!--	<arg>hide576p=true</arg> -->
   </arguments>
 </app>
