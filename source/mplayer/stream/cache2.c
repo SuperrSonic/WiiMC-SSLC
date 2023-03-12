@@ -77,12 +77,6 @@ extern void ShowProgress (const char *msg, int done, int total);
 #include "cache2.h"
 #include "mp_global.h"
 
-//testing here
-/*extern int lp0;
-extern int lp1;
-extern int lp2;
-extern int lp3; */
-
 typedef struct {
   // constats:
   unsigned char *buffer;      // base pointer of the allocated buffer memory
@@ -582,12 +576,10 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
 	while(!CacheThreadSuspended()) {
 		usleep(50);
 
-		if(getMESS != 0) { //this doesn't hit, but let's assume it's useful for edgecases
-			return 0;
-		}
-		//lp0 = 1;
+		//if(getMESS != 0) { //this doesn't hit, but let's assume it's useful for edgecases
+		//	return -1;
+		//}
 	}
-	//lp0 = 0;
 	cachearg = s;
 	stop_cache_thread = 0;
 	ResumeCacheThread();
@@ -619,7 +611,6 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
 		//getWeird = 8;
 		//return -1; //it's unlikely but let's assume in case of edgecases
 	//}
-	//lp1 = 1;
 	
 #ifdef GEKKO
 	if(s->stream->type == STREAMTYPE_STREAM && cntReconnect == 0)
@@ -631,7 +622,6 @@ int stream_enable_cache(stream_t *stream,int size,int min,int seek_limit){
 	  goto err_out;
         }
     }
-	//lp1 = 0;
 
     mp_msg(MSGT_CACHE,MSGL_STATUS,"\n");
     return 1; // parent exits
@@ -661,13 +651,11 @@ static void ThreadProc( void *s ){
     if(!cache_fill(s)){
 	 usec_sleep(FILL_USLEEP_TIME); // idle
     }else usec_sleep(500);
-	//lp2  = 1;
 #ifndef GEKKO
   } while (cache_execute_control(s));
 #else
-  } while (cache_execute_control(s) && !stop_cache_thread && getMESS == 0); //not this, but let's assume due to edgecases
-  //} while (cache_execute_control(s) && !stop_cache_thread); //not this
-  //lp2 = 0;
+  //} while (cache_execute_control(s) && !stop_cache_thread && getMESS == 0); //not this, but let's assume due to edgecases
+  } while (cache_execute_control(s) && !stop_cache_thread); //not this
 #endif  
 #if defined(__MINGW32__) || defined(__OS2__)
   _endthread();
@@ -839,9 +827,8 @@ int stream_read(stream_t *s,char* mem,int total)
 		getINFO = 0;
 		return 0;
 	}*/
-	if(getMESS != 0) //don't care, let's assume there's an edgecase that still fails rarely...
-		return 0;
-	//lp3 = 1;
+	//if(getMESS != 0) //don't care, let's assume there's an edgecase that still fails rarely...
+		//return 0;
 
     if(s->buf_len-s->buf_pos==0)
     {
@@ -859,7 +846,6 @@ int stream_read(stream_t *s,char* mem,int total)
     s->buf_pos+=x; mem+=x; len-=x;
     LWP_MutexUnlock(cache_mutex);
   }
-  //lp3 = 0;
   return total;
 }
 
