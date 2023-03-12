@@ -1,7 +1,7 @@
 # WiiMC-SS features:
 - Embedded cover art in MP3, MP4 (AAC, ALAC), FLAC, OGG, WMA, and AIFF.
 - Dynamic cover art updating from Tunein, Yggdrasil Radio, and ANISON.FM.
-- Tiled rendering (true 720x480p) allows better scaling.
+- Automatic tiled rendering (true 720x480p) allows better scaling.
 - Enable vsync in 30 fps videos in 480i/p modes.
 - Correct display of interlaced video in MPEG-2 files. Other codecs using MKV elements.
 - Subtitles always use DAR instead of SAR.
