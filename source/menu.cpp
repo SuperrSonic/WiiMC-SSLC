@@ -301,7 +301,7 @@ bool menuMode = 0; // 0 - normal GUI, 1 - GUI for MPlayer
 static int slideshow = 0; // slideshow mode
 static u64 ssTimer = 0;
 static u64 ssTimer_2 = 0; // banner ss
-int cnt_tes = 0; //delete ??
+u16 cnt_tes = 0;
 static vu32* HW_VIDIM = (vu32*)0xCD80001C;
 bool dontdim = false;
 
@@ -831,6 +831,9 @@ static void *ScreensaverThread(void *arg)
 					audiobarNowPlayingBtn->SetVisible(false);
 					//w.Remove(audiobarNowPlayingBtn);
 				
+				// Hey! This should be a setting
+			//	lessPos = 160;
+				
 				//if(lessPos > 2)
 					thumbImg->SetVisible(true);
 				w.SetPosition(x-lessPos, y);
@@ -1025,9 +1028,9 @@ static void *GuiThread (void *arg)
 	int i;
 	ssTimer = 0;
 	ssTimer_2 = 0;
-	u32 bannerTimer = 19; //og 22
+	u32 bannerTimer = 16;
 	if(CONF_GetAspectRatio() == CONF_ASPECT_16_9)
-		bannerTimer = 14; //og 14
+		bannerTimer = 14;
 
 	while(1)
 	{
@@ -1046,7 +1049,7 @@ static void *GuiThread (void *arg)
 			vmode->viWidth = 720;
 			for(int j=0;j < 2;++j)
 				VIDEO_ClearFrameBuffer (vmode, xfb[j], COLOR_BLACK);
-			GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+			GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 			f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 			u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 			GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -1132,7 +1135,7 @@ static void *GuiThread (void *arg)
 			vmode->fbWidth = 640;
 		//	vmode->viWidth = Settings.viWidth;
 			GX_SetScissorBoxOffset(0, 0);
-			GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+			GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 			f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 			u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 			GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -1211,6 +1214,13 @@ static void *GuiThread (void *arg)
 			{
 				//Avoid the distortion caused in 4:3 mode, the extra resolution
 				//isn't useful if the texture has to be scaled.
+				
+				//don't bother triggering the first fade
+				if(ssFirst) {
+					doneSafe = true;
+					break;
+				}
+				
 				if(CONF_GetAspectRatio() != CONF_ASPECT_16_9) {
 					for(i = ssFirst ? 255 : 0; i <= 255; i += 15)
 					{
@@ -1257,7 +1267,7 @@ static void *GuiThread (void *arg)
 			}
 			doneSafe = true;
 			
-			//fade-out effect
+			//old fade-out effect
 		/*	for(i = ssFirst ? 255 : 0; i <= 255; i += 15)
 			{
 				doneSafe = false;
@@ -1320,7 +1330,7 @@ static void *GuiThread (void *arg)
 		// Hack to reconnect radio streams
 		if(waitReload && reloadTimer == 0)
 			reloadTimer = gettime();
-		if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 69) {
+		if(waitReload && loadedFile[0] != 0 && diff_sec(reloadTimer, gettime()) > 72) {
 			waitReload = 0;
 			reloadTimer = 0;
 			
@@ -1331,8 +1341,6 @@ static void *GuiThread (void *arg)
 			//65...doesn't work...
 			//68...doesn't work...
 			//69...works
-			//70 works, yes!
-			//80 works, nice
 			//99 secs works but can be better
 			
 			//LoadNewFile();
@@ -2580,15 +2588,14 @@ bool VideoImgVisible()
 	return videoImg->IsVisible();
 }
 
-//int arraylength = 1;
-int numarray[8192];
+u16 numarray[8192];
 static bool shuffleOnce = true;
 unsigned get_inf = time(0);
 
 static bool BNRonce = true;
 
 //Shuffle ss banners, stackoverflow.com
-#if 1
+
 void ShuffleBanners()
 {
 	//if(WiiSettings.bannerLimit == 1)
@@ -2628,7 +2635,6 @@ void ShuffleBanners()
         }
     }
 }
-#endif
 
 /****************************************************************************
  * MenuBrowse
