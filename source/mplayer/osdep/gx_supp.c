@@ -435,7 +435,7 @@ static void draw_scaling()
 	guMtxTransApply(m, m, 0, 0, -100);
 	guMtxConcat(view, m, mv);
 	GX_LoadPosMtxImm(mv, GX_PNMTX0);
-	GX_SetViewport(0, 0, vmode->fbWidth, vmode->efbHeight, 0, 1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f, vmode->fbWidth, vmode->efbHeight, 0, 1);
 }
 
 void GX_ConfigTextureYUV(u16 width, u16 height, u16 chroma_width, u16 chroma_height)
@@ -516,11 +516,16 @@ inline void DrawMPlayer()
 
 	u32 level = 0;
 	_CPU_ISR_Disable(level);
-	if(sync_interlace == 1 && vmode->fbWidth > 640) {
+	
+	// only vsync on field if console output is 29.97 720x480
+	// otherwise heavy fps drops will occur
+	static vu16* const _vigReg = (vu16*)0xCC002030;
+	
+	if(sync_interlace == 1 && vmode->fbWidth > 640 && _vigReg == 0x1001) {
 		do VIDEO_WaitVSync();
 		while (!VIDEO_GetNextField());
 	}
-	else if(sync_interlace == 2 && vmode->fbWidth > 640) {
+	else if(sync_interlace == 2 && vmode->fbWidth > 640 && _vigReg == 0x1001) {
 		do VIDEO_WaitVSync();
 		while (VIDEO_GetNextField());
 	}

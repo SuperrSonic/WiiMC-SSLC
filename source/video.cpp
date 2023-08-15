@@ -391,7 +391,7 @@ void SetDoubleStrikeOff()
 	CONF_GetVideo();
 	vmode = VIDEO_GetPreferredMode(NULL);
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -414,7 +414,7 @@ void SetDoubleStrike()
 	else
 		vmode = &TVNtsc240Ds;
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -439,7 +439,7 @@ void Set576pOff()
 	CONF_GetVideo();
 	vmode = VIDEO_GetPreferredMode(NULL);
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -473,7 +473,7 @@ void Set576p()
 	vmode = &TVPal576ProgScale;
 
 	pal = true;
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,576);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -581,7 +581,7 @@ void SetInterlace()
 	else
 		vmode = &TVNtsc480IntDf;
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -609,7 +609,7 @@ void SetMplTiled()
 	vmode->fbWidth = VI_MAX_WIDTH_NTSC;
 	HOffset();
 	
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -658,7 +658,7 @@ void SetMplTiledOff()
 	vmode->fbWidth = 640;
 	HOffset();
 
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
 	u32 xfbHeight = GX_SetDispCopyYScale(yscale);
 	GX_SetScissor(0,0,vmode->fbWidth,vmode->efbHeight);
@@ -752,7 +752,7 @@ InitVideo2 ()
 	GX_SetCopyClear (background, 0x00ffffff);
 	GX_SetDispCopyGamma (GX_GM_1_0);
 	GX_SetCullMode (GX_CULL_NONE);
-	GX_SetViewport(0,0,vmode->fbWidth,vmode->efbHeight,0,1);
+	GX_SetViewport(1.0f/24.0f,1.0f/24.0f,vmode->fbWidth,vmode->efbHeight,0,1);
 	GX_SetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 	GX_SetAlphaUpdate(GX_TRUE);
 	f32 yscale = GX_GetYScaleFactor(vmode->efbHeight,vmode->xfbHeight);
