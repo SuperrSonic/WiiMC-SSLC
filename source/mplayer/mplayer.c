@@ -4677,7 +4677,7 @@ total_time_usage_start=GetTimer();
 				mpctx->loop_times = -1;
 
 			if(wiiTiledAuto && mpctx->sh_video) {
-				if(mplayerwidth > 640 && mpctx->sh_video->aspect < 1.6f)
+				if(mplayerwidth > 640 && mpctx->sh_video->aspect < 1.6f && CONF_GetAspectRatio() == CONF_ASPECT_16_9)
 					wiiTiledRender = true;
 			}
 #if 0
