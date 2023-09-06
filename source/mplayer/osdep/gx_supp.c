@@ -516,16 +516,11 @@ inline void DrawMPlayer()
 
 	u32 level = 0;
 	_CPU_ISR_Disable(level);
-	
-	// only vsync on field if console output is 29.97 720x480
-	// otherwise heavy fps drops will occur
-	static vu16* const _vigReg = (vu16*)0xCC002030;
-	
-	if(sync_interlace == 1 && vmode->fbWidth > 640 && _vigReg == 0x1001) {
+	if(sync_interlace == 1 && vmode->fbWidth > 640) {
 		do VIDEO_WaitVSync();
 		while (!VIDEO_GetNextField());
 	}
-	else if(sync_interlace == 2 && vmode->fbWidth > 640 && _vigReg == 0x1001) {
+	else if(sync_interlace == 2 && vmode->fbWidth > 640) {
 		do VIDEO_WaitVSync();
 		while (VIDEO_GetNextField());
 	}
