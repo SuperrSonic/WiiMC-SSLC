@@ -15,8 +15,8 @@
 #include <string.h>
 #include <ogcsys.h>
 #include <malloc.h>
-#include "tools.h"
 
+#define ALIGN32(x) (((x) + 31) & ~31)
 #define SECONDS_TO_2000 946684800LL
 #define TICKS_PER_SECOND 60750000LL
 
