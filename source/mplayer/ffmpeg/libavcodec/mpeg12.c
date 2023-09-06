@@ -1569,18 +1569,20 @@ static void mpeg_decode_picture_coding_extension(Mpeg1Context *s1)
 	//Otherwise the following should be safe to enable.
 	
 	//To ignore these flags simply turn off 'Enhanced Resolution' in the settings.
+	if(s->top_field_first)
+		sync_interlace = 1;
+	else
+		sync_interlace = 2;
 	
-	//if (!s->progressive_frame) {
-		if(s->top_field_first)
-			sync_interlace = 1;
-		else
-			sync_interlace = 2;
-	//} else
-	//	sync_interlace = 0;
+	if(s->progressive_frame)
+		sync_interlace = 0;
 
     if (s->progressive_sequence && !s->progressive_frame) {
         s->progressive_frame = 1;
         av_log(s->avctx, AV_LOG_ERROR, "interlaced frame in progressive sequence, ignoring\n");
+		
+		//better to avoid lag caused by excessive vsync
+		sync_interlace = 0;
     }
 
     if (s->picture_structure == 0 || (s->progressive_frame && s->picture_structure != PICT_FRAME)) {
