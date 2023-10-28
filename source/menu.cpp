@@ -2498,6 +2498,10 @@ static void CreditsWindow()
 
 	for(i=0; i < numEntries; i++)
 		delete txt[i];
+
+/*	FILE* fp = fopen("sd1:/REGS_VI.bin", "wb");
+	fwrite((void*)0xCC002000, 1, 0x40, fp);
+	fclose(fp); */
 }
 
 static void *CreditsThread(void *arg)
@@ -3205,11 +3209,13 @@ static void *ThumbThread (void *arg)
 						
 						//printf("get that width: %.4f", thumbImg->GetScaleX());
 						thumbHeight *= thumbImg->GetScaleY();
-						//banner ss
-						if(!screensaverThreadHalt && menuCurrent == MENU_BROWSE_VIDEOS)
-							;
-						else
-							thumbImg->SetVisible(true);
+						//banner ss, I think this was to avoid a glitch
+						//but it makes the banner ss black screen unless cover art is loaded.
+					//	if(!screensaverThreadHalt && menuCurrent == MENU_BROWSE_VIDEOS)
+					//		;
+					//	else
+						thumbImg->SetVisible(true);
+						
 						if(WiiSettings.descTxt != NULL && !secure_type)  // NOTE: Is this necessary?
 							fileInfo->SetText(WiiSettings.descTxt);
 						if(WiiSettings.yearNum != NULL && !secure_type)
