@@ -1718,6 +1718,28 @@ bool ParseDone()
 	return false;
 }
 
+int ParseJPEG()
+{
+	// Count how many JPEG files are found in the banner folder
+	u32 count = 0;
+	DIR *dir;
+	struct dirent *entry = NULL;
+	dir = opendir(WiiSettings.bannerFolder);
+	if (dir != NULL) {
+		while ((entry = readdir(dir)))
+		{
+			size_t length = strlen(entry->d_name);
+			if (length > 4 && stricmp(entry->d_name+length-4, ".JPG") == 0)
+			{
+				count++;
+				if(count > 9000)
+					break;
+			}
+		}
+	}
+	return count;
+}
+
 //int tesy_num = 0;
 //char tesy_cha[50] = { 0 };
 

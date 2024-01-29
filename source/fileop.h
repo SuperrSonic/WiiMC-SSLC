@@ -76,4 +76,6 @@ extern bool selectLoadedFile;
 extern bool foundArt;
 extern size_t loadOffset, loadSize;
 
+int ParseJPEG();
+
 #endif

@@ -4550,6 +4550,15 @@ static void MenuSettingsGlobal()
 			case 12:
 				char limit[8];
 				sprintf(limit, "%04d", WiiSettings.bannerLimit);
+				
+				// count all files so one doesn't need to recall the amount each time
+				if(WiiSettings.bannerLimit > 0 && WiiSettings.bannerFolder != NULL) {
+					u32 parseVal = ParseJPEG();
+					
+					if(parseVal > 0)
+						sprintf(limit, "%04d", parseVal);
+				}
+				
 				if(OnScreenKeypad(limit, 4, true))
 				{
 					if(limit[0] == 0)
