@@ -154,7 +154,7 @@ int http_hack = 1;
 double seek_2_sec = 0;
 bool http_block = false;
 
-bool delay_load = true;
+//bool delay_load = true;
 
 //Improve pacing/sync issues in 30fps videos
 bool halve_fps = true;
@@ -4393,10 +4393,10 @@ GetRelativeTime();
 total_time_usage_start=GetTimer();
 
 // Delay here, fixes slowdown when loading video from slow SD cards
-	if(delay_load && !strncmp(fileplaying,"sd",2)) {
-		sleep(2);
-		delay_load = false;
-	}
+//	if(delay_load && !strncmp(fileplaying,"sd",2)) {
+//		sleep(2);
+//		delay_load = false;
+//	}
 #endif
 
         while (!mpctx->eof) {

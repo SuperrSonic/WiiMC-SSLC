@@ -182,7 +182,7 @@ static void set_default_style(ASS_Style *style)
     style->SecondaryColour  = 0x00ffff00;
     style->OutlineColour    = 0x00000000;
     style->BackColour       = 0x00000080;
-    style->Bold             = 200;
+    style->Bold             = 1; // why was this set to 200?
     style->ScaleX           = 1.0;
     style->ScaleY           = 1.0;
     style->Spacing          = 0;
