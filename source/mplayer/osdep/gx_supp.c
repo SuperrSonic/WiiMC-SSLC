@@ -514,19 +514,19 @@ inline void DrawMPlayer()
 	GX_InvVtxCache();
 	GX_InvalidateTexAll();
 
-	u32 level = 0;
+/*	u32 level = 0;
 	_CPU_ISR_Disable(level);
 	if(sync_interlace == 1 && vmode->fbWidth > 640) {
 		do VIDEO_WaitVSync();
-		while (!VIDEO_GetNextField());
+		while (!VIDEO_GetNextField()); // This allows TV deinterlacing but it does have a speed cost.
 	}
 	else if(sync_interlace == 2 && vmode->fbWidth > 640) {
 		do VIDEO_WaitVSync();
 		while (VIDEO_GetNextField());
 	}
-	else if(flip_pending)
+	else*/ if(flip_pending)
 		VIDEO_WaitVSync();
-	_CPU_ISR_Restore(level);
+	//_CPU_ISR_Restore(level);
 
 	if(!wiiTiledRender || goBackto) {
 	GX_Begin(GX_QUADS, GX_VTXFMT0, 4);

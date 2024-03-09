@@ -56,6 +56,7 @@ bool tiledBlack = false;
 unsigned timerBlack = 12;
 extern bool wiiTiledRender;
 extern bool ssIsActive;
+extern int sync_interlace;
 
 /****************************************************************************
  * TakeScreenshot
@@ -357,13 +358,29 @@ void Draw_VIDEO()
 static void vblank_cb(u32 retraceCnt)
 {
 	if (flip_pending) {
-		VIDEO_SetNextFramebuffer(xfb[whichfb]);
-		VIDEO_Flush();
-		whichfb ^= 1;
-		/*++whichfb;
-		if(whichfb > 2)
-			whichfb = 0;*/
-		flip_pending = false;
+		if(sync_interlace == 1 && vmode->fbWidth > 640) {
+			if(!VIDEO_GetNextField()) {
+				VIDEO_SetNextFramebuffer(xfb[whichfb]);
+				VIDEO_Flush();
+				whichfb ^= 1;
+				/*++whichfb;
+				if(whichfb > 2)
+					whichfb = 0;*/
+				flip_pending = false;
+			}
+		} else if(sync_interlace == 2 && vmode->fbWidth > 640) {
+			if(VIDEO_GetNextField()) {
+				VIDEO_SetNextFramebuffer(xfb[whichfb]);
+				VIDEO_Flush();
+				whichfb ^= 1;
+				flip_pending = false;
+			}
+		} else {
+			VIDEO_SetNextFramebuffer(xfb[whichfb]);
+			VIDEO_Flush();
+			whichfb ^= 1;
+			flip_pending = false;
+		}
 	}
 }
 
