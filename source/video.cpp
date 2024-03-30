@@ -358,17 +358,14 @@ void Draw_VIDEO()
 static void vblank_cb(u32 retraceCnt)
 {
 	if (flip_pending) {
-		if(sync_interlace == 1 && vmode->fbWidth > 640) {
+		if(sync_interlace == 1) {
 			if(!VIDEO_GetNextField()) {
 				VIDEO_SetNextFramebuffer(xfb[whichfb]);
 				VIDEO_Flush();
 				whichfb ^= 1;
-				/*++whichfb;
-				if(whichfb > 2)
-					whichfb = 0;*/
 				flip_pending = false;
 			}
-		} else if(sync_interlace == 2 && vmode->fbWidth > 640) {
+		} else if(sync_interlace == 2) {
 			if(VIDEO_GetNextField()) {
 				VIDEO_SetNextFramebuffer(xfb[whichfb]);
 				VIDEO_Flush();
@@ -638,9 +635,12 @@ void SetMplTiled()
 	
 	// Clear framebuffers
 	VIDEO_SetNextFramebuffer (xfb[0]);
+	
+	// TEST: If 480i is set this line can make line 21 cc work
+	//vmode->viYOrigin = -2;
 
-    VIDEO_Configure(vmode);
-    VIDEO_Flush();
+	VIDEO_Configure(vmode);
+	VIDEO_Flush();
 }
 
 void SetMplTiledOff()
