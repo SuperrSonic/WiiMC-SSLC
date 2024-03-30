@@ -1452,8 +1452,7 @@ void ChangeLanguage()
 {
 	char error[128] = {0};
 
-	//if(WiiSettings.language == LANG_KOREAN || WiiSettings.language == LANG_JAPANESE)
-	if(WiiSettings.language < 7)
+	if(WiiSettings.language < 7 || WiiSettings.language == LANG_KOREAN)
 	{
 		char filepath[MAXPATHLEN];
 		int newFont = 0;
@@ -1465,11 +1464,13 @@ void ChangeLanguage()
 				sprintf(filepath, "%s/ko.ttf", appPath);
 				newFont = FONT_KOREAN;
 				break;
-		/*	case LANG_JAPANESE:
+		#if 0
+			case LANG_JAPANESE:
 				if(currentFont == FONT_JAPANESE) return;
 				sprintf(filepath, "%s/jp.ttf", appPath);
 				newFont = FONT_JAPANESE;
-				break;*/
+				break;
+		#endif
 			case LANG_ENGLISH:
 			case LANG_SPANISH:
 			//case LANG_FRENCH:
