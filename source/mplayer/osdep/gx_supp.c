@@ -165,9 +165,9 @@ void GX_SetScreenPos(int _hor_pos, int _vert_pos, float _hor_zoom, float _vert_z
 	if(wiiTiledRender)
 		hor_zoom = CONF_GetAspectRatio() == CONF_ASPECT_16_9 ? _hor_zoom+.003f : _hor_zoom;
 	else
-		hor_zoom = _hor_zoom;
 #endif
-	//hor_zoom = _hor_zoom;
+		hor_zoom = _hor_zoom;
+
 	vert_zoom = _vert_zoom;
 	GX_UpdateScaling();
 }
@@ -618,8 +618,8 @@ else {
 			GX_SetScissor(hor_offset, half_ht * y, corr_wh + ((8 * pad_wh) * x), half_ht);
 			GX_SetScissorBoxOffset(hor_offset, half_ht * y);
 			GX_SetDispCopySrc(0, 0, corr_wh, half_ht);
-
 			GX_CallDispList(dlist, 32);
+
 		if(copyScreen == 1)
 		{
 			if(controlledbygui != 2) {
@@ -681,7 +681,7 @@ else {
 void GX_AllocTextureMemory()
 {
 	Yltexture = (u8*)mem2_memalign(32, 1024*MAX_HEIGHT, MEM2_VIDEO);
-	Yrtexture = (u8*)mem2_memalign(32, WIDTH_MULT*MAX_HEIGHT, MEM2_VIDEO);
+	Yrtexture = (u8*)mem2_memalign(32, (MAX_WIDTH-1024)*MAX_HEIGHT, MEM2_VIDEO);
 	Utexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);
 	Vtexture = (u8*)mem2_memalign(32, 1024*(MAX_HEIGHT/2), MEM2_VIDEO);        
 }
@@ -709,7 +709,7 @@ void GX_StartYUV(u16 width, u16 height, u16 haspect, u16 vaspect)
 	UVtexsize = (w*h)/4;
 
     memset(Yltexture, 0, 1024*MAX_HEIGHT);
-    memset(Yrtexture, 0, WIDTH_MULT*MAX_HEIGHT);
+    memset(Yrtexture, 0, (MAX_WIDTH-1024)*MAX_HEIGHT);
     memset(Utexture, 0x80, 1024*(MAX_HEIGHT/2));
     memset(Vtexture, 0x80, 1024*(MAX_HEIGHT/2));	
 

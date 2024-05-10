@@ -1165,10 +1165,10 @@ int main(int argc, char *argv[])
 	
 	StartNetworkThread(); //to set net heap aside MEM2 area
 	usleep(100); //force network thread execution
-
-	u32 size = ( (1024*MAX_HEIGHT)+(WIDTH_MULT*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
-                (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot                     
-                (32*1024); // padding	
+	
+	u32 size = ( (1024*MAX_HEIGHT)+((MAX_WIDTH-1024)*MAX_HEIGHT) + (1024*(MAX_HEIGHT/2)*2) ) + // textures
+                (vmode->fbWidth * vmode->efbHeight * 4) + //videoScreenshot
+                (32*1024); // padding
 	AddMem2Area (size, MEM2_VIDEO); 
 	AddMem2Area (2*1024*1024, MEM2_BROWSER);
 	AddMem2Area (7.5*1024*1024, MEM2_GUI);
