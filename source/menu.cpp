@@ -5570,8 +5570,8 @@ static void MenuSettingsDVD()
 					WiiSettings.dvdMenu = 0;
 				*/
 				char title[4];
-				sprintf(title, "%03d", WiiSettings.dvdMenu);
-				if(OnScreenKeypad(title, 4, true))
+				sprintf(title, "%02d", WiiSettings.dvdMenu);
+				if(OnScreenKeypad(title, 2, true))
 				{
 					if(title[0] == 0)
 					{
