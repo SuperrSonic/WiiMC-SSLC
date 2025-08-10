@@ -1729,7 +1729,9 @@ int ParseJPEG()
 		while ((entry = readdir(dir)))
 		{
 			size_t length = strlen(entry->d_name);
-			if (length > 4 && stricmp(entry->d_name+length-4, ".JPG") == 0)
+			if (length > 4 && (stricmp(entry->d_name+length-4, ".JPG") == 0 ||
+								stricmp(entry->d_name+length-5, ".JPEG") == 0 ||
+								stricmp(entry->d_name+length-4, ".PNG") == 0))
 			{
 				count++;
 				if(count > 9000)

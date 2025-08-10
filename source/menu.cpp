@@ -21,6 +21,7 @@
 #include <iso9660.h>
 #include <ogc/lwp_watchdog.h>
 #include <ogc/machine/processor.h>
+#include <dirent.h>
 
 #include "libwiigui/gui.h"
 #include "menu.h"
@@ -2613,10 +2614,11 @@ void ShuffleBanners()
 {
 	//if(WiiSettings.bannerLimit == 1)
 		//return;
-	int low = 1;
-	int	high = WiiSettings.bannerLimit;
-	if(WiiSettings.bannerLimit == 1)
-		high = 2;
+	
+	WiiSettings.bannerLimit = ParseJPEG();
+
+	int low = 0;
+	int	high = WiiSettings.bannerLimit-1;
 
     int arraylength = high - low + 1; //not sure why, but it's including 0 so the 2 fixes that.
     //numarray[arraylength];
@@ -3100,17 +3102,55 @@ static void *ThumbThread (void *arg)
 							}
 						}
 						//testing every banner
-						if(cnt_tes > WiiSettings.bannerLimit-1) {
-							cnt_tes = 0;
-							shuffleOnce = true;
-						}
+				//		if(cnt_tes > WiiSettings.bannerLimit) {
+				//			cnt_tes = 0;
+				//			shuffleOnce = true;
+				//		}
 						if(shuffleOnce) {
 							ShuffleBanners();
 							shuffleOnce = false;
 						}
 						if(!WiiSettings.onlineBanners) {
+						#if 0
 							sprintf(banner_path,"%s%04d.jpg", WiiSettings.bannerFolder, numarray[cnt_tes]);
 							read = LoadFile(thumbBuffer, 880*1024, banner_path, SILENT);
+						#else
+							// Do it regardless of name
+							DIR *dir;
+							struct dirent *entry;
+							dir = opendir(WiiSettings.bannerFolder);
+							if (dir!=NULL) {
+								u32 index = 0;
+								
+								while ((entry = readdir(dir)))
+								{
+									size_t length = strlen(entry->d_name);
+									int i = 0;
+									while(entry->d_name[i] != 0)
+									{
+										if(entry->d_name[i] == 0x2F) { // assume dir
+											length = 0;
+											break;
+										}
+										++i;
+									}
+									if(length < 4)
+										continue;
+									
+									if (numarray[cnt_tes]==index++)
+										break;
+								}
+								
+								sprintf(banner_path,"%s%s", WiiSettings.bannerFolder, entry->d_name);
+								closedir(dir);
+								read = LoadFile(thumbBuffer, 880*1024, banner_path, SILENT);
+								
+								if(cnt_tes > (WiiSettings.bannerLimit-2)) {
+									cnt_tes = 0;
+									shuffleOnce = true;
+								}
+							}
+						#endif
 						} else {
 							sprintf(banner_path,"%s/%04d.jpg", onlineBNR, numarray[cnt_tes]);
 							read = http_request(banner_path, NULL, thumbBuffer, 880*1024, SILENT);
@@ -4403,7 +4443,7 @@ static void MenuSettingsGlobal()
 	sprintf(options.name[i++], "Starting Area");
 	sprintf(options.name[i++], "Artwork Viewer");
 	sprintf(options.name[i++], "Art Folder");
-	sprintf(options.name[i++], "Screensaver Banner Limiter");
+	sprintf(options.name[i++], "Screensaver Banners");
 	sprintf(options.name[i++], "Banner Folder");
 	sprintf(options.name[i++], "JPEG Resample");
 	sprintf(options.name[i++], "Night Filter");
@@ -4557,17 +4597,23 @@ static void MenuSettingsGlobal()
 				CleanupPath(WiiSettings.artworkFolder);
 				break;
 			case 12:
-				char limit[8];
-				sprintf(limit, "%04d", WiiSettings.bannerLimit);
+			//	char limit[8];
+			//	sprintf(limit, "%04d", WiiSettings.bannerLimit);
+				if(WiiSettings.bannerLimit != 0)
+					WiiSettings.bannerLimit = 0;
+				else
+					WiiSettings.bannerLimit = 1;
 				
 				// count all files so one doesn't need to recall the amount each time
+			#if 0
 				if(WiiSettings.bannerLimit > 0 && WiiSettings.bannerFolder != NULL) {
 					u32 parseVal = ParseJPEG();
 					
 					if(parseVal > 0)
 						sprintf(limit, "%04d", parseVal);
 				}
-				
+			#endif
+			#if 0
 				if(OnScreenKeypad(limit, 4, true))
 				{
 					if(limit[0] == 0)
@@ -4580,6 +4626,7 @@ static void MenuSettingsGlobal()
 						WiiSettings.bannerLimit = bannerValue;
 					}
 				}
+			#endif
 				break;
 			case 13:
 				OnScreenKeyboard(WiiSettings.bannerFolder, MAXPATHLEN);
@@ -4716,7 +4763,8 @@ static void MenuSettingsGlobal()
 			
 			sprintf(options.value[10], "%s", WiiSettings.artwork ? "On" : "Off");
 			snprintf(options.value[11], 60, "%s", WiiSettings.artworkFolder);
-			sprintf(options.value[12], "%04d", WiiSettings.bannerLimit);
+			sprintf(options.value[12], "%s, #%04d", WiiSettings.bannerLimit > 0 ?
+													"On" : "Off", WiiSettings.bannerLimit);
 			snprintf(options.value[13], 60, "%s", WiiSettings.bannerFolder);
 			sprintf(options.value[14], "%s", WiiSettings.jpegQuality ? "On" : "Off");
 			sprintf(options.value[15], "%s", WiiSettings.night ? "On" : "Off");
