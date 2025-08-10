@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>WiiMC-SS</name>
+  <version>3.0.0</version>
+  <coder>SuperrSonic</coder>
+  <release_date>2025</release_date>
+  <ahb_access/>
+  <short_description>Wii Media Player</short_description>
+  <long_description>An updated version of WiiMC.
+
+It can now display cover art for popular audio formats
+as well as dynamic art for radio streams.
+
+Videos can be set to have a description alongside
+poster art, and can be shuffled or looped.
+
+Further tweaks and fixes, radio streams can reconnect
+after a minute of inactivity. H.264 videos can have
+deblocking removed to greatly improve speed. ADX/BRSTM
+game sound files can loop correctly.
+
+Interlaced content is handled better by allowing
+sync by field order.
+
+Certain subtitle settings can be overriden by editing
+the settings file.
+
+A horizontal banner scrolling screensaver can be enabled
+for the video section, along with several cover positions
+for the music and online media sections.
+
+The GameCube controller or a Nintendo 3DS can be used
+to control nearly everything.
+  </long_description>
+  <arguments>
+	<arg>theme="random"</arg>
+<!--	<arg>ios=202</arg> -->
+<!--	<arg>32khz=1</arg> -->
+<!--	<arg>dumbRestorePoints=0</arg> -->
+<!--	<arg>3ds=1</arg> -->
+  </arguments>
+</app>
