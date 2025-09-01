@@ -132,6 +132,9 @@ GuiOptionBrowser::GuiOptionBrowser(int w, int s, OptionList * l)
  */
 GuiOptionBrowser::~GuiOptionBrowser()
 {
+	delete bgOptionsEntry;
+	delete bgOptionsEntryOver;
+
 	delete arrowUpBtn;
 	delete arrowDownBtn;
 
